@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{674C78B7-5337-4954-848D-C21724249B98}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{6F072E38-E84E-486A-886D-E33B621A8949}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Teal.CodeEditor</RootNamespace>
-    <AssemblyName>Teal.CodeEditor</AssemblyName>
+    <RootNamespace>Teal.CodeEditor.Test</RootNamespace>
+    <AssemblyName>Teal.CodeEditor.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,70 +22,73 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>default</LangVersion>
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\ArrayList.cs" />
-    <Compile Include="Core\CodeEditor.Control.cs">
-      <SubType>Component</SubType>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Core\CodeEditorConfigs.cs" />
-    <Compile Include="Document\Document.cs" />
-    <Compile Include="Document\DocumentLine.cs" />
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rendering\CodeEditor.Folding.cs">
-      <SubType>Component</SubType>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Rendering\CodeEditor.Gutter.cs">
-      <SubType>Component</SubType>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Rendering\CodeEditor.Layout.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\CodeEditor.Rendering.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\CodeEditor.Scrolling.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\CodeEditor.Sizes.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\FoldingList.cs" />
-    <Compile Include="Rendering\LayoutBreakPoint.cs" />
-    <Compile Include="Rendering\SplitButton.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\VisualElement.cs" />
-    <Compile Include="View\CodeView.cs" />
-    <Compile Include="Win32\Painter.cs" />
-    <Compile Include="Win32\Win32API.Gdi.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Teal.CodeEditor\Teal.CodeEditor.csproj">
+      <Project>{674c78b7-5337-4954-848d-c21724249b98}</Project>
+      <Name>Teal.CodeEditor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\_refs\hardek\Code Editor\CodeEditor\CodeEditor.csproj">
+      <Project>{94bfa44a-f4d0-4605-88e6-3add498f5e16}</Project>
+      <Name>CodeEditor</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
