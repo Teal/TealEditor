@@ -1,0 +1,526 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{436368AE-AF7F-4363-8D1E-B53AE1C80225}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>Library</OutputType>
+    <AssemblyName>AIMS.ScriptControl</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <OutputPath>..\Bin\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AIMS.Docking">
+      <HintPath>..\Bin\AIMS.Docking.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AIMS.Libraries.Scripting.CodeCompletion\AmbienceReflectionDecorator.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.CodeCompletion\CSharpCompletionBinding.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.CodeCompletion\DefaultCodeCompletionBinding.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.CodeCompletion\EventHandlerCompletitionDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.CodeCompletion\ICodeCompletionBinding.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.CodeCompletion\NRefactoryCodeCompletionBinding.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.CodeCompletion\VBNetCompletionBinding.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.CSharp\CSharpAmbience.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.CSharp\CSharpExpressionFinder.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.NRefactoryResolver\NRefactoryASTConvertVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.NRefactoryResolver\NRefactoryInformationProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.NRefactoryResolver\NRefactoryResolver.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.NRefactoryResolver\TypeVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.Refactoring\CodeGenerator.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.Refactoring\CodeGeneratorOptions.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.Refactoring\CSharpCodeGenerator.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.Refactoring\IDocument.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.Refactoring\IDocumentLine.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.Refactoring\NRefactoryCodeGenerator.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.Refactoring\NRefactoryRefactoringProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.Refactoring\RefactoringProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.Refactoring\VBNetCodeGenerator.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.ReflectionLayer\ReflectionClass.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.ReflectionLayer\ReflectionEvent.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.ReflectionLayer\ReflectionField.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.ReflectionLayer\ReflectionMethod.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.ReflectionLayer\ReflectionParameter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.ReflectionLayer\ReflectionProperty.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.ReflectionLayer\ReflectionReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.VBNet\VBExpressionFinder.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom.VBNet\VBNetAmbience.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\AbstractAmbience.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\AbstractDecoration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\AbstractMember.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\AbstractNamedEntity.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\AbstractReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\AnonymousMethodReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ArrayReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\AttributeArgument.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\AttributeTarget.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ClassFinder.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ClassType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\CombinedReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\CompoundClass.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ConstructedReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\Constructor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ConversionFlags.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\CtrlSpaceResolveHelper.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultAttribute.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultClass.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultComment.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultCompilationUnit.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultEvent.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultField.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultMethod.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultParameter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultProjectContent.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultProperty.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultTypeParameter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DefaultUsing.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\Destructor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DiffUtility.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DomAssemblyName.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DomPersistence.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\DomRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ExplicitInterfaceImplementation.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ExpressionContext.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ExpressionResult.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\FilePosition.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\FoldingRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\GacAssemblyName.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\GacInterop.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\GenericReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\GetClassReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\HostCallback.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IAmbience.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IAttribute.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IClass.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IComment.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ICompilationUnit.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IDecoration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IEvent.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IExpressionFinder.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IField.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IMember.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IMethod.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IMethodOrProperty.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IntegerLiteralResolveResult.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IParameter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IProjectContent.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IProperty.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IResolver.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ITypeParameter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\IUsing.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\LanguageProperties.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\LocalResolveResult.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\LoggingService.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\MemberLookupHelper.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\MemberResolveResult.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\MethodResolveResult.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\MixedResolveResult.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ModifierEnum.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\NamespaceResolveResult.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\NullReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ParameterModifiers.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ParseInformation.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ProjectContentRegistry.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ProxyReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ReflectionLoader.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ReflectionProjectContent.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\ResolveResult.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\SearchClassReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\SearchTypeRequest.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\SearchTypeResult.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\SystemTypes.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\TagComment.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\TypeResolveResult.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\VoidClass.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\VoidReturnType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.Dom\XmlDoc.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\AbstractNode.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\AddHandlerStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\AddressOfExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\AnonymousMethodExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ArrayCreateExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ArrayInitializerExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\AssignmentExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\AssignmentOperatorType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\Attribute.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\AttributedNode.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\AttributeSection.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\BaseReferenceExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\BinaryOperatorExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\BinaryOperatorType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\BlockStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\BreakStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\CaseLabel.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\CastExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\CastType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\CatchClause.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\CharsetModifier.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\CheckedExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\CheckedStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ClassReferenceExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ClassType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\CompilationUnit.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ConditionalExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ConditionPosition.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ConditionType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ConstructorDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ConstructorInitializer.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ConstructorInitializerType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ContinueStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ContinueType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ConversionType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\DeclareDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\DefaultValueExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\DelegateDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\DestructorDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\DirectionExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\DoLoopStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ElseIfSection.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\EmptyStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\EndStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\EraseStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ErrorStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\EventAddRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\EventAddRemoveRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\EventDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\EventRaiseRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\EventRemoveRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ExitStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ExitType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\Expression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ExpressionStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\FieldDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\FieldDirection.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\FieldReferenceExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\FixedStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ForeachStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ForNextStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ForStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\GotoCaseStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\GotoStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\IdentifierExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\IfElseStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\IndexerDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\IndexerExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\InnerClassTypeReference.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\INode.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\InterfaceImplementation.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\INullable.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\InvocationExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\LabelStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\LocalVariableDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\LockStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\MethodDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\Modifiers.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NamedArgumentExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NamespaceDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NullArrayInitializerExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NullBlockStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NullConstructorInitializer.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NullEventAddRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NullEventRaiseRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NullEventRemoveRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NullExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NullPropertyGetRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NullPropertySetRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NullStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\NullTypeReference.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ObjectCreateExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\OnErrorStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\OperatorDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\OptionDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\OptionType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\OverloadableOperatorType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ParameterDeclarationExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ParameterModifiers.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ParametrizedNode.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ParenthesizedExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ParentType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\PointerReferenceExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\PrimitiveExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\PropertyDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\PropertyGetRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\PropertyGetSetRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\PropertySetRegion.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\RaiseEventStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ReDimStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\RemoveHandlerStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ResumeStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ReturnStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\SizeOfExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\StackAllocExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\Statement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\StatementWithEmbeddedStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\StopStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\SwitchSection.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\SwitchStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\TemplateDefinition.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ThisReferenceExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\ThrowStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\TryCatchStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\TypeDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\TypeOfExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\TypeOfIsExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\TypeReference.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\TypeReferenceExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\UnaryOperatorExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\UnaryOperatorType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\UncheckedExpression.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\UncheckedStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\UnsafeStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\Using.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\UsingDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\UsingStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\VariableDeclaration.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\WithStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Ast\YieldStatement.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser.CSharp\Keywords.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser.CSharp\Lexer.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser.CSharp\Parser.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser.CSharp\Tokens.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser.VB\Keywords.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser.VB\Lexer.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser.VB\ParamModifierList.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser.VB\Parser.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser.VB\Tokens.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser\AbstractLexer.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser\AbstractParser.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser\ErrorCodeProc.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser\ErrorMsgProc.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser\Errors.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser\ILexer.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser\LookupTable.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser\ModifierList.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser\SpecialTracker.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser\TagComment.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Parser\Token.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\AbstractOutputFormatter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\AbstractPrettyPrintOptions.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\BraceStyle.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\CSharpOutputFormatter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\CSharpOutputVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\InformNode.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\IOutputAstVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\IOutputFormatter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\NodeTracker.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\PrettyPrintOptions.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\SpecialNodesInserter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\SpecialOutputVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\VBNetOutputFormatter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\VBNetOutputVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.PrettyPrinter\VBNetPrettyPrintOptions.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\AbstractAstTransformer.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\AbstractAstVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\CodeDomVerboseOutputGenerator.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\CodeDomVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\CSharpConstructsVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\CSharpToVBNetConvertVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\LocalLookupVariable.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\LookupTableVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\NodeTrackingAstVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\PrefixFieldsVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\ToCSharpConvertVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\ToVBNetConvertVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\VBNetConstructsConvertVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory.Visitors\VBNetToCSharpConvertVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\AbstractSpecial.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\BlankLine.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\Comment.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\CommentType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\DummyEnvironmentInformationProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\IAstVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\IEnvironmentInformationProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\IParser.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\ISpecial.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\ISpecialVisitor.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\Location.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\ParserFactory.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\PreprocessingDirective.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\SnippetParser.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.NRefactory\SupportedLanguage.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\AbstractCodeCompletionDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\AbstractCompletionDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\AttributesDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\CachedCompletionDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\CodeCompletionData.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\CodeCompletionDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\CodeCompletionDataUsageCache.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\CommentCompletionDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\CtrlSpaceCompletionDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\IndexerInsightDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\MethodInsightDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\OverrideCompletionData.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\OverrideCompletionDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.CodeCompletion\TextCompletionDataProvider.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Converter\CodeCompiler.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Converter\CodeConverter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Converter\ConversionEventHandler.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Converter\ReportEventEventArgs.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Converter\ResolveRefEventArgs.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Converter\TlbImp.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Parser\CSharpParser.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Parser\IParser.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Parser\ProjectContentItem.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Parser\ProjectParser.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Parser\VbExpressionFinder.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Parser\VbParser.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\ComReferenceProjectItem.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\CopyToOutputDirectory.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\DefaultProject.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\FileProjectItem.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\ImportProjectItem.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\IProject.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\ItemType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\ProjectItem.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\ProjectReferenceProjectItem.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\ReferenceProjectItem.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\TypeLibrary.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\UnknownProjectItem.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\WebReferencesProjectItem.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Project\WebReferenceUrl.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.Properties\Resources.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\AddWebReferenceDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\AssemblyReferencePanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\AsyncDiscoveryState.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\COMReferencePanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\DiscoveryNetworkCredential.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\GacReferencePanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\HttpAuthenticationHeader.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\IReferencePanel.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\ISelectReferenceDialog.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\ReferenceType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\SelectReferenceDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\UserCredentialsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\WebReference.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\WebReferenceChanges.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\WebServiceDiscoveryClientProtocol.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\WebServicesView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\CodeCompletionOptions.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\Document.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\ErrorList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\ExplorerClickEventArgs.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\ExplorerLabelEditEventArgs.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\GenericConverter.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\ListViewItemEventArgs.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\NewFileDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\NodeType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\Output.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\ParseContentEventArgs.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\ProjectExplorer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\QuickClassBrowserPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\ReadOnlyCollectionWrapper.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\ScriptControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\ScriptLanguage.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\SelectedItemType.cs" />
+    <Compile Include="AIMS.Libraries.Scripting.ScriptControl\Set.cs" />
+    <Compile Include="AIMS.Libraries.Scripting\Action.cs" />
+    <Compile Include="AIMS.Libraries.Scripting\FileErrorPolicy.cs" />
+    <Compile Include="AIMS.Libraries.Scripting\FileOperationDelegate.cs" />
+    <Compile Include="AIMS.Libraries.Scripting\FileOperationResult.cs" />
+    <Compile Include="AIMS.Libraries.Scripting\FileUtility.cs" />
+    <Compile Include="AIMS.Libraries.Scripting\Func.cs" />
+    <Compile Include="AIMS.Libraries.Scripting\NamedFileOperationDelegate.cs" />
+    <Compile Include="ICSharpCode.EasyCodeDom\Easy.cs" />
+    <Compile Include="ICSharpCode.EasyCodeDom\EasyBlock.cs" />
+    <Compile Include="ICSharpCode.EasyCodeDom\EasyCompileUnit.cs" />
+    <Compile Include="ICSharpCode.EasyCodeDom\EasyExpression.cs" />
+    <Compile Include="ICSharpCode.EasyCodeDom\EasyField.cs" />
+    <Compile Include="ICSharpCode.EasyCodeDom\EasyMethod.cs" />
+    <Compile Include="ICSharpCode.EasyCodeDom\EasyNamespace.cs" />
+    <Compile Include="ICSharpCode.EasyCodeDom\EasyProperty.cs" />
+    <Compile Include="ICSharpCode.EasyCodeDom\EasyTypeDeclaration.cs" />
+    <Compile Include="MSjogren.GacTool.FusionNative\Fusion.cs" />
+    <Compile Include="MSjogren.GacTool.FusionNative\IApplicationContext.cs" />
+    <Compile Include="MSjogren.GacTool.FusionNative\IAssemblyCache.cs" />
+    <Compile Include="MSjogren.GacTool.FusionNative\IAssemblyCacheItem.cs" />
+    <Compile Include="MSjogren.GacTool.FusionNative\IAssemblyEnum.cs" />
+    <Compile Include="MSjogren.GacTool.FusionNative\IAssemblyName.cs" />
+    <Compile Include="MSjogren.GacTool.FusionNative\IHistoryReader.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AIMS.Libraries.Scripting.ScriptControl.Properties\Resources.resources" />
+    <EmbeddedResource Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\AddWebReferenceDialog.resources" />
+    <EmbeddedResource Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\SelectReferenceDialog.resources" />
+    <EmbeddedResource Include="AIMS.Libraries.Scripting.ScriptControl.ReferenceDialog\WebServicesView.resources" />
+    <EmbeddedResource Include="AIMS.Libraries.Scripting.ScriptControl\Document.resources" />
+    <EmbeddedResource Include="AIMS.Libraries.Scripting.ScriptControl\ErrorList.resources" />
+    <EmbeddedResource Include="AIMS.Libraries.Scripting.ScriptControl\NewFileDialog.resources" />
+    <EmbeddedResource Include="AIMS.Libraries.Scripting.ScriptControl\Output.resources" />
+    <EmbeddedResource Include="AIMS.Libraries.Scripting.ScriptControl\ProjectExplorer.resources" />
+    <EmbeddedResource Include="AIMS.Libraries.Scripting.ScriptControl\QuickClassBrowserPanel.resources" />
+    <EmbeddedResource Include="AIMS.Libraries.Scripting.ScriptControl\ScriptControl.resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIMS.CodeEditor\CodeEditor.csproj">
+      <Project>{94bfa44a-f4d0-4605-88e6-3add498f5e16}</Project>
+      <Name>CodeEditor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AIMS.SyntaxFiles\CodeEditor.SyntaxFiles.csproj">
+      <Project>{3814f627-858a-42a3-9aaf-cd649413f2a8}</Project>
+      <Name>CodeEditor.SyntaxFiles</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SyntaxDocument\CodeEditor.SyntaxDocument.csproj">
+      <Project>{3f43bab0-22b4-4fd6-9655-8ba214a093a5}</Project>
+      <Name>CodeEditor.SyntaxDocument</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
