@@ -36,7 +36,7 @@ namespace Teal.CodeEditor {
         //            Array.Copy(array, result, index);
         //            Array.Copy(array, index, result, index + count, restCount);
         //        }
-                
+
         //        return result;
         //    }
 
@@ -244,7 +244,24 @@ namespace Teal.CodeEditor {
         }
 
         public static DocumentLineFlags newlineToNewLineType(string flags) {
-            return flags.Length != 1 ? DocumentLineFlags.newLineTypeWin : flags[0] == '\r' ?  DocumentLineFlags.newLineTypeMac : DocumentLineFlags.newLineTypeUnix;
+            return flags.Length != 1 ? DocumentLineFlags.newLineTypeWin : flags[0] == '\r' ? DocumentLineFlags.newLineTypeMac : DocumentLineFlags.newLineTypeUnix;
+        }
+
+
+        public static void appendArrayList<T>(ref T[] array, ref int length) {
+            if (array.Length <= ++length) {
+                var newArray = new T[array.Length << 1];
+                Array.Copy(array, newArray, length);
+                array = newArray;
+            }
+        }
+
+        public static void prependArrayList<T>(ref T[] array, ref int length) {
+            if (array.Length <= ++length) {
+                var newArray = new T[array.Length << 1];
+                Array.Copy(array, 0, newArray, 1, length);
+                array = newArray;
+            }
         }
 
     }

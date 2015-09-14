@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TealEditor", "TealEditor\TealEditor.csproj", "{D9F6DB2D-5E0A-4E25-BBA4-DE34E0FF7C4E}"
 EndProject
@@ -11,9 +11,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Teal.CodeEditor.Test", "Tea
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "参考项目", "参考项目", "{F7833274-8A4A-4270-B02A-8EE5771EF095}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeEditor", "_refs\hardek\Code Editor\CodeEditor\CodeEditor.csproj", "{94BFA44A-F4D0-4605-88E6-3ADD498F5E16}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIMS.IDE", "_refs\AIMS\AIMS.IDE\AIMS.IDE.csproj", "{AC3122D8-ECC0-417D-A585-12438C8CB76D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeEditor.SyntaxDocument", "_refs\hardek\Code Editor\SyntaxDocument\CodeEditor.SyntaxDocument.csproj", "{3F43BAB0-22B4-4FD6-9655-8BA214A093A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeEditor", "_refs\AIMS\AIMS.CodeEditor\CodeEditor.csproj", "{94BFA44A-F4D0-4605-88E6-3ADD498F5E16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeEditor.SyntaxFiles", "_refs\AIMS\AIMS.SyntaxFiles\CodeEditor.SyntaxFiles.csproj", "{3814F627-858A-42A3-9AAF-CD649413F2A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeEditor.SyntaxDocument", "_refs\AIMS\SyntaxDocument\CodeEditor.SyntaxDocument.csproj", "{3F43BAB0-22B4-4FD6-9655-8BA214A093A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{764DACCF-D87A-401C-B96C-BCF44BD064BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,20 +39,34 @@ Global
 		{6F072E38-E84E-486A-886D-E33B621A8949}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F072E38-E84E-486A-886D-E33B621A8949}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F072E38-E84E-486A-886D-E33B621A8949}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC3122D8-ECC0-417D-A585-12438C8CB76D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC3122D8-ECC0-417D-A585-12438C8CB76D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC3122D8-ECC0-417D-A585-12438C8CB76D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC3122D8-ECC0-417D-A585-12438C8CB76D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{94BFA44A-F4D0-4605-88E6-3ADD498F5E16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{94BFA44A-F4D0-4605-88E6-3ADD498F5E16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94BFA44A-F4D0-4605-88E6-3ADD498F5E16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94BFA44A-F4D0-4605-88E6-3ADD498F5E16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3814F627-858A-42A3-9AAF-CD649413F2A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3814F627-858A-42A3-9AAF-CD649413F2A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3814F627-858A-42A3-9AAF-CD649413F2A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3814F627-858A-42A3-9AAF-CD649413F2A8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3F43BAB0-22B4-4FD6-9655-8BA214A093A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3F43BAB0-22B4-4FD6-9655-8BA214A093A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F43BAB0-22B4-4FD6-9655-8BA214A093A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F43BAB0-22B4-4FD6-9655-8BA214A093A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{764DACCF-D87A-401C-B96C-BCF44BD064BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{764DACCF-D87A-401C-B96C-BCF44BD064BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{764DACCF-D87A-401C-B96C-BCF44BD064BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{764DACCF-D87A-401C-B96C-BCF44BD064BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{AC3122D8-ECC0-417D-A585-12438C8CB76D} = {F7833274-8A4A-4270-B02A-8EE5771EF095}
 		{94BFA44A-F4D0-4605-88E6-3ADD498F5E16} = {F7833274-8A4A-4270-B02A-8EE5771EF095}
+		{3814F627-858A-42A3-9AAF-CD649413F2A8} = {F7833274-8A4A-4270-B02A-8EE5771EF095}
 		{3F43BAB0-22B4-4FD6-9655-8BA214A093A5} = {F7833274-8A4A-4270-B02A-8EE5771EF095}
 	EndGlobalSection
 EndGlobal

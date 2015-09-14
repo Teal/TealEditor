@@ -15,8 +15,8 @@ namespace Test
             return s;
         }
 
-    }
 
+    }
 
 	internal static class Program
 	{

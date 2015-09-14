@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Teal.CodeEditor.Test</RootNamespace>
     <AssemblyName>Teal.CodeEditor.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -83,10 +84,6 @@
     <ProjectReference Include="..\Teal.CodeEditor\Teal.CodeEditor.csproj">
       <Project>{674c78b7-5337-4954-848d-c21724249b98}</Project>
       <Name>Teal.CodeEditor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\_refs\hardek\Code Editor\CodeEditor\CodeEditor.csproj">
-      <Project>{94bfa44a-f4d0-4605-88e6-3add498f5e16}</Project>
-      <Name>CodeEditor</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
