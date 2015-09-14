@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Teal.CodeEditor {
 
@@ -11,41 +8,35 @@ namespace Teal.CodeEditor {
     /// </summary>
     public abstract class SegmentType {
 
+        ///// <summary>
+        ///// 获取当前判断类型的名字。
+        ///// </summary>
+        //public string name { get; }
+
         /// <summary>
         /// 获取当前片段类型的开始部分的模式表达式。
         /// </summary>
         public Pettern start { get; }
 
-        private static SegmentType[] _emptyChildren = new SegmentType[0];
-
         /// <summary>
         /// 获取当前片段类型的子片段类型。
         /// </summary>
-        public SegmentType[] children { get; } = _emptyChildren;
+        public SegmentType[] children { get; }
 
         /// <summary>
         /// 判断当前片段类型是否是跨行的。
         /// </summary>
-        public abstract bool isMultiLine {
-            get {
-                return false;
-            }
-        }
-
-        ///// <summary>
-        ///// 在指定的文本内找到当前片段的开始位置。如果找不到则返回 -1。
-        ///// </summary>
-        ///// <param name="text">要匹配的文本。</param>
-        ///// <param name="startIndex">文本的开始位置。</param>
-        ///// <param name="endIndex">文本的结束位置。</param>
-        ///// <param name="start">返回匹配的起始位置。</param>
-        ///// <param name="endIndex">返回匹配的结束位置。</param>
-        //public abstract bool matchStart(string text, int startIndex, int endIndex, out int start, out int end);
+        public abstract bool isMultiLine { get; }
 
         /// <summary>
         /// 判断当前片段是否属于块级片段。块级片段即可能横跨多行的块，一般会拥有一个折叠域。
         /// </summary>
         public abstract bool isBlock { get; }
+
+        protected SegmentType(Pettern start, SegmentType[] children = null) {
+            this.start = start;
+            this.children = children;
+        }
 
     }
 
@@ -57,19 +48,19 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 判断当前片段类型是否是跨行的。
         /// </summary>
-        public override bool isMultiLine {
-            get {
-                return false;
-            }
-        }
+        public override bool isMultiLine => false;
 
         /// <summary>
         /// 判断当前片段类型是否是块。
         /// </summary>
-        public override bool isBlock {
-            get {
-                return false;
-            }
+        public override bool isBlock => false;
+
+        public WordSegmentType(Pettern start, SegmentType[] children = null)
+                : base(start, children) {
+        }
+
+        public override string ToString() {
+            return $"{start}";
         }
 
     }
@@ -83,14 +74,19 @@ namespace Teal.CodeEditor {
         /// 当前块的结束模式表达式。
         /// </summary>
         public Pettern end { get; }
-        
+
         /// <summary>
         /// 判断当前片段类型是否是块。
         /// </summary>
-        public sealed override bool isBlock {
-            get {
-                return true;
-            }
+        public sealed override bool isBlock => true;
+
+        protected BlockSegmentType(Pettern start, Pettern end, SegmentType[] children = null)
+                : base(start, children) {
+            this.end = end;
+        }
+
+        public override string ToString() {
+            return $"{start}...{end}";
         }
 
     }
@@ -99,30 +95,32 @@ namespace Teal.CodeEditor {
     /// 表示一个块级类型。
     /// </summary>
     public sealed class MultiLineBlockSegmentType : BlockSegmentType {
-        
+
         /// <summary>
         /// 判断当前片段类型是否是跨行的。
         /// </summary>
-        public override bool isMultiLine {
-            get {
-                return true;
-            }
+        public override bool isMultiLine => true;
+
+        public MultiLineBlockSegmentType(Pettern start, Pettern end, SegmentType[] children = null)
+                : base(start, end, children) {
+
         }
 
     }
-    
+
     /// <summary>
     /// 表示一个内联块级类型。
     /// </summary>
     public sealed class SingleLineBlockSegmentType : BlockSegmentType {
-        
+
         /// <summary>
         /// 判断当前片段类型是否是跨行的。
         /// </summary>
-        public override bool isMultiLine {
-            get {
-                return false;
-            }
+        public override bool isMultiLine => false;
+
+        public SingleLineBlockSegmentType(Pettern start, Pettern end, SegmentType[] children = null)
+                : base(start, end, children) {
+
         }
 
     }
@@ -138,23 +136,36 @@ namespace Teal.CodeEditor {
         /// <param name="text">要匹配的文本。</param>
         /// <param name="startIndex">文本的开始位置。</param>
         /// <param name="endIndex">文本的结束位置。</param>
-        /// <param name="resultStartIndex">返回匹配的起始位置。</param>
-        /// <param name="resultEndIndex">返回匹配的结束位置。</param>
-        public abstract void match(string text, int startIndex, int endIndex, out int resultStartIndex, out int resultEndIndex);
+        /// <returns>返回匹配结果。</returns>
+        public abstract PatternMatchResult match(string text, int startIndex, int endIndex);
 
     }
-    
+
     /// <summary>
-    /// 表示一个字符串模式表达式。
+    /// 表示模式匹配的结果。
     /// </summary>
-    public abstract class StringPettern {
-                
+    public struct PatternMatchResult {
+
         /// <summary>
-        /// 获取当前模式的内容。
+        /// 获取匹配的开始位置。
         /// </summary>
-        /// <value>
-        public string content{ get; }
-        
+        public int startIndex;
+
+        /// <summary>
+        /// 获取匹配的结束位置。
+        /// </summary>
+        public int endIndex;
+
+        /// <summary>
+        /// 判断当前匹配是否成功。
+        /// </summary>
+        public bool success => startIndex >= 0;
+
+        public PatternMatchResult(int startIndex, int endIndex) {
+            this.startIndex = startIndex;
+            this.endIndex = endIndex;
+        }
+
         /// <summary>
         /// 返回表示当前对象的字符串。
         /// </summary>
@@ -162,7 +173,33 @@ namespace Teal.CodeEditor {
         /// 表示当前对象的字符串。
         /// </returns>
         public override string ToString() {
- 	         return content;
+            return success ? $"{startIndex}-{endIndex}" : "(Dismatch)";
+        }
+
+    }
+
+    /// <summary>
+    /// 表示一个字符串模式表达式。
+    /// </summary>
+    public abstract class StringPettern : Pettern {
+
+        /// <summary>
+        /// 获取当前模式的内容。
+        /// </summary>
+        public string content { get; }
+
+        protected StringPettern(string content) {
+            this.content = content;
+        }
+
+        /// <summary>
+        /// 返回表示当前对象的字符串。
+        /// </summary>
+        /// <returns>
+        /// 表示当前对象的字符串。
+        /// </returns>
+        public override string ToString() {
+            return content;
         }
 
     }
@@ -172,27 +209,32 @@ namespace Teal.CodeEditor {
     /// </summary>
     public sealed class CaseSensitiveStringPettern : StringPettern {
 
+        public CaseSensitiveStringPettern(string content)
+                : base(content) { }
+
         /// <summary>
         /// 尝试使用当前模式表达式去匹配指定的文本。
         /// </summary>
         /// <param name="text">要匹配的文本。</param>
         /// <param name="startIndex">文本的开始位置。</param>
         /// <param name="endIndex">文本的结束位置。</param>
-        /// <param name="resultStartIndex">返回匹配的起始位置。</param>
-        /// <param name="resultEndIndex">返回匹配的结束位置。</param>
-        public override void match(string text, int startIndex, int endIndex, out int resultStartIndex, out int resultEndIndex) {
-            resultStartIndex = text.IndexOf(content, startIndex, endIndex - startIndex + 1);
-            resultEndIndex = resultStartIndex + content.Length;
+        /// <returns>返回匹配结果。</returns>
+        public override PatternMatchResult match(string text, int startIndex, int endIndex) {
+            PatternMatchResult result;
+            result.startIndex = text.IndexOf(content, startIndex, endIndex - startIndex, StringComparison.Ordinal);
+            result.endIndex = result.startIndex + content.Length;
+            return result;
         }
 
     }
-    
+
     /// <summary>
     /// 表示一个不区分大小写的字符串模式表达式。
     /// </summary>
-    public sealed class CaseInsensitiveStringPettern : StringPettern  {
+    public sealed class CaseInsensitiveStringPettern : StringPettern {
 
-        public string content{ get; }
+        public CaseInsensitiveStringPettern(string content)
+                : base(content) { }
 
         /// <summary>
         /// 尝试使用当前模式表达式去匹配指定的文本。
@@ -200,21 +242,58 @@ namespace Teal.CodeEditor {
         /// <param name="text">要匹配的文本。</param>
         /// <param name="startIndex">文本的开始位置。</param>
         /// <param name="endIndex">文本的结束位置。</param>
-        /// <param name="resultStartIndex">返回匹配的起始位置。</param>
-        /// <param name="resultEndIndex">返回匹配的结束位置。</param>
-        public override void match(string text, int startIndex, int endIndex, out int resultStartIndex, out int resultEndIndex) {
-           resultStartIndex = text.IndexOf(content, startIndex, endIndex - startIndex + 1, StringComparison.OrdinalIgnoreCase);
-            resultEndIndex = resultStartIndex + content.Length;
+        /// <returns>返回匹配结果。</returns>
+        public override PatternMatchResult match(string text, int startIndex, int endIndex) {
+            PatternMatchResult result;
+            result.startIndex = text.IndexOf(content, startIndex, endIndex - startIndex + 1, StringComparison.OrdinalIgnoreCase);
+            result.endIndex = result.startIndex + content.Length;
+            return result;
         }
-        
+
+    }
+
+    /// <summary>
+    /// 表示一个不区分大小写的字符串模式表达式。
+    /// </summary>
+    [DebuggerStepThrough]
+    public sealed class AnyMatchPettern : Pettern {
+
         /// <summary>
-        /// 返回表示当前对象的字符串。
+        /// 尝试使用当前模式表达式去匹配指定的文本。
         /// </summary>
-        /// <returns>
-        /// 表示当前对象的字符串。
-        /// </returns>
+        /// <param name="text">要匹配的文本。</param>
+        /// <param name="startIndex">文本的开始位置。</param>
+        /// <param name="endIndex">文本的结束位置。</param>
+        /// <returns>返回匹配结果。</returns>
+        public override PatternMatchResult match(string text, int startIndex, int endIndex) {
+            return new PatternMatchResult(startIndex, startIndex);
+        }
+
         public override string ToString() {
- 	         return content;
+            return "*";
+        }
+
+    }
+
+    /// <summary>
+    /// 表示一个不区分大小写的字符串模式表达式。
+    /// </summary>
+    [DebuggerStepThrough]
+    public sealed class AnyDismatchPettern : Pettern {
+
+        /// <summary>
+        /// 尝试使用当前模式表达式去匹配指定的文本。
+        /// </summary>
+        /// <param name="text">要匹配的文本。</param>
+        /// <param name="startIndex">文本的开始位置。</param>
+        /// <param name="endIndex">文本的结束位置。</param>
+        /// <returns>返回匹配结果。</returns>
+        public override PatternMatchResult match(string text, int startIndex, int endIndex) {
+            return new PatternMatchResult(-1, -1);
+        }
+
+        public override string ToString() {
+            return "";
         }
 
     }

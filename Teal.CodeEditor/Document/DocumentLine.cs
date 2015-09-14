@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Teal.CodeEditor {
 
@@ -92,7 +94,7 @@ namespace Teal.CodeEditor {
         /// <param name="length">设置字符串长度。</param>
         public DocumentLine(char[] chars, CharStyles[] styles, int length) {
             this.chars = chars;
-          //  this.styles = styles;
+            //  this.styles = styles;
             _length = length;
         }
 
@@ -101,7 +103,10 @@ namespace Teal.CodeEditor {
         /// </summary>
         /// <param name="value">初始化的值。</param>
         public DocumentLine(string value)
-            : this(value.ToCharArray(), new CharStyles[value.Length], value.Length) { }
+            : this(value.ToCharArray(), new CharStyles[value.Length], value.Length) {
+            this._data = value;
+            this._length = value.Length;
+        }
 
         /// <summary>
         /// 初始化 <see cref="DocumentLine" /> 类的新实例。
@@ -116,6 +121,18 @@ namespace Teal.CodeEditor {
         public void ensureCapacity(int capacity) {
             if (capacity > this.capacity) {
                 this.capacity = capacity;
+            }
+        }
+
+        public char this[int index] {
+            get {
+                return _data[index];
+            }
+        }
+
+        public string this[int startIndex, int endIndex] {
+            get {
+                return _data.Substring(startIndex, endIndex - startIndex);
             }
         }
 
@@ -465,14 +482,18 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 获取属于当前行的所有片段。
         /// </summary>
-        public ArrayList<Segment> segments {
-            get;
+        public IEnumerable<Segment> segments {
+            get {
+                for (int i = 0; i < _segmentLength; i++) {
+                    yield return _segments[i];
+                }
+            }
         }
 
         /// <summary>
         /// 所有的片段列表。
         /// </summary>
-        private Segment[] _segments;
+        private Segment[] _segments = new Segment[2];
 
         /// <summary>
         /// 所有的片段列表实际长度。
@@ -482,10 +503,10 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 获取属于当前行的最后一个语句块。
         /// </summary>
-        public Block lastBlock {
+        public BlockSegment LastBlockSegment {
             get {
-                if (endBlock.startLine == this) {
-                    return endBlock;
+                if (EndBlockSegment.startLine == this) {
+                    return EndBlockSegment;
                 }
                 return null;
             }
@@ -494,7 +515,7 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 获取当前行末尾的所属块。
         /// </summary>
-        public Block endBlock {
+        public BlockSegment EndBlockSegment {
             get;
             internal set;
         }
@@ -502,24 +523,24 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 更新当前行的片段列表。
         /// </summary>
-        /// <param name="parentBlock">当前行所在的块。</param>
-        public void parseSegments(Block parentBlock) {
+        /// <param name="parentBlockSegment">当前行所在的块。</param>
+        public void parseSegments(BlockSegment parentBlockSegment) {
 
             //// 清空片段列表。
             //_segmentLength = 1;
-            //_segments[0].type = parentBlock.type;
+            //_segments[0].type = parentBlockSegment.type;
             //_segments[0].startIndex = -1;
             //_segments[0].endIndex = -1;
 
-            parseSegments(ref parentBlock, 0, _length);
+            parseSegments(ref parentBlockSegment, 0, _length);
 
         }
 
-        private int parseSegments(ref Block parentBlock, int startIndex, int endIndex) {
+        private int parseSegments(ref BlockSegment parentBlockSegment, int startIndex, int endIndex) {
             while (startIndex < endIndex) {
                 // 每次解析到当前块的结束。
-                int lastStartIndex = startIndex;
-                startIndex = parseSegment(ref parentBlock, parentBlock.type, startIndex, endIndex);
+                var lastStartIndex = startIndex;
+                startIndex = parseSegment(ref parentBlockSegment, parentBlockSegment.type, startIndex, endIndex);
                 if (startIndex < 0) {
                     return lastStartIndex;
                 }
@@ -530,41 +551,33 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 解析一个块级的子类型。
         /// </summary>
-        /// <param name="parentBlock">上级块级。</param>
+        /// <param name="parentBlockSegment">上级块级。</param>
         /// <param name="parentSegmentType">上级片段类型。</param>
         /// <param name="startIndex">解析的开始位置。</param>
         /// <param name="endIndex">解析的结束位置。</param>
         /// <returns>返回当前块的关闭位置。如果当前块未关闭则返回 -1。</returns>
-        private int parseSegment(ref Block parentBlock, SegmentType parentSegmentType, int startIndex, int endIndex) {
-        redo:
+        private int parseSegment(ref BlockSegment parentBlockSegment, SegmentType parentSegmentType, int startIndex, int endIndex) {
+            redo:
 
             // 1. 查找父块的结束标志。
-            int parentBlockEndLeft;
-            int parentBlockEndRight;
-            if (parentBlock != null) {
-                parentBlock.type.end.match(_data, startIndex, endIndex, out parentBlockEndLeft, out parentBlockEndRight);
-            } else {
-                parentBlockEndLeft = parentBlockEndRight = -1;
-            }
+            var parentBlockEnd = parentBlockSegment?.type.end.match(_data, startIndex, endIndex) ?? new PatternMatchResult(-1, -1);
 
             // 2. 查找子块开始标志。
             Segment childSegment;
             childSegment.type = null;
-            childSegment.startIndex = parentBlockEndLeft == -1 ? int.MaxValue : childSegment.startIndex;
+            childSegment.startIndex = parentBlockEnd.success ? parentBlockEnd.startIndex : int.MaxValue;
             childSegment.endIndex = 0;
 
             // 遍历所有子片段类型，找到匹配的子片段类型。
             // 如果发现多个匹配项，则匹配位置最前的生效。
             // 子片段可能是完全匹配一个单词或仅仅匹配其开始标记。
             if (parentSegmentType.children != null) {
-                for (var i = 0; i < parentSegmentType.children.Length; i++) {
-                    var currentSegmentType = parentSegmentType.children[i];
-                    int start, end;
-                    currentSegmentType.start.match(_data, startIndex, endIndex, out start, out end);
-                    if (start > 0 && childSegment.startIndex > start) {
-                        childSegment.type = currentSegmentType;
-                        childSegment.startIndex = start;
-                        childSegment.endIndex = end;
+                foreach (var segmentType in parentSegmentType.children) {
+                    var matchResult = segmentType.start.match(_data, startIndex, endIndex);
+                    if (matchResult.success && matchResult.startIndex < childSegment.startIndex) {
+                        childSegment.type = segmentType;
+                        childSegment.startIndex = matchResult.startIndex;
+                        childSegment.endIndex = matchResult.endIndex;
                     }
                 }
             }
@@ -581,15 +594,15 @@ namespace Teal.CodeEditor {
                 if (childSegment.type.isBlock) {
 
                     // 创建一个子块。
-                    var block = new Block();
-                    block.parent = parentBlock;
-                    block.startLine = this;
-                    block.type = (BlockSegmentType)childSegment.type;
+                    var block = new BlockSegment(parentBlockSegment, (BlockSegmentType)childSegment.type, this);
 
                     // 继续解析内部区块。
                     int childBlockEnd = parseSegment(ref block, childSegment.type, childSegment.endIndex, endIndex);
                     _segments[segmentIndex].endIndex = childBlockEnd;
                     if (childBlockEnd < 0) {
+                        if(!childSegment.type.isMultiLine) {
+                            _segments[segmentIndex].endIndex = endIndex;
+                        }
                         return childBlockEnd;
                     }
 
@@ -599,10 +612,10 @@ namespace Teal.CodeEditor {
                 } else {
 
                     // 内联区块：childSegment.endIndex 表示当前区块的结束点。
-                    Block block = null;
+                    BlockSegment blockSegment = null;
 
                     // 在内部继续查找子片段。
-                    parseSegment(ref block, childSegment.type, childSegment.startIndex, childSegment.endIndex);
+                    parseSegment(ref blockSegment, childSegment.type, childSegment.startIndex, childSegment.endIndex);
 
                     // 跳过当前内部块继续解析剩余内容。
                     startIndex = childSegment.endIndex;
@@ -613,25 +626,25 @@ namespace Teal.CodeEditor {
             }
 
             // 4. 处理父块结束。
-            if (parentBlockEndLeft != -1) {
+            if (parentBlockEnd.success) {
 
                 // 如果当前行自之前的行开始则插入一个片段。
-                if (parentBlock.startLine != this) {
+                if (parentBlockSegment.startLine != this) {
                     int segmentIndex = _segmentLength;
                     Utility.prependArrayList(ref _segments, ref _segmentLength);
                     _segments[0].type = parentSegmentType;
                     _segments[0].startIndex = -1;
-                    _segments[0].endIndex = parentBlockEndRight;
+                    _segments[0].endIndex = parentBlockEnd.endIndex;
                 }
 
                 // 设置块的结束行。
-                parentBlock.endLine = this;
+                parentBlockSegment.endLine = this;
 
                 // 回溯到父级块。
-                parentBlock = parentBlock.parent;
+                parentBlockSegment = parentBlockSegment.parent;
 
                 // 返回结束行。
-                return parentBlockEndRight;
+                return parentBlockEnd.endIndex;
             }
 
             // 5. 当前块未结束。
@@ -657,11 +670,11 @@ namespace Teal.CodeEditor {
         //    // 子片段可能是完全匹配一个单词或仅仅匹配其开始标记。
         //    for (var i = 0; i < parentSegmentType.children.Length; i++) {
         //        var currentSegmentType = parentSegmentType.children[i];
-        //        int start, end;
-        //        currentSegmentType.start.match(_data, startIndex, endIndex, out start, out end);
-        //        if (start > 0 && childSegment.startIndex > start) {
+        //        int startIndex, end;
+        //        currentSegmentType.startIndex.match(_data, startIndex, endIndex, out startIndex, out end);
+        //        if (startIndex > 0 && childSegment.startIndex > startIndex) {
         //            childSegment.type = currentSegmentType;
-        //            childSegment.startIndex = start;
+        //            childSegment.startIndex = startIndex;
         //            childSegment.endIndex = end;
         //        }
         //    }
@@ -681,12 +694,12 @@ namespace Teal.CodeEditor {
         //        // 块级区块：end 表示结束为止。
 
         //        // 创建一个区块。
-        //        var block = new Block();
-        //        block.startLine = this;
-        //        block.type = (BlockSegmentType)childSegment.type;
+        //        var BlockSegment = new BlockSegment();
+        //        BlockSegment.startLine = this;
+        //        BlockSegment.type = (BlockSegmentType)childSegment.type;
 
         //        // 继续解析内部区块。
-        //        int newEndIndex = parseSegment(block, childSegment.endIndex, endIndex);
+        //        int newEndIndex = parseSegment(BlockSegment, childSegment.endIndex, endIndex);
 
         //        // 同行片段不跨越行。
         //        if (newEndIndex <= childSegment.endIndex && !childSegment.type.isMultiLine) {
@@ -778,31 +791,31 @@ namespace Teal.CodeEditor {
 
     }
 
-    /// <summary>
-    /// 表示一个布局信息元素。
-    /// </summary>
-    public abstract class DocumentLayoutElement {
+    ///// <summary>
+    ///// 表示一个布局信息元素。
+    ///// </summary>
+    //public abstract class DocumentLayoutElement {
 
-        /// <summary>
-        /// 获取同个布局行的下一个中断点。
-        /// </summary>
-        public LayoutBreakPoint next;
+    //    /// <summary>
+    //    /// 获取同个布局行的下一个中断点。
+    //    /// </summary>
+    //    public LayoutBreakPoint next;
 
-        /// <summary>
-        /// 获取当前中断点的起始列。
-        /// </summary>
-        public abstract int startColumn {
-            get;
-        }
+    //    /// <summary>
+    //    /// 获取当前中断点的起始列。
+    //    /// </summary>
+    //    public abstract int startColumn {
+    //        get;
+    //    }
 
-        /// <summary>
-        /// 判断当前中断点是否是自动换行中断点。
-        /// </summary>
-        public abstract bool isWrapPoint {
-            get;
-        }
+    //    /// <summary>
+    //    /// 判断当前中断点是否是自动换行中断点。
+    //    /// </summary>
+    //    public abstract bool isWrapPoint {
+    //        get;
+    //    }
 
-    }
+    //}
 
     /// <summary>
     /// 表示一个文档行标记。
@@ -884,39 +897,50 @@ namespace Teal.CodeEditor {
     /// <summary>
     /// 表示一个行内的片段。
     /// </summary>
+    [DebuggerStepThrough]
     public struct Segment {
-
-        /// <summary>
-        /// 获取当前片段在行内的开始位置。如果开始位置属于上一行，则返回 -1。
-        /// </summary>
-        public int startIndex { get; internal set; }
-
-        /// <summary>
-        /// 获取当前片段在行内的结束位置。如果结束位置属于下一行，则返回 -1。
-        /// </summary>
-        public int endIndex { get; internal set; }
 
         /// <summary>
         /// 获取当前片段的类型。
         /// </summary>
-        public SegmentType type { get; internal set; }
+        public SegmentType type;
 
-        public Segment(int startIndex, int endIndex, SegmentType type) {
+        /// <summary>
+        /// 获取当前片段在行内的开始位置。如果开始位置属于上一行，则返回 -1。
+        /// </summary>
+        public int startIndex;
+
+        /// <summary>
+        /// 获取当前片段在行内的结束位置。如果结束位置属于下一行，则返回 -1。
+        /// </summary>
+        public int endIndex;
+
+        public Segment(SegmentType type, int startIndex, int endIndex) {
             this.startIndex = startIndex;
             this.endIndex = endIndex;
             this.type = type;
         }
+
+        public override string ToString() {
+            return $"{startIndex}-{endIndex}: {type}";
+        }
     }
 
     /// <summary>
-    /// 表示一个跨行的代码块。
+    /// 表示一个代码块。
     /// </summary>
-    public sealed class Block {
+    [DebuggerStepThrough]
+    public sealed class BlockSegment {
 
         /// <summary>
-        /// 获取同行的上一级代码块。
+        /// 获取上一级代码块。
         /// </summary>
-        public Block parent { get; internal set; }
+        public BlockSegment parent { get; internal set; }
+
+        /// <summary>
+        /// 获取当前代码块的类型。
+        /// </summary>
+        public BlockSegmentType type { get; }
 
         /// <summary>
         /// 获取当前代码块的起始行。
@@ -933,10 +957,15 @@ namespace Teal.CodeEditor {
         /// </summary>
         public bool collapsed { get; internal set; }
 
-        /// <summary>
-        /// 获取当前代码块的类型。
-        /// </summary>
-        public BlockSegmentType type { get; internal set; }
+        public BlockSegment(BlockSegment parent, BlockSegmentType type, DocumentLine startLine) {
+            this.parent = parent;
+            this.type = type;
+            this.startLine = startLine;
+        }
+
+        public override string ToString() {
+            return $"{type}";
+        }
     }
 
 }

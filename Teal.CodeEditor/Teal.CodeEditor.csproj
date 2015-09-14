@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -48,43 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\ArrayList.cs" />
-    <Compile Include="Core\CodeEditor.Control.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Core\CodeEditorConfigs.cs" />
     <Compile Include="Core\Utility.cs" />
     <Compile Include="Document\SegmentType.cs" />
-    <Compile Include="Document\Document.cs" />
     <Compile Include="Document\DocumentLine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rendering\CodeEditor.Folding.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\CodeEditor.Gutter.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\CodeEditor.Layout.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\CodeEditor.Rendering.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\CodeEditor.Scrolling.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\CodeEditor.Sizes.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\FoldingList.cs" />
-    <Compile Include="Rendering\LayoutBreakPoint.cs" />
-    <Compile Include="Rendering\SplitButton.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\VisualElement.cs" />
-    <Compile Include="View\CodeView.cs" />
-    <Compile Include="Win32\Painter.cs" />
-    <Compile Include="Win32\Win32API.Gdi.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

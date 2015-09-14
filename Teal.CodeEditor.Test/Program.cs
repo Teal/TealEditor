@@ -11,6 +11,11 @@ namespace Teal.CodeEditor.Test {
         /// </summary>
         [STAThread]
         static void Main() {
+
+
+            new DocumentLineTest().run();
+
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
