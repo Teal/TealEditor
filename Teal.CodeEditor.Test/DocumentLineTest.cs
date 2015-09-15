@@ -20,12 +20,12 @@ namespace Teal.CodeEditor.Test {
 
         public void run() {
 
-            var multiComment = new MultiLineBlockSegmentType(new CaseSensitiveStringPettern("/*"), new CaseSensitiveStringPettern("*/"), null);
-            var signleComment = new SingleLineBlockSegmentType(new CaseSensitiveStringPettern("//"), new AnyDismatchPettern(), null);
-            var keyword_if = new WordSegmentType(new CaseSensitiveStringPettern("if"), null);
-            var keyword_else = new WordSegmentType(new CaseSensitiveStringPettern("else"), null);
-            var keyword_for = new WordSegmentType(new CaseSensitiveStringPettern("for"), null);
-            var str = new SingleLineBlockSegmentType(new CaseSensitiveStringPettern("'"), new CaseSensitiveStringPettern("'"), new SegmentType[] { keyword_if, keyword_else });
+            var multiComment = new MultiLineBlockSegmentType("comment.multiLine", new CaseSensitiveStringPettern("/*"), new CaseSensitiveStringPettern("*/"), null);
+            var signleComment = new SingleLineBlockSegmentType("comment.s", new CaseSensitiveStringPettern("//"), new AnyDismatchPettern(), null);
+            var keyword_if = new WordSegmentType("keyword_if", new CaseSensitiveStringPettern("if"), null);
+            var keyword_else = new WordSegmentType("keyword_else", new CaseSensitiveStringPettern("else"));
+            var keyword_for = new WordSegmentType("keyword_for", new CaseSensitiveStringPettern("for"), null);
+            var str = new SingleLineBlockSegmentType("str", new CaseSensitiveStringPettern("'"), new CaseSensitiveStringPettern("'"), new SegmentType[] { keyword_if, keyword_else });
 
             var allChildren = new SegmentType[5]{
                 multiComment,
@@ -35,11 +35,11 @@ namespace Teal.CodeEditor.Test {
                 null
             };
 
-            var block = new MultiLineBlockSegmentType(new CaseSensitiveStringPettern("{"), new CaseSensitiveStringPettern("}"), allChildren);
+            var block = new MultiLineBlockSegmentType("block", new CaseSensitiveStringPettern("{"), new CaseSensitiveStringPettern("}"), allChildren);
 
             allChildren[4] = block;
 
-            var all = new MultiLineBlockSegmentType(new AnyMatchPettern(), new AnyDismatchPettern(), allChildren);
+            var all = new MultiLineBlockSegmentType("all", new AnyMatchPettern(), new AnyDismatchPettern(), allChildren);
 
 
             var preLine = new DocumentLine("a//b");

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -109,6 +110,47 @@ namespace Teal.CodeEditor {
             Console.WriteLine();
             Console.ResetColor();
         }
+
+        public static bool isCloserToAThanB(int value, int a, int b) {
+            return b - value > value - a;
+        }
+
+        public static string newlineTypeToNewLine(DocumentLineFlags flags) {
+            switch (flags) {
+                case DocumentLineFlags.newLineTypeWin:
+                    return "\r\n";
+                case DocumentLineFlags.newLineTypeUnix:
+                    return "\n";
+                default:
+                    return "\r";
+            }
+        }
+
+        public static DocumentLineFlags newlineToNewLineType(string flags) {
+            return flags.Length != 1 ? DocumentLineFlags.newLineTypeWin : flags[0] == '\r' ? DocumentLineFlags.newLineTypeMac : DocumentLineFlags.newLineTypeUnix;
+        }
+
+
+        public static void appendArrayList<T>(ref T[] array, ref int length) {
+            if (array.Length <= ++length) {
+                var newArray = new T[array.Length << 1];
+                Array.Copy(array, newArray, length);
+                array = newArray;
+            }
+        }
+
+        public static void prependArrayList<T>(ref T[] array, ref int length) {
+            if (array.Length <= ++length) {
+                var newArray = new T[array.Length << 1];
+                Array.Copy(array, 0, newArray, 1, length);
+                array = newArray;
+            }
+        }
+
+        #region 字符串
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern string FastAllocateString(int length);
 
         public unsafe static void wstrcpy(char* dest, char* src, int charCount) {
             memcpy((byte*)dest, (byte*)src, charCount << 1);
@@ -228,41 +270,6 @@ namespace Teal.CodeEditor {
             }
         }
 
-        public static bool isCloserToAThanB(int value, int a, int b) {
-            return b - value > value - a;
-        }
-
-        public static string newlineTypeToNewLine(DocumentLineFlags flags) {
-            switch (flags) {
-                case DocumentLineFlags.newLineTypeWin:
-                    return "\r\n";
-                case DocumentLineFlags.newLineTypeUnix:
-                    return "\n";
-                default:
-                    return "\r";
-            }
-        }
-
-        public static DocumentLineFlags newlineToNewLineType(string flags) {
-            return flags.Length != 1 ? DocumentLineFlags.newLineTypeWin : flags[0] == '\r' ? DocumentLineFlags.newLineTypeMac : DocumentLineFlags.newLineTypeUnix;
-        }
-
-
-        public static void appendArrayList<T>(ref T[] array, ref int length) {
-            if (array.Length <= ++length) {
-                var newArray = new T[array.Length << 1];
-                Array.Copy(array, newArray, length);
-                array = newArray;
-            }
-        }
-
-        public static void prependArrayList<T>(ref T[] array, ref int length) {
-            if (array.Length <= ++length) {
-                var newArray = new T[array.Length << 1];
-                Array.Copy(array, 0, newArray, 1, length);
-                array = newArray;
-            }
-        }
-
+        #endregion
     }
 }

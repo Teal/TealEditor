@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Teal.CodeEditor {
 
@@ -8,10 +9,10 @@ namespace Teal.CodeEditor {
     /// </summary>
     public abstract class SegmentType {
 
-        ///// <summary>
-        ///// 获取当前判断类型的名字。
-        ///// </summary>
-        //public string name { get; }
+        /// <summary>
+        /// 获取当前片段类型的名字。
+        /// </summary>
+        public string name { get; }
 
         /// <summary>
         /// 获取当前片段类型的开始部分的模式表达式。
@@ -33,9 +34,14 @@ namespace Teal.CodeEditor {
         /// </summary>
         public abstract bool isBlock { get; }
 
-        protected SegmentType(Pettern start, SegmentType[] children = null) {
+        protected SegmentType(string name, Pettern start, SegmentType[] children = null) {
+            this.name = name;
             this.start = start;
             this.children = children;
+        }
+
+        public override string ToString() {
+            return name;
         }
 
     }
@@ -55,12 +61,8 @@ namespace Teal.CodeEditor {
         /// </summary>
         public override bool isBlock => false;
 
-        public WordSegmentType(Pettern start, SegmentType[] children = null)
-                : base(start, children) {
-        }
-
-        public override string ToString() {
-            return $"{start}";
+        public WordSegmentType(string name, Pettern start, SegmentType[] children = null)
+                : base(name, start, children) {
         }
 
     }
@@ -80,13 +82,9 @@ namespace Teal.CodeEditor {
         /// </summary>
         public sealed override bool isBlock => true;
 
-        protected BlockSegmentType(Pettern start, Pettern end, SegmentType[] children = null)
-                : base(start, children) {
+        protected BlockSegmentType(string name, Pettern start, Pettern end, SegmentType[] children = null)
+                : base(name, start, children) {
             this.end = end;
-        }
-
-        public override string ToString() {
-            return $"{start}...{end}";
         }
 
     }
@@ -101,8 +99,8 @@ namespace Teal.CodeEditor {
         /// </summary>
         public override bool isMultiLine => true;
 
-        public MultiLineBlockSegmentType(Pettern start, Pettern end, SegmentType[] children = null)
-                : base(start, end, children) {
+        public MultiLineBlockSegmentType(string name, Pettern start, Pettern end, SegmentType[] children = null)
+                : base(name, start, end, children) {
 
         }
 
@@ -118,8 +116,8 @@ namespace Teal.CodeEditor {
         /// </summary>
         public override bool isMultiLine => false;
 
-        public SingleLineBlockSegmentType(Pettern start, Pettern end, SegmentType[] children = null)
-                : base(start, end, children) {
+        public SingleLineBlockSegmentType(string name, Pettern start, Pettern end, SegmentType[] children = null)
+                : base(name, start, end, children) {
 
         }
 
@@ -247,6 +245,37 @@ namespace Teal.CodeEditor {
             PatternMatchResult result;
             result.startIndex = text.IndexOf(content, startIndex, endIndex - startIndex + 1, StringComparison.OrdinalIgnoreCase);
             result.endIndex = result.startIndex + content.Length;
+            return result;
+        }
+
+    }
+
+    /// <summary>
+    /// 表示一个区分大小写的字符串模式表达式。
+    /// </summary>
+    public sealed class RegexPettern : Pettern {
+
+        Regex content { get; }
+
+        public RegexPettern(Regex content) {
+            this.content = content;
+        }
+
+        public RegexPettern(string content, RegexOptions options = RegexOptions.Compiled | RegexOptions.Singleline)
+                : this(new Regex(content, options)) {}
+
+        /// <summary>
+        /// 尝试使用当前模式表达式去匹配指定的文本。
+        /// </summary>
+        /// <param name="text">要匹配的文本。</param>
+        /// <param name="startIndex">文本的开始位置。</param>
+        /// <param name="endIndex">文本的结束位置。</param>
+        /// <returns>返回匹配结果。</returns>
+        public override PatternMatchResult match(string text, int startIndex, int endIndex) {
+            var match = content.Match(text, startIndex, endIndex - startIndex);
+            PatternMatchResult result;
+            result.startIndex = match.Index;
+            result.endIndex = result.startIndex + match.Length;
             return result;
         }
 

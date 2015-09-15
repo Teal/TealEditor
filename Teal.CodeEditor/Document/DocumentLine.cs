@@ -9,7 +9,7 @@ namespace Teal.CodeEditor {
     /// </summary>
     public sealed class DocumentLine {
 
-        #region 字符和样式
+        #region 字符
 
         /// <summary>
         /// 存储当前行的实际字符串数组。
@@ -17,50 +17,27 @@ namespace Teal.CodeEditor {
         private string _data;
 
         /// <summary>
-        /// 获取当前行的所有字符数组。
-        /// </summary>
-        public char[] chars;
-
-        /// <summary>
-        /// 获取当前行的所有字符样式。
-        /// </summary>
-        public CharStylePoint[] styles;
-
-        /// <summary>
-        /// 存储当前行的字符长度。
+        /// 存储当前行的实际字符长度。
         /// </summary>
         private int _length;
 
         /// <summary>
-        /// 获取或设置当前行的字符长度。
+        /// 获取当前行的字符长度。
         /// </summary>
         public int length {
             get {
                 return _length;
             }
-            set {
+            private set {
+
+                // 确保字符串长度足够。
+                // 如果数据长度和字符串长度一致，说明当前行的数据是只读的。
+                // 此次必须重新创建一份长度不一致的字符串缓存对象。
+                if (_data.Length == _length || value >= _data.Length) {
+                    capacity = Math.Max(_length << 1, value + 2);
+                }
+
                 _length = value;
-
-                if (value < capacity) {
-                    return;
-                }
-
-                if (value < 128) {
-                    capacity = 128;
-                    return;
-                }
-
-                if (value < 512) {
-                    capacity = 512;
-                    return;
-                }
-
-                if (value < 2048) {
-                    capacity = 2048;
-                    return;
-                }
-
-                capacity = value * 2 + 1;
 
             }
         }
@@ -70,40 +47,58 @@ namespace Teal.CodeEditor {
         /// </summary>
         public int capacity {
             get {
-                return chars.Length;
+                return _data.Length;
             }
             set {
-                //var count = Math.Min(chars.Length, value);
-
-                //var newData = new char[value];
-                //Array.Copy(chars, newData, count);
-                //chars = newData;
-
-                //var newStyles = new CharStyles[value];
-                //Array.Copy(styles, newStyles, count);
-                //styles = newStyles;
-
+                if (value <= _length)
+                    return;
+                var oldString = _data;
+                _data = Utility.FastAllocateString(value);
+                unsafe
+                {
+                    fixed (char* o = oldString)
+                    {
+                        fixed (char* n = _data)
+                        {
+                            Utility.wstrcpy(n, o, _length);
+                        }
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// 初始化 <see cref="DocumentLine"/> 类的新实例。
+        /// 获取当前行指定位置的字符。
         /// </summary>
-        /// <param name="chars">当前行的所有字符。</param>
-        /// <param name="styles">当前行的所有样式。</param>
-        /// <param name="length">设置字符串长度。</param>
-        public DocumentLine(char[] chars, CharStyles[] styles, int length) {
-            this.chars = chars;
-            //  this.styles = styles;
-            _length = length;
+        /// <param name="index">要获取的索引。</param>
+        /// <returns>返回对应的字符。</returns>
+        public char this[int index] => index >= 0 && index < _length ? _data[index] : '\0';
+
+        /// <summary>
+        /// 获取当前行指定区域的子字符串。
+        /// </summary>
+        /// <param name="startIndex">要获取的开始索引。</param>
+        /// <param name="endIndex">要获取的结束索引。</param>
+        /// <returns>返回子字符串。</returns>
+        public string this[int startIndex, int endIndex] {
+            get {
+                if (startIndex < 0) {
+                    startIndex = 0;
+                }
+
+                if (endIndex > _length) {
+                    endIndex = _length;
+                }
+
+                return startIndex >= endIndex ? String.Empty : _data.Substring(startIndex, endIndex - startIndex);
+            }
         }
 
         /// <summary>
         /// 初始化 <see cref="DocumentLine"/> 类的新实例。
         /// </summary>
         /// <param name="value">初始化的值。</param>
-        public DocumentLine(string value)
-            : this(value.ToCharArray(), new CharStyles[value.Length], value.Length) {
+        public DocumentLine(string value) {
             this._data = value;
             this._length = value.Length;
         }
@@ -113,304 +108,298 @@ namespace Teal.CodeEditor {
         /// </summary>
         /// <param name="capacity">初始化容量。</param>
         public DocumentLine(int capacity = 16)
-            : this(new char[capacity], new CharStyles[capacity], 0) { }
+            : this(new string('\0', capacity)) { }
+
+        #endregion
+
+        #region 追加
 
         /// <summary>
-        /// 确保当前行可以容纳指定的字符数。
+        /// 向当前行追加字符。
         /// </summary>
-        public void ensureCapacity(int capacity) {
-            if (capacity > this.capacity) {
-                this.capacity = capacity;
+        /// <param name="value">要追加的字符。</param>
+        public void append(char value) {
+            var currentLength = _length;
+            length++;
+            unsafe
+            {
+                fixed (char* n = _data)
+                {
+                    n[currentLength] = value;
+                }
             }
         }
 
-        public char this[int index] {
-            get {
-                return _data[index];
+        /// <summary>
+        /// 向当前行追加字符。
+        /// </summary>
+        /// <param name="value">要追加的字符。</param>
+        /// <param name="repeatCount">字符重复的次数。</param>
+        public void append(char value, int repeatCount) {
+            int currentLength = length;
+            length += repeatCount;
+            unsafe
+            {
+                fixed (char* n = _data)
+                {
+                    while (repeatCount-- > 0) {
+                        n[currentLength++] = value;
+                    }
+                }
             }
         }
 
-        public string this[int startIndex, int endIndex] {
-            get {
-                return _data.Substring(startIndex, endIndex - startIndex);
+        /// <summary>
+        /// 向当前行追加字符。
+        /// </summary>
+        /// <param name="value">要追加的字符指针。</param>
+        /// <param name="charCount">要追加的字符数。</param>
+        public unsafe void append(char* value, int charCount) {
+            var currentLength = length;
+            length += charCount;
+            fixed (char* n = _data)
+            {
+                Utility.wstrcpy(n + currentLength, value, charCount);
+            }
+        }
+
+        /// <summary>
+        /// 向当前行追加字符。
+        /// </summary>
+        /// <param name="value">要追加的字符串。</param>
+        public void append(string value) {
+            append(value, 0, value.Length);
+        }
+
+        /// <summary>
+        /// 向当前字符串缓存追加数据。
+        /// </summary>
+        /// <param name="value">要追加的字符串。</param>
+        /// <param name="startIndex">插入的起始位置。</param>
+        /// <param name="charCount">插入的个数。</param>
+        public void append(string value, int startIndex, int charCount) {
+            var currentLength = length;
+            length += charCount;
+            unsafe
+            {
+                fixed (char* o = value)
+                {
+                    fixed (char* n = _data)
+                    {
+                        Utility.wstrcpy(n + currentLength, o + startIndex, charCount);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 向当前行追加字符。
+        /// </summary>
+        /// <param name="value">要追加的字符数组。</param>
+        /// <param name="startIndex">数组的起始位置。</param>
+        /// <param name="charCount">要追加的字符数。</param>
+        public void append(char[] value, int startIndex, int charCount) {
+            var currentLength = length;
+            length += charCount;
+            unsafe
+            {
+                fixed (char* o = value)
+                {
+                    fixed (char* n = _data)
+                    {
+                        Utility.wstrcpy(n + currentLength, o + startIndex, charCount);
+                    }
+                }
             }
         }
 
         #endregion
 
-        //#region 追加
+        #region 插入
 
-        ///// <summary>
-        ///// 向当前行追加字符。
-        ///// </summary>
-        ///// <param name="value">要追加的字符。</param>
-        //public void append(char value) {
-        //    int currentLength = length;
-        //    length++;
-        //    chars[currentLength] = value;
-        //}
+        /// <summary>
+        /// 在指定位置插入一个字符。
+        /// </summary>
+        /// <param name="index">插入的位置。</param>
+        /// <param name="value">要插入的字符串。</param>
+        /// <param name="charCount">插入的长度。</param>
+        public unsafe void insert(int index, char* value, int charCount) {
+            if (index >= _length) {
+                index = _length;
+            }
+            length += charCount;
+            fixed (char* c = _data)
+            {
+                var cs = c + length;
+                var cd = cs + charCount;
 
-        ///// <summary>
-        ///// 向当前行追加字符。
-        ///// </summary>
-        ///// <param name="value">要追加的字符。</param>
-        ///// <param name="repeatCount">字符重复的次数。</param>
-        //public void append(char value, int repeatCount) {
-        //    int currentLength = length;
-        //    length += repeatCount;
-        //    while (repeatCount > 0) {
-        //        chars[currentLength++] = value;
-        //    }
-        //}
+                var ce = c + index;
 
-        ///// <summary>
-        ///// 向当前行追加字符。
-        ///// </summary>
-        ///// <param name="value">要追加的字符数组。</param>
-        ///// <param name="startIndex">数组的起始位置。</param>
-        ///// <param name="charCount">要追加的字符数。</param>
-        //public void append(char[] value, int startIndex, int charCount) {
-        //    int currentLength = length;
-        //    length += charCount;
-        //    Array.Copy(value, startIndex, chars, currentLength, charCount);
-        //}
+                while (cs >= ce) {
+                    *--cd = *--cs;
+                }
 
-        ///// <summary>
-        ///// 向当前行追加字符。
-        ///// </summary>
-        ///// <param name="value">要追加的字符串。</param>
-        //public void append(string value) {
-        //    append(value, 0, value.Length);
-        //}
+                Utility.wstrcpy(ce, value, charCount);
 
-        ///// <summary>
-        ///// 向当前字符串缓存追加数据。
-        ///// </summary>
-        ///// <param name="value">要追加的字符串。</param>
-        ///// <param name="startIndex">插入的起始位置。</param>
-        ///// <param name="count">插入的个数。</param>
-        //public void append(string value, int startIndex, int count) {
-        //    int currentLength = length;
-        //    length += count;
-        //    value.CopyTo(startIndex, chars, currentLength, count);
-        //}
+            }
+        }
 
-        //#endregion
+        /// <summary>
+        /// 在指定位置插入一个字符。
+        /// </summary>
+        /// <param name="index">插入的位置。</param>
+        /// <param name="value">要插入的字符。</param>
+        public unsafe void insert(int index, char value) {
+            if (index >= _length) {
+                append(value);
+                return;
+            }
+            var currentLength = length;
+            length++;
+            fixed (char* c = _data)
+            {
 
-        //#region 插入
+                var cs = c + length;
+                var cd = cs + 1;
 
-        ///// <summary>
-        ///// 在指定位置插入一个字符。
-        ///// </summary>
-        ///// <param name="index">插入的位置。</param>
-        ///// <param name="value">要插入的字符串。</param>
-        ///// <param name="count">插入的长度。</param>
-        //public unsafe void insert(int index, char* value, int count) {
-        //    if (index >= _length) {
-        //        index = _length;
-        //    }
-        //    length += count;
-        //    fixed (char* c = chars) {
-        //        fixed (CharStyles* s = styles) {
+                var ce = c + index;
 
-        //            char* cs = c + length;
-        //            char* cd = cs + count;
+                while (cs >= ce) {
+                    *--cd = *--cs;
+                }
 
-        //            CharStyles* ss = s + length;
-        //            CharStyles* sd = ss + count;
+                *ce = value;
 
-        //            char* ce = c + index;
+            }
+        }
 
-        //            while (cs >= ce) {
-        //                *--cd = *--cs;
-        //                *--sd = *--ss;
-        //            }
+        /// <summary>
+        /// 在指定位置插入一个字符串。
+        /// </summary>
+        /// <param name="index">插入的位置。</param>
+        /// <param name="value">要插入的字符串。</param>
+        /// <param name="startIndex">开始的索引。</param>
+        /// <param name="charCount">插入的长度。</param>
+        public unsafe void insert(int index, string value, int startIndex, int charCount) {
+            fixed (char* p = value)
+            {
+                insert(index, p + startIndex, charCount);
+            }
+        }
 
-        //            Utility.wstrcpy(ce, value, count);
+        /// <summary>
+        /// 在指定位置插入一个字符串。
+        /// </summary>
+        /// <param name="index">插入的位置。</param>
+        /// <param name="value">要插入的字符串。</param>
+        public void insert(int index, string value) {
+            insert(index, value, 0, value.Length);
+        }
 
-        //        }
-        //    }
-        //}
+        /// <summary>
+        /// 在指定位置插入一个字符数组。
+        /// </summary>
+        /// <param name="index">插入的位置。</param>
+        /// <param name="value">要插入的字符数组。</param>
+        /// <param name="startIndex">开始的索引。</param>
+        /// <param name="charCount">插入的长度。</param>
+        public unsafe void insert(int index, char[] value, int startIndex, int charCount) {
+            fixed (char* p = value)
+            {
+                insert(index, p + startIndex, charCount);
+            }
+        }
 
-        ///// <summary>
-        ///// 在指定位置插入一个字符。
-        ///// </summary>
-        ///// <param name="index">插入的位置。</param>
-        ///// <param name="value">要插入的字符。</param>
-        //public unsafe void insert(int index, char value) {
-        //    if (index >= _length) {
-        //        append(value);
-        //        return;
-        //    }
-        //    int currentLength = length;
-        //    length++;
-        //    fixed (char* c = chars) {
-        //        fixed (CharStyles* s = styles) {
+        /// <summary>
+        /// 在指定位置插入一个字符数组。
+        /// </summary>
+        /// <param name="index">插入的位置。</param>
+        /// <param name="value">要插入的字符数组。</param>
+        public void insert(int index, char[] value) {
+            insert(index, value, 0, value.Length);
+        }
 
-        //            char* cs = c + length;
-        //            char* cd = cs + 1;
+        #endregion
 
-        //            CharStyles* ss = s + length;
-        //            CharStyles* sd = ss + 1;
+        #region 删除
 
-        //            char* ce = c + index;
+        /// <summary>
+        /// 清空当前行内容。
+        /// </summary>
+        public void clear() {
+            _length = 0;
+        }
 
-        //            while (cs >= ce) {
-        //                *--cd = *--cs;
-        //                *--sd = *--ss;
-        //            }
+        /// <summary>
+        /// 从当前缓存删除指定索引的字符串。
+        /// </summary>
+        /// <param name="startIndex">开始的索引。</param>
+        /// <param name="charCount">删除的长度。</param>
+        public unsafe void remove(int startIndex, int charCount) {
+            fixed (char* p = _data)
+            {
+                var ps = p + startIndex;
 
-        //            *ce = value;
+                var copyLength = length - startIndex - charCount;
+                Utility.wstrcpy(ps, ps + charCount, copyLength);
 
-        //        }
-        //    }
-        //}
+                length -= charCount;
+            }
 
-        ///// <summary>
-        ///// 在指定位置插入一个字符串。
-        ///// </summary>
-        ///// <param name="index">插入的位置。</param>
-        ///// <param name="value">要插入的字符串。</param>
-        ///// <param name="startIndex">开始的索引。</param>
-        ///// <param name="count">插入的长度。</param>
-        //public unsafe void insert(int index, string value, int startIndex, int count) {
-        //    fixed (char* p = value) {
-        //        insert(index, p + startIndex, count);
-        //    }
-        //}
+        }
 
-        ///// <summary>
-        ///// 在指定位置插入一个字符串。
-        ///// </summary>
-        ///// <param name="index">插入的位置。</param>
-        ///// <param name="value">要插入的字符串。</param>
-        //public void insert(int index, string value) {
-        //    insert(index, value, 0, value.Length);
-        //}
+        /// <summary>
+        /// 从当前缓存删除指定索引的字符串。
+        /// </summary>
+        /// <param name="startIndex">开始的索引。</param>
+        public void remove(int startIndex) {
+            remove(startIndex, length - startIndex);
+        }
 
-        ///// <summary>
-        ///// 在指定位置插入一个字符数组。
-        ///// </summary>
-        ///// <param name="index">插入的位置。</param>
-        ///// <param name="value">要插入的字符数组。</param>
-        ///// <param name="startIndex">开始的索引。</param>
-        ///// <param name="count">插入的长度。</param>
-        //public unsafe void insert(int index, char[] value, int startIndex, int count) {
-        //    fixed (char* p = value) {
-        //        insert(index, p + startIndex, count);
-        //    }
-        //}
+        #endregion
 
-        ///// <summary>
-        ///// 在指定位置插入一个字符数组。
-        ///// </summary>
-        ///// <param name="index">插入的位置。</param>
-        ///// <param name="value">要插入的字符数组。</param>
-        //public void insert(int index, char[] value) {
-        //    insert(index, value, 0, value.Length);
-        //}
+        #region 获取
 
-        //#endregion
+        /// <summary>
+        /// 获取从指定位置开始指定长度的子字符串。
+        /// </summary>
+        /// <param name="startIndex">开始的索引。</param>
+        /// <param name="length">获取的字符串长度。</param>
+        /// <returns>返回子字符串。</returns>
+        public string substring(int startIndex, int length) {
+            return _data.Substring(startIndex, length);
+        }
 
-        //#region 删除
+        /// <summary>
+        /// 获取从指定位置开始指定长度的子字符串。
+        /// </summary>
+        /// <param name="startIndex">开始的索引。</param>
+        /// <returns>返回子字符串。</returns>
+        public string substring(int startIndex) {
+            return substring(startIndex, length - startIndex);
+        }
 
-        ///// <summary>
-        ///// 清空当前行内容。
-        ///// </summary>
-        //public void clear() {
-        //    length = 0;
-        //}
+        /// <summary>
+        /// 获取或设置当前行的文本。
+        /// </summary>
+        public string text {
+            get {
+                return _length == 0 ? String.Empty : _data.Substring(0, _length);
+            }
+            set {
+                _data = value;
+            }
+        }
 
-        ///// <summary>
-        ///// 从当前缓存删除指定索引的字符串。
-        ///// </summary>
-        ///// <param name="startIndex">开始的索引。</param>
-        ///// <param name="count">删除的长度。</param>
-        //public unsafe void remove(int startIndex, int count) {
-        //    fixed (char* p = chars) {
-        //        fixed (CharStyles* s = styles) {
+        /// <summary>
+        /// 返回当前行的字符串形式。
+        /// </summary>
+        /// <returns>表示当前对象的字符串。</returns>
+        public override string ToString() {
+            return text;
+        }
 
-        //            char* ps = p + startIndex;
-        //            CharStyles* ss = s + startIndex;
-
-        //            int copyLength = length - startIndex - count;
-        //            Utility.wstrcpy(ps, ps + count, copyLength);
-        //            Utility.memcpy((byte*)ss, (byte*)(ss + count), copyLength * sizeof(CharStyles));
-
-        //            length -= count;
-        //        }
-        //    }
-
-        //}
-
-        ///// <summary>
-        ///// 从当前缓存删除指定索引的字符串。
-        ///// </summary>
-        ///// <param name="startIndex">开始的索引。</param>
-        //public void remove(int startIndex) {
-        //    remove(startIndex, length - startIndex);
-        //}
-
-        //#endregion
-
-        //#region 获取
-
-        ///// <summary>
-        ///// 获取从指定位置开始指定长度的子字符串。
-        ///// </summary>
-        ///// <param name="startIndex">开始的索引。</param>
-        ///// <param name="length">获取的字符串长度。</param>
-        ///// <returns>返回子字符串。</returns>
-        //public string substring(int startIndex, int length) {
-        //    return new String(chars, startIndex, length);
-        //}
-
-        ///// <summary>
-        ///// 获取从指定位置开始指定长度的子字符串。
-        ///// </summary>
-        ///// <param name="startIndex">开始的索引。</param>
-        ///// <returns>返回子字符串。</returns>
-        //public string substring(int startIndex) {
-        //    return substring(startIndex, length - startIndex);
-        //}
-
-        ///// <summary>
-        ///// 获取或设置当前行的文本。
-        ///// </summary>
-        //public string text {
-        //    get {
-        //        return _length == 0 ? String.Empty : new String(chars, 0, _length);
-        //    }
-        //    set {
-        //        length = value.Length;
-        //        value.CopyTo(0, chars, 0, value.Length);
-        //        Array.Clear(styles, 0, value.Length);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 获取或设置指定索引的字符。
-        ///// </summary>
-        ///// <param name="index"></param>
-        ///// <returns></returns>
-        //public char this[int index] {
-        //    get {
-        //        return chars[index];
-        //    }
-        //    set {
-        //        chars[index] = value;
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 返回当前行的字符串形式。
-        ///// </summary>
-        ///// <returns>表示当前对象的字符串。</returns>
-        //public override string ToString() {
-        //    return text;
-        //}
-
-        //#endregion
+        #endregion
 
         //#region 行的属性
 
@@ -600,7 +589,7 @@ namespace Teal.CodeEditor {
                     int childBlockEnd = parseSegment(ref block, childSegment.type, childSegment.endIndex, endIndex);
                     _segments[segmentIndex].endIndex = childBlockEnd;
                     if (childBlockEnd < 0) {
-                        if(!childSegment.type.isMultiLine) {
+                        if (!childSegment.type.isMultiLine) {
                             _segments[segmentIndex].endIndex = endIndex;
                         }
                         return childBlockEnd;
@@ -630,7 +619,7 @@ namespace Teal.CodeEditor {
 
                 // 如果当前行自之前的行开始则插入一个片段。
                 if (parentBlockSegment.startLine != this) {
-                    int segmentIndex = _segmentLength;
+                    var segmentIndex = _segmentLength;
                     Utility.prependArrayList(ref _segments, ref _segmentLength);
                     _segments[0].type = parentSegmentType;
                     _segments[0].startIndex = -1;
@@ -723,61 +712,6 @@ namespace Teal.CodeEditor {
         //}
 
         #endregion
-
-    }
-
-    /// <summary>
-    /// 表示一个字符样式点。用于声明指定位置之后的字符样式为新的样式。
-    /// </summary>
-    public struct CharStylePoint {
-
-        /// <summary>
-        /// 当前样式的开始位置。
-        /// </summary>
-        public int index;
-
-        /// <summary>
-        /// 当前应用的字符样式。
-        /// </summary>
-        public CharStyles styles;
-
-    }
-
-    /// <summary>
-    /// 表示一个字符样式。
-    /// </summary>
-    [Flags]
-    public enum CharStyles {
-
-        /// <summary>
-        /// 无样式。
-        /// </summary>
-        none = 0,
-
-        /// <summary>
-        /// 空格。
-        /// </summary>
-        space = 1,
-
-        /// <summary>
-        /// 存在错误的文本。
-        /// </summary>
-        errorText = 1 << 1,
-
-        /// <summary>
-        /// 存在警告的文本。
-        /// </summary>
-        warningText = 1 << 2,
-
-        /// <summary>
-        /// 存在警告的文本。
-        /// </summary>
-        hintText = 1 << 3,
-
-        /// <summary>
-        /// 存在超链接的文本。
-        /// </summary>
-        hyperText = 1 << 4,
 
     }
 
