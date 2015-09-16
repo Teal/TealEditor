@@ -48,7 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\CodeEditorConfigs.cs" />
     <Compile Include="Core\Utility.cs" />
+    <Compile Include="Document\Document.cs" />
     <Compile Include="Document\SegmentType.cs" />
     <Compile Include="Document\DocumentLine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

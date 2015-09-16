@@ -12,7 +12,7 @@ namespace Teal.CodeEditor {
         #region 字符
 
         /// <summary>
-        /// 存储当前行的实际字符串数组。
+        /// 存储当前行的所有字符数据。
         /// </summary>
         private string _data;
 
@@ -20,6 +20,11 @@ namespace Teal.CodeEditor {
         /// 存储当前行的实际字符长度。
         /// </summary>
         private int _length;
+
+        /// <summary>
+        /// 获取当前行的所有字符数据。
+        /// </summary>
+        public string data => _data;
 
         /// <summary>
         /// 获取当前行的字符长度。
@@ -50,17 +55,20 @@ namespace Teal.CodeEditor {
                 return _data.Length;
             }
             set {
-                if (value <= _length)
-                    return;
-                var oldString = _data;
-                _data = Utility.FastAllocateString(value);
+                // 无法设置容器大小比字符串更短。
+                if (value < _length) {
+                    value = _length;
+                }
+
+                var oldData = _data;
+                _data = Utility.allocateString(value);
                 unsafe
                 {
-                    fixed (char* o = oldString)
+                    fixed (char* src = oldData)
                     {
-                        fixed (char* n = _data)
+                        fixed (char* dest = _data)
                         {
-                            Utility.wstrcpy(n, o, _length);
+                            Utility.wstrcpy(dest, src, _length);
                         }
                     }
                 }
@@ -68,14 +76,35 @@ namespace Teal.CodeEditor {
         }
 
         /// <summary>
-        /// 获取当前行指定位置的字符。
+        /// 获取或设置当前行指定位置的字符。
         /// </summary>
         /// <param name="index">要获取的索引。</param>
         /// <returns>返回对应的字符。</returns>
-        public char this[int index] => index >= 0 && index < _length ? _data[index] : '\0';
+        public char this[int index] {
+            get {
+                return index >= 0 && index < _length ? _data[index] : '\0';
+            }
+            set {
+                if (index < 0) {
+                    return;
+                }
+                if (index < _length) {
+                    unsafe
+                    {
+                        fixed (char* dest = _data)
+                        {
+                            dest[index] = value;
+                        }
+                    }
+                    onUpdate();
+                } else {
+                    append(value);
+                }
+            }
+        }
 
         /// <summary>
-        /// 获取当前行指定区域的子字符串。
+        /// 获取或设置当前行指定区域的子字符串。
         /// </summary>
         /// <param name="startIndex">要获取的开始索引。</param>
         /// <param name="endIndex">要获取的结束索引。</param>
@@ -91,6 +120,22 @@ namespace Teal.CodeEditor {
                 }
 
                 return startIndex >= endIndex ? String.Empty : _data.Substring(startIndex, endIndex - startIndex);
+            }
+            set {
+                remove(startIndex, endIndex - startIndex);
+                insert(startIndex, value);
+            }
+        }
+
+        /// <summary>
+        /// 获取或设置当前行的文本。
+        /// </summary>
+        public string text {
+            get {
+                return _length == 0 ? String.Empty : _data.Substring(0, _length);
+            }
+            set {
+                _data = value;
             }
         }
 
@@ -110,6 +155,37 @@ namespace Teal.CodeEditor {
         public DocumentLine(int capacity = 16)
             : this(new string('\0', capacity)) { }
 
+        /// <summary>
+        /// 返回当前行的字符串形式。
+        /// </summary>
+        /// <returns>表示当前对象的字符串。</returns>
+        public override string ToString() {
+            return text;
+        }
+
+        /// <summary>
+        /// 获取从指定位置开始指定长度的子字符串。
+        /// </summary>
+        /// <param name="startIndex">开始的索引。</param>
+        /// <param name="length">获取的字符串长度。</param>
+        /// <returns>返回子字符串。</returns>
+        public string substring(int startIndex, int length) {
+            return _data.Substring(startIndex, length);
+        }
+
+        /// <summary>
+        /// 获取从指定位置开始指定长度的子字符串。
+        /// </summary>
+        /// <param name="startIndex">开始的索引。</param>
+        /// <returns>返回子字符串。</returns>
+        public string substring(int startIndex) {
+            return substring(startIndex, length - startIndex);
+        }
+
+        private void onUpdate() {
+
+        }
+
         #endregion
 
         #region 追加
@@ -128,6 +204,7 @@ namespace Teal.CodeEditor {
                     n[currentLength] = value;
                 }
             }
+            onUpdate();
         }
 
         /// <summary>
@@ -147,6 +224,7 @@ namespace Teal.CodeEditor {
                     }
                 }
             }
+            onUpdate();
         }
 
         /// <summary>
@@ -161,6 +239,7 @@ namespace Teal.CodeEditor {
             {
                 Utility.wstrcpy(n + currentLength, value, charCount);
             }
+            onUpdate();
         }
 
         /// <summary>
@@ -178,16 +257,13 @@ namespace Teal.CodeEditor {
         /// <param name="startIndex">插入的起始位置。</param>
         /// <param name="charCount">插入的个数。</param>
         public void append(string value, int startIndex, int charCount) {
-            var currentLength = length;
-            length += charCount;
+            Debug.Assert(startIndex >= 0);
+            Debug.Assert(startIndex + charCount <= value.Length);
             unsafe
             {
-                fixed (char* o = value)
+                fixed (char* src = value)
                 {
-                    fixed (char* n = _data)
-                    {
-                        Utility.wstrcpy(n + currentLength, o + startIndex, charCount);
-                    }
+                    append(src + startIndex, charCount);
                 }
             }
         }
@@ -199,16 +275,13 @@ namespace Teal.CodeEditor {
         /// <param name="startIndex">数组的起始位置。</param>
         /// <param name="charCount">要追加的字符数。</param>
         public void append(char[] value, int startIndex, int charCount) {
-            var currentLength = length;
-            length += charCount;
+            Debug.Assert(startIndex >= 0);
+            Debug.Assert(startIndex + charCount <= value.Length);
             unsafe
             {
-                fixed (char* o = value)
+                fixed (char* src = value)
                 {
-                    fixed (char* n = _data)
-                    {
-                        Utility.wstrcpy(n + currentLength, o + startIndex, charCount);
-                    }
+                    append(src + startIndex, charCount);
                 }
             }
         }
@@ -224,8 +297,10 @@ namespace Teal.CodeEditor {
         /// <param name="value">要插入的字符串。</param>
         /// <param name="charCount">插入的长度。</param>
         public unsafe void insert(int index, char* value, int charCount) {
+            Debug.Assert(index >= 0);
             if (index >= _length) {
-                index = _length;
+                append(value, charCount);
+                return;
             }
             length += charCount;
             fixed (char* c = _data)
@@ -242,6 +317,7 @@ namespace Teal.CodeEditor {
                 Utility.wstrcpy(ce, value, charCount);
 
             }
+            onUpdate();
         }
 
         /// <summary>
@@ -281,6 +357,8 @@ namespace Teal.CodeEditor {
         /// <param name="startIndex">开始的索引。</param>
         /// <param name="charCount">插入的长度。</param>
         public unsafe void insert(int index, string value, int startIndex, int charCount) {
+            Debug.Assert(startIndex >= 0);
+            Debug.Assert(startIndex + charCount <= value.Length);
             fixed (char* p = value)
             {
                 insert(index, p + startIndex, charCount);
@@ -304,6 +382,8 @@ namespace Teal.CodeEditor {
         /// <param name="startIndex">开始的索引。</param>
         /// <param name="charCount">插入的长度。</param>
         public unsafe void insert(int index, char[] value, int startIndex, int charCount) {
+            Debug.Assert(startIndex >= 0);
+            Debug.Assert(startIndex + charCount <= value.Length);
             fixed (char* p = value)
             {
                 insert(index, p + startIndex, charCount);
@@ -328,6 +408,7 @@ namespace Teal.CodeEditor {
         /// </summary>
         public void clear() {
             _length = 0;
+            onUpdate();
         }
 
         /// <summary>
@@ -336,6 +417,8 @@ namespace Teal.CodeEditor {
         /// <param name="startIndex">开始的索引。</param>
         /// <param name="charCount">删除的长度。</param>
         public unsafe void remove(int startIndex, int charCount) {
+            Debug.Assert(startIndex >= 0);
+            Debug.Assert(startIndex + charCount <= _length);
             fixed (char* p = _data)
             {
                 var ps = p + startIndex;
@@ -343,9 +426,9 @@ namespace Teal.CodeEditor {
                 var copyLength = length - startIndex - charCount;
                 Utility.wstrcpy(ps, ps + charCount, copyLength);
 
-                length -= charCount;
+                _length -= charCount;
             }
-
+            onUpdate();
         }
 
         /// <summary>
@@ -353,98 +436,55 @@ namespace Teal.CodeEditor {
         /// </summary>
         /// <param name="startIndex">开始的索引。</param>
         public void remove(int startIndex) {
-            remove(startIndex, length - startIndex);
+            remove(startIndex, _length - startIndex);
         }
 
         #endregion
 
-        #region 获取
+        #region 行属性
 
         /// <summary>
-        /// 获取从指定位置开始指定长度的子字符串。
+        /// 获取当前行和上一行之间的换行符。
         /// </summary>
-        /// <param name="startIndex">开始的索引。</param>
-        /// <param name="length">获取的字符串长度。</param>
-        /// <returns>返回子字符串。</returns>
-        public string substring(int startIndex, int length) {
-            return _data.Substring(startIndex, length);
-        }
-
-        /// <summary>
-        /// 获取从指定位置开始指定长度的子字符串。
-        /// </summary>
-        /// <param name="startIndex">开始的索引。</param>
-        /// <returns>返回子字符串。</returns>
-        public string substring(int startIndex) {
-            return substring(startIndex, length - startIndex);
-        }
-
-        /// <summary>
-        /// 获取或设置当前行的文本。
-        /// </summary>
-        public string text {
+        public string newLine {
             get {
-                return _length == 0 ? String.Empty : _data.Substring(0, _length);
+                return Utility.newlineTypeToNewLine(newLineType);
             }
             set {
-                _data = value;
+                newLineType = Utility.newlineToNewLineType(value);
             }
         }
 
         /// <summary>
-        /// 返回当前行的字符串形式。
+        /// 获取当前行和上一行之间的换行符类型。
         /// </summary>
-        /// <returns>表示当前对象的字符串。</returns>
-        public override string ToString() {
-            return text;
+        public DocumentLineFlags newLineType {
+            get {
+                return flags & DocumentLineFlags.NEW_LINE_TYPE;
+            }
+            set {
+                flags = (flags & ~DocumentLineFlags.NEW_LINE_TYPE) | value;
+            }
         }
 
-        #endregion
+        /// <summary>
+        /// 获取当前行的缩进长度。
+        /// </summary>
+        public int indentCount {
+            get {
+                for (var i = 0; i < _length; i++) {
+                    if (!Utility.isIndentChar(_data[i])) {
+                        return i;
+                    }
+                }
+                return 0;
+            }
+        }
 
-        //#region 行的属性
-
-        ///// <summary>
-        ///// 获取当前行和上一行之间的换行符。
-        ///// </summary>
-        //public string newLine {
-        //    get {
-        //        return Utility.newlineTypeToNewLine(newLineType);
-        //    }
-        //    set {
-        //        newLineType = Utility.newlineToNewLineType(value);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 获取当前行和上一行之间的换行符类型。
-        ///// </summary>
-        //public DocumentLineFlags newLineType {
-        //    get {
-        //        return flags & DocumentLineFlags.NEW_LINE_TYPE;
-        //    }
-        //    set {
-        //        flags = (flags & ~DocumentLineFlags.NEW_LINE_TYPE) | value;
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 获取当前行的缩进长度。
-        ///// </summary>
-        //public int indentCount {
-        //    get {
-        //        for (var i = 0; i < length; i++) {
-        //            if (chars[i] != ' ' && chars[i] != '\t' && chars[i] != '\u3000') {
-        //                return i;
-        //            }
-        //        }
-        //        return 0;
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 获取或设置当前行的书签。
-        ///// </summary>
-        //public DocumentLineFlags flags;
+        /// <summary>
+        /// 获取或设置当前行的标记。
+        /// </summary>
+        public DocumentLineFlags flags;
 
         /////// <summary>
         /////// 获取或设置当前行的状态。
@@ -458,7 +498,7 @@ namespace Teal.CodeEditor {
         ////    }
         ////}
 
-        //#endregion
+        #endregion
 
         //#region 布局
 
@@ -802,11 +842,6 @@ namespace Teal.CodeEditor {
         //needRelayout,
 
         /// <summary>
-        /// 当前行已解析。
-        /// </summary>
-        parsed = 1 << 2,
-
-        /// <summary>
         /// 普通书签。
         /// </summary>
         bookmark = 1 << 3,
@@ -815,6 +850,11 @@ namespace Teal.CodeEditor {
         /// 包含断点。
         /// </summary>
         breakpoint = 1 << 4,
+
+        /// <summary>
+        /// 当前行已解析。
+        /// </summary>
+        parsed = 1 << 2,
 
         /// <summary>
         /// 正在激活。
@@ -863,7 +903,6 @@ namespace Teal.CodeEditor {
     /// <summary>
     /// 表示一个代码块。
     /// </summary>
-    [DebuggerStepThrough]
     public sealed class BlockSegment {
 
         /// <summary>

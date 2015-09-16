@@ -147,10 +147,15 @@ namespace Teal.CodeEditor {
             }
         }
 
+        public static bool isIndentChar(char c) {
+            return c == ' ' || c == '\t' || c == '\u3000';
+        }
+
         #region 字符串
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern string FastAllocateString(int length);
+        public static string allocateString(int length) {
+            return new String('\0', length);
+        }
 
         public unsafe static void wstrcpy(char* dest, char* src, int charCount) {
             memcpy((byte*)dest, (byte*)src, charCount << 1);

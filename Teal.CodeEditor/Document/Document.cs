@@ -19,6 +19,17 @@ namespace Teal.CodeEditor {
         /// </summary>
         public List<DocumentLine> lines = new List<DocumentLine>();
 
+        /// <summary>
+        /// 获取指定索引的行。
+        /// </summary>
+        /// <param name="index">要获取的行号。行号从 0 开始。</param>
+        /// <returns>返回指定的行。</returns>
+        public DocumentLine this[int index] {
+            get {
+                return index >= 0 && index < lines.Count ? lines[index] : null;
+            }
+        }
+
         ///// <summary>
         ///// 创建用于读取当前文档内容的读取器。
         ///// </summary>
@@ -181,10 +192,10 @@ namespace Teal.CodeEditor {
 
         #region 换行
 
-        ///// <summary>
-        ///// 当前文档的换行符。
-        ///// </summary>
-        //private DocumentLineFlags _newLineType = Configs.newLineType;
+        /// <summary>
+        /// 当前文档的换行符。
+        /// </summary>
+        private DocumentLineFlags _newLineType = CodeEditorConfigs.defaultNewLineType;
 
         /// <summary>
         /// 判断当前文档是否包含混合的换行符。
@@ -302,117 +313,117 @@ namespace Teal.CodeEditor {
 
         #endregion
 
-        //#region 修改
+        #region 修改
 
-        ///// <summary>
-        ///// 在指定位置插入一行。
-        ///// </summary>
-        ///// <param name="line">插入的行号。新插入的行将在指定行之后。</param>
-        ///// <param name="column">插入的列号。新插入的行将从指定列开始。</param>
-        ///// <param name="inheritIndents">指示新行是否继承原行的缩进。</param>
-        ///// <param name="newLineType">新行的换行符。如果为 null 则继承上一行。</param>
-        ///// <returns>返回插入的新行。</returns>
-        //public DocumentLine breakLine(int line, int column, bool inheritIndents = true, DocumentLineFlags newLineType = DocumentLineFlags.NEW_LINE_TYPE) {
-        //    int indentCount;
-        //    return breakLine(line, column, inheritIndents, newLineType, out indentCount);
-        //}
+        /// <summary>
+        /// 在指定位置插入一行。
+        /// </summary>
+        /// <param name="line">插入的行号。新插入的行将在指定行之后。</param>
+        /// <param name="column">插入的列号。新插入的行将从指定列开始。</param>
+        /// <param name="inheritIndents">指示新行是否继承原行的缩进。</param>
+        /// <param name="newLineType">新行的换行符。如果为 null 则继承上一行。</param>
+        /// <returns>返回插入的新行。</returns>
+        public DocumentLine breakLine(int line, int column, bool inheritIndents = true, DocumentLineFlags newLineType = DocumentLineFlags.NEW_LINE_TYPE) {
+            int indentCount;
+            return breakLine(line, column, inheritIndents, newLineType, out indentCount);
+        }
 
-        ///// <summary>
-        ///// 在指定位置插入一行。
-        ///// </summary>
-        ///// <param name="line">插入的行号。新插入的行将在指定行之后。</param>
-        ///// <param name="column">插入的列号。新插入的行将从指定列开始。</param>
-        ///// <param name="inheritIndents">指示新行是否继承原行的缩进。</param>
-        ///// <param name="newLineType">新行的换行符。如果为 null 则继承上一行。</param>
-        ///// <param name="indentCount">输出缩进的个数。</param>
-        ///// <returns>返回插入的新行。</returns>
-        //public DocumentLine breakLine(int line, int column, bool inheritIndents, DocumentLineFlags newLineType, out int indentCount) {
+        /// <summary>
+        /// 在指定位置插入一行。
+        /// </summary>
+        /// <param name="line">插入的行号。新插入的行将在指定行之后。</param>
+        /// <param name="column">插入的列号。新插入的行将从指定列开始。</param>
+        /// <param name="inheritIndents">指示新行是否继承原行的缩进。</param>
+        /// <param name="newLineType">新行的换行符。如果为 null 则继承上一行。</param>
+        /// <param name="indentCount">输出缩进的个数。</param>
+        /// <returns>返回插入的新行。</returns>
+        public DocumentLine breakLine(int line, int column, bool inheritIndents, DocumentLineFlags newLineType, out int indentCount) {
 
-        //    var oldDocumentLine = lines[line];
+            var oldDocumentLine = lines[line];
 
-        //    // 生成新行。
-        //    var newDocumentLine = new DocumentLine();
+            // 生成新行。
+            var newDocumentLine = new DocumentLine();
 
-        //    // 插入换行。
-        //    if (newLineType == DocumentLineFlags.NEW_LINE_TYPE) {
-        //        newLineType = oldDocumentLine.newLineType;
-        //    }
-        //    newDocumentLine.newLineType = newLineType;
+            // 插入换行。
+            if (newLineType == DocumentLineFlags.NEW_LINE_TYPE) {
+                newLineType = oldDocumentLine.newLineType;
+            }
+            newDocumentLine.newLineType = newLineType;
 
-        //    // 拷贝继承缩进。
-        //    if (inheritIndents) {
-        //        newDocumentLine.append(oldDocumentLine.chars, 0, oldDocumentLine.indentCount);
-        //    }
+            // 拷贝继承缩进。
+            if (inheritIndents) {
+                newDocumentLine.append(oldDocumentLine.data, 0, oldDocumentLine.indentCount);
+            }
 
-        //    // 生成新列。
-        //    var newColumn = indentCount = newDocumentLine.length;
+            // 生成新列。
+            var newColumn = indentCount = newDocumentLine.length;
 
-        //    // 将原行数据分成两行。
-        //    var restCount = oldDocumentLine.length - column;
-        //    if (restCount > 0) {
-        //        newDocumentLine.append(oldDocumentLine.chars, column, restCount);
-        //        oldDocumentLine.remove(column);
-        //    }
+            // 将原行数据分成两行。
+            var restCount = oldDocumentLine.length - column;
+            if (restCount > 0) {
+                newDocumentLine.append(oldDocumentLine.data, column, restCount);
+                oldDocumentLine.remove(column);
+            }
 
-        //    // 保存新行。
-        //    lines.Insert(line + 1, newDocumentLine);
+            // 保存新行。
+            lines.Insert(line + 1, newDocumentLine);
 
-        //    onUpdate(line, column, 0, 1, column, newColumn);
+            onUpdate(line, column, 0, 1, column, newColumn);
 
-        //    return newDocumentLine;
-        //}
+            return newDocumentLine;
+        }
 
-        ///// <summary>
-        ///// 将指定的行将和上一行合并为一行。
-        ///// </summary>
-        ///// <param name="line">要删除的行号。</param>
-        ///// <param name="column">要删除的列号。</param>
-        ///// <returns>返回删除的行。</returns>
-        //public DocumentLine unbreakLine(int line, int column = 0) {
-        //    if (line == 0) {
-        //        return null;
-        //    }
+        /// <summary>
+        /// 将指定的行将和上一行合并为一行。
+        /// </summary>
+        /// <param name="line">要删除的行号。</param>
+        /// <param name="column">要删除的列号。</param>
+        /// <returns>返回删除的行。</returns>
+        public DocumentLine unbreakLine(int line, int column = 0) {
+            if (line == 0) {
+                return null;
+            }
 
-        //    var oldLine = lines[line];
-        //    lines[line - 1].append(oldLine.chars, column, oldLine.length - column);
-        //    lines.RemoveAt(line);
+            var oldLine = lines[line];
+            lines[line - 1].append(oldLine.data, column, oldLine.length - column);
+            lines.RemoveAt(line);
 
-        //    onUpdate(line, column, 1, 0, column, lines[line - 1].length - column);
+            onUpdate(line, column, 1, 0, column, lines[line - 1].length - column);
 
-        //    return oldLine;
-        //}
+            return oldLine;
+        }
 
-        ///// <summary>
-        ///// 在指定位置插入一个非换行字符。
-        ///// </summary>
-        ///// <param name="line">插入的行号。</param>
-        ///// <param name="column">插入的列号。</param>
-        ///// <param name="value">插入的字符。不允许插入换行符。</param>
-        //public void insert(int line, int column, char value) {
-        //    lines[line].insert(column, value);
-        //    onUpdate(line, column, 0, 0, 0, 1);
-        //}
+        /// <summary>
+        /// 在指定位置插入一个非换行字符。
+        /// </summary>
+        /// <param name="line">插入的行号。</param>
+        /// <param name="column">插入的列号。</param>
+        /// <param name="value">插入的字符。不允许插入换行符。</param>
+        public void insert(int line, int column, char value) {
+            lines[line].insert(column, value);
+            onUpdate(line, column, 0, 0, 0, 1);
+        }
 
-        ///// <summary>
-        ///// 替换指定位置的字符。
-        ///// </summary>
-        ///// <param name="line">插入的行号。</param>
-        ///// <param name="column">插入的列号。</param>
-        ///// <param name="value">插入的字符。不允许插入换行符。</param>
-        //public void replace(int line, int column, char value) {
-        //    lines[line].chars[column] = value;
-        //    onUpdate(line, column + 1, 0, 0, 1, 1);
-        //}
+        /// <summary>
+        /// 替换指定位置的字符。
+        /// </summary>
+        /// <param name="line">插入的行号。</param>
+        /// <param name="column">插入的列号。</param>
+        /// <param name="value">插入的字符。不允许插入换行符。</param>
+        public void replace(int line, int column, char value) {
+            lines[line][column] = value;
+            onUpdate(line, column + 1, 0, 0, 1, 1);
+        }
 
-        ///// <summary>
-        ///// 删除指定位置的字符。
-        ///// </summary>
-        ///// <param name="line">删除的行号。</param>
-        ///// <param name="column">删除的列号。</param>
-        //public void delete(int line, int column) {
-        //    lines[line].remove(column, 1);
-        //    onUpdate(line, column, 0, 0, 1, 0);
-        //}
+        /// <summary>
+        /// 删除指定位置的字符。
+        /// </summary>
+        /// <param name="line">删除的行号。</param>
+        /// <param name="column">删除的列号。</param>
+        public void delete(int line, int column) {
+            lines[line].remove(column, 1);
+            onUpdate(line, column, 0, 0, 1, 0);
+        }
 
         ///// <summary>
         ///// 在指定位置插入一个多行字符串。
@@ -444,7 +455,7 @@ namespace Teal.CodeEditor {
         //    // 剪切被删除的行尾。
         //    var restCount = currentLine.length - column;
         //    if (restCount > 0) {
-        //        rest = new String(currentLine.chars, column, restCount);
+        //        rest = new String(currentLine.data, column, restCount);
         //        currentLine.remove(column);
         //    }
 
@@ -598,7 +609,7 @@ namespace Teal.CodeEditor {
 
         //}
 
-        //#endregion
+        #endregion
 
     }
 
