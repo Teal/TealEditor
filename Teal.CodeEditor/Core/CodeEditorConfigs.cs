@@ -9,7 +9,7 @@ namespace Teal.CodeEditor {
     /// </summary>
     public class CodeEditorConfigs {
 
-        //#region 渲染
+        #region 渲染
 
         //#region 边界
 
@@ -73,8 +73,8 @@ namespace Teal.CodeEditor {
         //public int documentPaddingRight = 2;
         //public int autoBreakMarkWidth = 10;
 
-        //public string defaultFontName = "Yahei Consolas Hybrid";
-        //public float defaultFontSize = 30;
+        public const string defaultFontName = "Yahei Consolas Hybrid";
+        public const float defaultFontSize = 30;
 
         //public int defaultVScrollBarSize = 21;
         //public int defaultHScrollBarSize = 21;
@@ -107,7 +107,7 @@ namespace Teal.CodeEditor {
 
         public const DocumentLineFlags defaultNewLineType = DocumentLineFlags.newLineTypeWin;
 
-        //#endregion
+        #endregion
 
     }
 

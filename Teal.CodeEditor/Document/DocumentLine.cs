@@ -753,6 +753,43 @@ namespace Teal.CodeEditor {
 
         #endregion
 
+        #region 折叠
+
+        /// <summary>
+        /// 存储从当前行开始的折叠域。
+        /// </summary>
+        private BlockSegment[] startBlocks;
+
+        #endregion
+
+        #region 布局
+
+        public BlockSegment getCollapsedBlock() {
+
+        }
+
+        internal void draw(ref LayoutInfo layoutInfo, int startColumn) {
+            Document document = layoutInfo.document;
+            Painter painter = document.painter;
+
+            // 绘制当前行的所有折叠块。
+
+            foreach (var startBlock in startBlocks) {
+                if (startBlock.collapsed) {
+
+                }
+            }
+
+            drawWithoutCollapsed(ref layoutInfo, layoutInfo.column, _length);
+
+        }
+
+        private void drawWithoutCollapsed(ref LayoutInfo layoutInfo, int startIndex, int endIndex) {
+
+        }
+
+        #endregion
+
     }
 
     public struct DocumentLayoutInfo {
@@ -919,6 +956,11 @@ namespace Teal.CodeEditor {
         /// 获取当前代码块的起始行。
         /// </summary>
         public DocumentLine startLine { get; internal set; }
+
+        /// <summary>
+        /// 获取当前代码块的起始列。
+        /// </summary>
+        public int startColumn;
 
         /// <summary>
         /// 获取当前代码块的结束行。

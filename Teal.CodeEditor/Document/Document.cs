@@ -10,7 +10,7 @@ namespace Teal.CodeEditor {
     /// <summary>
     /// 表示一个文档。
     /// </summary>
-    public sealed class Document {
+    public sealed partial class Document {
 
         #region 行
 

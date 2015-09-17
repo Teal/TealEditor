@@ -703,10 +703,10 @@ namespace Teal.CodeEditor {
         /// <param name="dashStyle">指示线条样式。</param>
         public void drawLine(int x1, int y1, int x2, int y2, DashStyle dashStyle) {
             var intPtr = Win32Api.CreatePen(dashStyle, 1, foreColor);
-            IntPtr obj = Win32.SelectObject(_hdc, intPtr);
+            IntPtr obj = Win32Api.SelectObject(_hdc, intPtr);
             drawLine(x1, y1, x2, y2);
-            Win32.SelectObject(_hdc, obj);
-            Win32.DeleteObject(intPtr);
+            Win32Api.SelectObject(_hdc, obj);
+            Win32Api.DeleteObject(intPtr);
         }
 
         /// <summary>

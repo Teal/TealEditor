@@ -11,10 +11,10 @@ namespace Teal.CodeEditor {
     /// </summary>
     public class SyntaxBinding {
 
-        /// <summary>
-        /// 获取当前语法绑定对应的编辑器。
-        /// </summary>
-        public CodeEditor codeEditor;
+        ///// <summary>
+        ///// 获取当前语法绑定对应的编辑器。
+        ///// </summary>
+        //public CodeEditor codeEditor;
 
         /// <summary>
         /// 判断一个字符是否是单词的分隔符。
@@ -41,25 +41,25 @@ namespace Teal.CodeEditor {
         /// <param name="column"></param>
         /// <returns></returns>
         public int findPrevWordStart(int line, int column) {
-            if (column > 0) {
-                var chars = codeEditor.document.lines[line].chars;
+            //if (column > 0) {
+            //    var chars = codeEditor.document.lines[line].chars;
 
-                // 跳到第一个改变字符类型的位置。
-                CharacterType t = getCharacterType(chars[column - 1]);
+            //    // 跳到第一个改变字符类型的位置。
+            //    CharacterType t = getCharacterType(chars[column - 1]);
 
-                // 如果本来就在空格处，则先忽略空格。
-                if (t == CharacterType.whitespace) {
-                    while (column > 0 && (t = getCharacterType(chars[column - 1])) == CharacterType.whitespace) {
-                        column--;
-                    }
-                }
+            //    // 如果本来就在空格处，则先忽略空格。
+            //    if (t == CharacterType.whitespace) {
+            //        while (column > 0 && (t = getCharacterType(chars[column - 1])) == CharacterType.whitespace) {
+            //            column--;
+            //        }
+            //    }
 
-                // 从当前位置开始找到第一个类型不同的位置。
-                while (column > 0 && getCharacterType(chars[column - 1]) == t) {
-                    column--;
-                }
+            //    // 从当前位置开始找到第一个类型不同的位置。
+            //    while (column > 0 && getCharacterType(chars[column - 1]) == t) {
+            //        column--;
+            //    }
 
-            }
+            //}
 
             return column;
         }
@@ -71,25 +71,25 @@ namespace Teal.CodeEditor {
         /// <param name="column"></param>
         /// <returns></returns>
         public int findNextWordEnd(int line, int column) {
-            var chars = codeEditor.document.lines[line].chars;
-            if (column < chars.Length) {
+            //var chars = codeEditor.document.lines[line].chars;
+            //if (column < chars.Length) {
 
-                // 跳到第一个改变字符类型的位置。
-                CharacterType t = getCharacterType(chars[column]);
+            //    // 跳到第一个改变字符类型的位置。
+            //    CharacterType t = getCharacterType(chars[column]);
 
-                // 如果本来就在空格处，则先忽略空格。
-                if (t == CharacterType.whitespace) {
-                    while (column < chars.Length && (t = getCharacterType(chars[column])) == CharacterType.whitespace) {
-                        column++;
-                    }
-                }
+            //    // 如果本来就在空格处，则先忽略空格。
+            //    if (t == CharacterType.whitespace) {
+            //        while (column < chars.Length && (t = getCharacterType(chars[column])) == CharacterType.whitespace) {
+            //            column++;
+            //        }
+            //    }
 
-                // 从当前位置开始找到第一个类型不同的位置。
-                while (column < chars.Length && getCharacterType(chars[column]) == t) {
-                    column++;
-                }
+            //    // 从当前位置开始找到第一个类型不同的位置。
+            //    while (column < chars.Length && getCharacterType(chars[column]) == t) {
+            //        column++;
+            //    }
 
-            }
+            //}
 
             return column;
         }
