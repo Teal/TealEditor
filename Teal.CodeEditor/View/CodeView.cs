@@ -15,16 +15,6 @@ namespace Teal.CodeEditor {
 
         #region 核心
 
-        /// <summary>
-        /// 获取用于绘制整个编辑器的绘图器。
-        /// </summary>
-        private readonly Painter _painter = new Painter(new Font(CodeEditorConfigs.defaultFontName, CodeEditorConfigs.defaultFontSize));
-
-        /// <summary>
-        /// 获取或设置当前视图的配置。
-        /// </summary>
-        public CodeEditorConfigs configs { get; set; } = new CodeEditorConfigs();
-
         private Document document { get; set; }
 
         #endregion
@@ -39,7 +29,7 @@ namespace Teal.CodeEditor {
 
 
 
-            // 获取 documentLine 的 segments
+            // 获取 documentLine 的 words
 
             var x = 0;
 
@@ -303,7 +293,7 @@ namespace Teal.CodeEditor {
 
         void t() {
             DocumentLine line;
-            // line.segments.First().type.c
+            // line.words.First().type.c
 
         }
 

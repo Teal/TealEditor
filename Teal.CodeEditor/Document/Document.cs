@@ -15,9 +15,25 @@ namespace Teal.CodeEditor {
         #region 行
 
         /// <summary>
+        /// 存储文档的所有行。
+        /// </summary>
+        private DocumentLine[] _lines = new DocumentLine[0];
+
+        /// <summary>
+        /// 存储当前文档的行数。
+        /// </summary>
+        private int _linesLength;
+
+        /// <summary>
         /// 获取当前文档的所有行。
         /// </summary>
-        public List<DocumentLine> lines = new List<DocumentLine>();
+        public IEnumerable<DocumentLine> lines {
+            get {
+                for (int i = 0; i < _linesLength; i++) {
+                    yield return _lines[i];
+                }
+            }
+        }
 
         /// <summary>
         /// 获取指定索引的行。
@@ -26,8 +42,12 @@ namespace Teal.CodeEditor {
         /// <returns>返回指定的行。</returns>
         public DocumentLine this[int index] {
             get {
-                return index >= 0 && index < lines.Count ? lines[index] : null;
+                return index >= 0 && index < _linesLength ? _lines[index] : null;
             }
+        }
+
+        private int indexOf(DocumentLine endLine, DocumentLine startLine) {
+            throw new NotImplementedException();
         }
 
         ///// <summary>
@@ -89,7 +109,7 @@ namespace Teal.CodeEditor {
         //        if (line.newLine != null) {
         //            writer.Write(line.newLine);
         //        }
-        //        writer.Write(line.chars, 0, line.length);
+        //        writer.Write(line.chars, 0, line.textLength);
         //    }
         //}
 
@@ -133,10 +153,10 @@ namespace Teal.CodeEditor {
         //    if (endLine == startLine) {
         //        sb.Append(lines[startLine].chars, startColumn, endColumn - startColumn);
         //    } else {
-        //        sb.Append(lines[startLine].chars, startColumn, lines[startLine].length - startColumn);
+        //        sb.Append(lines[startLine].chars, startColumn, lines[startLine].textLength - startColumn);
         //        for (var i = startLine + 1; i < endLine; i++) {
         //            sb.Append(lines[i].newLine);
-        //            sb.Append(lines[i].chars, 0, lines[i].length);
+        //            sb.Append(lines[i].chars, 0, lines[i].textLength);
         //        }
         //        sb.Append(lines[endLine].newLine);
         //        sb.Append(lines[endLine].chars, 0, endColumn);
@@ -356,7 +376,7 @@ namespace Teal.CodeEditor {
             }
 
             // 生成新列。
-            var newColumn = indentCount = newDocumentLine.length;
+            var newColumn = indentCount = newDocumentLine.textLength;
 
             // 将原行数据分成两行。
             var restCount = oldDocumentLine.length - column;
@@ -443,9 +463,9 @@ namespace Teal.CodeEditor {
         ///// <param name="column">插入的列号。</param>
         ///// <param name="value">插入的字符串。</param>
         ///// <param name="startIndex">插入的字符串起始位置。</param>
-        ///// <param name="length">插入的字符串长度。</param>
+        ///// <param name="textLength">插入的字符串长度。</param>
         ///// <returns>返回插入后的新位置。</returns>
-        //public Point insert(int line, int column, string value, int startIndex, int length) {
+        //public Point insert(int line, int column, string value, int startIndex, int textLength) {
 
         //    var currentLineNumber = line;
         //    var currentLine = lines[currentLineNumber];
@@ -453,7 +473,7 @@ namespace Teal.CodeEditor {
         //    string rest = null;
 
         //    // 剪切被删除的行尾。
-        //    var restCount = currentLine.length - column;
+        //    var restCount = currentLine.textLength - column;
         //    if (restCount > 0) {
         //        rest = new String(currentLine.data, column, restCount);
         //        currentLine.remove(column);
@@ -462,7 +482,7 @@ namespace Teal.CodeEditor {
         //    // 插入行。
         //    int index = startIndex, count;
         //    string newLine;
-        //    while ((count = Utility.readLine(value, length, ref index, out newLine)) > 0) {
+        //    while ((count = Utility.readLine(value, textLength, ref index, out newLine)) > 0) {
 
         //        // 插入当前行字符串。
         //        currentLine.append(value, startIndex, count);
@@ -482,7 +502,7 @@ namespace Teal.CodeEditor {
 
         //    }
 
-        //    var newColumn = currentLine.length;
+        //    var newColumn = currentLine.textLength;
 
         //    // 重新复制被粘贴的末尾。
         //    if (rest != null) {
@@ -521,14 +541,14 @@ namespace Teal.CodeEditor {
         ///// <param name="startIndex">替换的字符串起始位置。</param>
         ///// <param name="value">替换的字符串长度。</param>
         ///// <returns>返回插入后的新位置。</returns>
-        //public Point replace(int startLine, int startColumn, int endLine, int endColumn, string value, int startIndex, int length) {
+        //public Point replace(int startLine, int startColumn, int endLine, int endColumn, string value, int startIndex, int textLength) {
 
         //    var currentLineNumber = startLine;
         //    var currentLine = lines[currentLineNumber];
         //    string rest = null;
 
         //    // 剪切被删除的行尾。
-        //    var restCount = lines[endLine].length - endColumn;
+        //    var restCount = lines[endLine].textLength - endColumn;
         //    if (restCount > 0) {
         //        rest = new String(lines[endLine].chars, endColumn, restCount);
         //    }
@@ -539,7 +559,7 @@ namespace Teal.CodeEditor {
         //    // 插入行。
         //    int index = startIndex, count;
         //    string newLine;
-        //    while ((count = Utility.readLine(value, length, ref index, out newLine)) > 0) {
+        //    while ((count = Utility.readLine(value, textLength, ref index, out newLine)) > 0) {
 
         //        // 插入当前行字符串。
         //        currentLine.append(value, startIndex, count);
@@ -564,7 +584,7 @@ namespace Teal.CodeEditor {
 
         //    }
 
-        //    var newColumn = currentLine.length;
+        //    var newColumn = currentLine.textLength;
 
         //    // 粘贴被剪切的末尾。
         //    if (rest != null) {
@@ -599,7 +619,7 @@ namespace Teal.CodeEditor {
         //    var oldLine = lines[startLine];
 
         //    oldLine.remove(startColumn);
-        //    oldLine.append(lines[endLine].chars, endColumn, lines[endLine].length - endColumn);
+        //    oldLine.append(lines[endLine].chars, endColumn, lines[endLine].textLength - endColumn);
 
         //    for (var i = endLine; i > startLine; i++) {
         //        lines.RemoveAt(i);

@@ -11,28 +11,28 @@ namespace Teal.CodeEditor {
     /// <summary>
     /// 提供工具函数。
     /// </summary>
-    public static class Utility {
+    internal static class Utility {
 
         ///// <summary>
         ///// 在指定数组插入指定数量元素。
         ///// </summary>
         ///// <typeparam name="T"></typeparam>
         ///// <param name="array">原数组。</param>
-        ///// <param name="length">原数组的长度。</param>
+        ///// <param name="textLength">原数组的长度。</param>
         ///// <param name="index">要插入的位置。</param>
         ///// <param name="count">要插入的数量。</param>
         ///// <returns>返回已插入的数组。</returns>
-        //public static T[] insert<T>(T[] array, int length, int index, int count) {
+        //public static T[] insert<T>(T[] array, int textLength, int index, int count) {
 
-        //    var restCount = length - index;
+        //    var restCount = textLength - index;
 
         //    // 判断数组是否需要扩容。
-        //    if (length + count >= array.Length) {
-        //        var result = new T[length + count];
+        //    if (textLength + count >= array.Length) {
+        //        var result = new T[textLength + count];
 
         //        // 插入到数组末尾。
         //        if (restCount <= 0) {
-        //            Array.Copy(array, result, length);
+        //            Array.Copy(array, result, textLength);
         //        } else {
         //            Array.Copy(array, result, index);
         //            Array.Copy(array, index, result, index + count, restCount);
@@ -42,7 +42,7 @@ namespace Teal.CodeEditor {
         //    }
 
         //    if (restCount > 0) {
-        //        for (int from = length, to = length + count; restCount > 0; restCount--) {
+        //        for (int from = textLength, to = textLength + count; restCount > 0; restCount--) {
         //            array[to--] = array[from--];
         //        }
         //    }
@@ -55,13 +55,13 @@ namespace Teal.CodeEditor {
         ///// </summary>
         ///// <typeparam name="T"></typeparam>
         ///// <param name="array">原数组。</param>
-        ///// <param name="length">原数组的长度。</param>
+        ///// <param name="textLength">原数组的长度。</param>
         ///// <param name="index">要插入的位置。</param>
         ///// <param name="index">要插入的内容。</param>
-        //public static void insert<T>(ref T[] array, ref int length, int index, T value) {
+        //public static void insert<T>(ref T[] array, ref int textLength, int index, T value) {
 
         //    // 检查是否需扩容。
-        //    if (array.Length < ++length) {
+        //    if (array.Length < ++textLength) {
         //        var result = new T[array.Length << 1];
 
         //    }
@@ -274,6 +274,10 @@ namespace Teal.CodeEditor {
                     return;
             }
         }
+
+        #endregion
+
+        #region 数组列表
 
         #endregion
     }
