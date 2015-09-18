@@ -47,7 +47,7 @@ namespace Teal.CodeEditor.Test {
 
             line.parseSegments(new Block(null, all, preLine));
 
-            line.words.All((a) => {
+            line.segments.All((a) => {
                 Console.WriteLine($"{line[a.startIndex, a.endIndex]}: {a.type}");
                 return true;
             });

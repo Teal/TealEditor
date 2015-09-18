@@ -12,19 +12,14 @@ namespace Teal.CodeEditor {
         #region 字符
 
         /// <summary>
-        /// 存储当前行的所有字符数据。
+        /// 获取当前行的所有字符数据。
         /// </summary>
-        private string _data;
+        public string textData;
 
         /// <summary>
         /// 存储当前行的实际字符长度。
         /// </summary>
         private int _textLength;
-
-        /// <summary>
-        /// 获取当前行的所有字符数据。
-        /// </summary>
-        public string data => _data;
 
         /// <summary>
         /// 获取当前行的字符长度。
@@ -38,7 +33,7 @@ namespace Teal.CodeEditor {
                 // 确保字符串长度足够。
                 // 如果数据长度和字符串长度一致，说明当前行的数据是只读的。
                 // 此次必须重新创建一份长度不一致的字符串缓存对象。
-                if (_data.Length == _textLength || value >= _data.Length) {
+                if (TextData.Length == _textLength || value >= TextData.Length) {
                     capacity = Math.Max(_textLength << 1, value + 2);
                 }
 
@@ -52,7 +47,7 @@ namespace Teal.CodeEditor {
         /// </summary>
         public int capacity {
             get {
-                return _data.Length;
+                return TextData.Length;
             }
             set {
                 // 无法设置容器大小比字符串更短。
@@ -60,13 +55,13 @@ namespace Teal.CodeEditor {
                     value = _textLength;
                 }
 
-                var oldData = _data;
-                _data = Utility.allocateString(value);
+                var oldData = TextData;
+                textData = Utility.allocateString(value);
                 unsafe
                 {
                     fixed (char* src = oldData)
                     {
-                        fixed (char* dest = _data)
+                        fixed (char* dest = TextData)
                         {
                             Utility.wstrcpy(dest, src, _textLength);
                         }
@@ -82,7 +77,7 @@ namespace Teal.CodeEditor {
         /// <returns>返回对应的字符。</returns>
         public char this[int index] {
             get {
-                return index >= 0 && index < _textLength ? _data[index] : '\0';
+                return index >= 0 && index < _textLength ? TextData[index] : '\0';
             }
             set {
                 if (index < 0) {
@@ -91,7 +86,7 @@ namespace Teal.CodeEditor {
                 if (index < _textLength) {
                     unsafe
                     {
-                        fixed (char* dest = _data)
+                        fixed (char* dest = TextData)
                         {
                             dest[index] = value;
                         }
@@ -119,7 +114,7 @@ namespace Teal.CodeEditor {
                     endIndex = _textLength;
                 }
 
-                return startIndex >= endIndex ? String.Empty : _data.Substring(startIndex, endIndex - startIndex);
+                return startIndex >= endIndex ? String.Empty : TextData.Substring(startIndex, endIndex - startIndex);
             }
             set {
                 remove(startIndex, endIndex - startIndex);
@@ -132,10 +127,10 @@ namespace Teal.CodeEditor {
         /// </summary>
         public string text {
             get {
-                return _textLength == 0 ? String.Empty : _data.Substring(0, _textLength);
+                return _textLength == 0 ? String.Empty : TextData.Substring(0, _textLength);
             }
             set {
-                _data = value;
+                TextData = value;
             }
         }
 
@@ -144,7 +139,7 @@ namespace Teal.CodeEditor {
         /// </summary>
         /// <param name="value">初始化的值。</param>
         public DocumentLine(string value) {
-            this._data = value;
+            this.TextData = value;
             this._textLength = value.Length;
         }
 
@@ -170,7 +165,7 @@ namespace Teal.CodeEditor {
         /// <param name="length">获取的字符串长度。</param>
         /// <returns>返回子字符串。</returns>
         public string substring(int startIndex, int length) {
-            return _data.Substring(startIndex, length);
+            return TextData.Substring(startIndex, length);
         }
 
         /// <summary>
@@ -199,7 +194,7 @@ namespace Teal.CodeEditor {
             textLength++;
             unsafe
             {
-                fixed (char* n = _data)
+                fixed (char* n = TextData)
                 {
                     n[currentLength] = value;
                 }
@@ -217,7 +212,7 @@ namespace Teal.CodeEditor {
             textLength += repeatCount;
             unsafe
             {
-                fixed (char* n = _data)
+                fixed (char* n = TextData)
                 {
                     while (repeatCount-- > 0) {
                         n[currentLength++] = value;
@@ -235,7 +230,7 @@ namespace Teal.CodeEditor {
         public unsafe void append(char* value, int charCount) {
             var currentLength = textLength;
             textLength += charCount;
-            fixed (char* n = _data)
+            fixed (char* n = TextData)
             {
                 Utility.wstrcpy(n + currentLength, value, charCount);
             }
@@ -303,7 +298,7 @@ namespace Teal.CodeEditor {
                 return;
             }
             textLength += charCount;
-            fixed (char* c = _data)
+            fixed (char* c = TextData)
             {
                 var cs = c + textLength;
                 var cd = cs + charCount;
@@ -332,7 +327,7 @@ namespace Teal.CodeEditor {
             }
             var currentLength = textLength;
             textLength++;
-            fixed (char* c = _data)
+            fixed (char* c = TextData)
             {
 
                 var cs = c + textLength;
@@ -419,7 +414,7 @@ namespace Teal.CodeEditor {
         public unsafe void remove(int startIndex, int charCount) {
             Debug.Assert(startIndex >= 0);
             Debug.Assert(startIndex + charCount <= _textLength);
-            fixed (char* p = _data)
+            fixed (char* p = textData)
             {
                 var ps = p + startIndex;
 
@@ -473,7 +468,7 @@ namespace Teal.CodeEditor {
         public int indentCount {
             get {
                 for (var i = 0; i < _textLength; i++) {
-                    if (!Utility.isIndentChar(_data[i])) {
+                    if (!Utility.isIndentChar(textData[i])) {
                         return i;
                     }
                 }
@@ -561,22 +556,27 @@ namespace Teal.CodeEditor {
         #region 单词
 
         /// <summary>
-        /// 存储所有的单词列表。
+        /// 存储所有的片段分割器。
         /// </summary>
-        private Word[] _words = new Word[2];
+        public SegmentSplitter[] segmentSplitterData = new SegmentSplitter[2];
 
         /// <summary>
         /// 所有的片段列表实际长度。
         /// </summary>
-        private int _wordLength;
+        private int _segmentSplitterCount;
+
+        /// <summary>
+        /// 获取当前片段的数目。
+        /// </summary>
+        public int segmentSplitterCount => _segmentSplitterCount;
 
         /// <summary>
         /// 获取属于当前行的所有单词。
         /// </summary>
-        public IEnumerable<Word> words {
+        public IEnumerable<Segment> segments {
             get {
-                for (int i = 0; i < _wordLength; i++) {
-                    yield return _words[i];
+                for (int i = 0; i < _segmentSplitterCount; i++) {
+                    yield return segmentSplitterData[i];
                 }
             }
         }
@@ -621,7 +621,7 @@ namespace Teal.CodeEditor {
             redo:
 
             // 1. 查找父块的结束标志。
-            var parentBlockEnd = parentBlockSegment?.type.end.match(_data, startIndex, endIndex) ?? new PatternMatchResult(-1, -1);
+            var parentBlockEnd = parentBlockSegment?.type.end.match(TextData, startIndex, endIndex) ?? new PatternMatchResult(-1, -1);
 
             // 2. 查找子块开始标志。
             Word childSegment;
@@ -634,7 +634,7 @@ namespace Teal.CodeEditor {
             // 子片段可能是完全匹配一个单词或仅仅匹配其开始标记。
             if (parentSegmentType.children != null) {
                 foreach (var segmentType in parentSegmentType.children) {
-                    var matchResult = segmentType.start.match(_data, startIndex, endIndex);
+                    var matchResult = segmentType.start.match(TextData, startIndex, endIndex);
                     if (matchResult.success && matchResult.startIndex < childSegment.startIndex) {
                         childSegment.type = segmentType;
                         childSegment.startIndex = matchResult.startIndex;
@@ -647,9 +647,9 @@ namespace Teal.CodeEditor {
             if (childSegment.type != null) {
 
                 // 添加片段信息。
-                int segmentIndex = _wordLength;
-                Utility.appendArrayList(ref _words, ref _wordLength);
-                _words[segmentIndex] = childSegment;
+                int segmentIndex = _segmentSplitterCount;
+                Utility.appendArrayList(ref segmentSplitterData, ref _segmentSplitterCount);
+                segmentSplitterData[segmentIndex] = childSegment;
 
                 // 区分是块级片段还是内联片段。
                 if (childSegment.type.isBlock) {
@@ -659,10 +659,10 @@ namespace Teal.CodeEditor {
 
                     // 继续解析内部区块。
                     int childBlockEnd = parseSegment(ref block, childSegment.type, childSegment.endIndex, endIndex);
-                    _words[segmentIndex].endIndex = childBlockEnd;
+                    segmentSplitterData[segmentIndex].endIndex = childBlockEnd;
                     if (childBlockEnd < 0) {
                         if (!childSegment.type.isMultiLine) {
-                            _words[segmentIndex].endIndex = endIndex;
+                            segmentSplitterData[segmentIndex].endIndex = endIndex;
                         }
                         return childBlockEnd;
                     }
@@ -691,11 +691,11 @@ namespace Teal.CodeEditor {
 
                 // 如果当前行自之前的行开始则插入一个片段。
                 if (parentBlockSegment.startLine != this) {
-                    var segmentIndex = _wordLength;
-                    Utility.prependArrayList(ref _words, ref _wordLength);
-                    _words[0].type = parentSegmentType;
-                    _words[0].startIndex = -1;
-                    _words[0].endIndex = parentBlockEnd.endIndex;
+                    var segmentIndex = _segmentSplitterCount;
+                    Utility.prependArrayList(ref segmentSplitterData, ref _segmentSplitterCount);
+                    segmentSplitterData[0].type = parentSegmentType;
+                    segmentSplitterData[0].startIndex = -1;
+                    segmentSplitterData[0].endIndex = parentBlockEnd.endIndex;
                 }
 
                 // 设置块的结束行。
@@ -732,7 +732,7 @@ namespace Teal.CodeEditor {
         //    for (var i = 0; i < parentSegmentType.children.Length; i++) {
         //        var currentSegmentType = parentSegmentType.children[i];
         //        int startIndex, end;
-        //        currentSegmentType.startIndex.match(_data, startIndex, endIndex, out startIndex, out end);
+        //        currentSegmentType.startIndex.match(textData, startIndex, endIndex, out startIndex, out end);
         //        if (startIndex > 0 && childSegment.startIndex > startIndex) {
         //            childSegment.type = currentSegmentType;
         //            childSegment.startIndex = startIndex;
@@ -810,6 +810,7 @@ namespace Teal.CodeEditor {
         #endregion
 
     }
+
 
     public struct DocumentLayoutInfo {
 
@@ -947,8 +948,26 @@ namespace Teal.CodeEditor {
     //}
 
     /// <summary>
+    /// 表示一个行内片段分割器。同一行的文本可能被多个分割器分成多个部分。
+    /// </summary>
+    public struct SegmentSplitter {
+
+        /// <summary>
+        /// 获取当前分割列号之前的样式。
+        /// </summary>
+        public SegmentType type;
+
+        /// <summary>
+        /// 获取当前分割的列号。
+        /// </summary>
+        public int index;
+
+    }
+
+    /// <summary>
     /// 表示一个行内的片段。
     /// </summary>
+    [DebuggerStepThrough]
     public struct Segment {
 
         /// <summary>
@@ -957,31 +976,16 @@ namespace Teal.CodeEditor {
         public SegmentType type;
 
         /// <summary>
-        /// 获取当前片段在行内的开始位置。如果开始位置属于上一行，则返回 -1。
-        /// </summary>
-        public int index;
-
-    }
-
-    [DebuggerStepThrough]
-    public struct Word {
-
-        /// <summary>
-        /// 获取当前片段的类型。
-        /// </summary>
-        public SegmentType type;
-
-        /// <summary>
-        /// 获取当前片段在行内的开始位置。如果开始位置属于上一行，则返回 -1。
+        /// 获取当前片段在行内的开始位置。
         /// </summary>
         public int startIndex;
 
         /// <summary>
-        /// 获取当前片段在行内的结束位置。如果结束位置属于下一行，则返回 -1。
+        /// 获取当前片段在行内的结束位置。
         /// </summary>
         public int endIndex;
 
-        public Word(SegmentType type, int startIndex, int endIndex) {
+        public Segment(SegmentType type, int startIndex, int endIndex) {
             this.startIndex = startIndex;
             this.endIndex = endIndex;
             this.type = type;

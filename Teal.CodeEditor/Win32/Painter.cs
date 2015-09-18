@@ -345,33 +345,9 @@ namespace Teal.CodeEditor {
             return null;
         }
 
-        /// <summary>
-        /// 获取或设置 TAB 字符宽度。如果是负数表示强制宽度值，不允许自动对齐。
-        /// </summary>
-        public int tabWidth;
-
         #endregion
 
         #region 绘制和测量文本
-
-        /// <summary>
-        /// 计算加上 TAB 后新坐标。
-        /// </summary>
-        /// <param name="x">当前的左边距。</param>
-        /// <returns>返回添加 TAB 后的左边距。</returns>
-        public int alignTab(int x) {
-            return tabWidth <= 0 ? x - tabWidth : (x / tabWidth + 1) * tabWidth;
-        }
-
-        /// <summary>
-        /// 计算加上指定字符后新坐标。
-        /// </summary>
-        /// <param name="x">当前的左边距。</param>
-        /// <param name="ch">追加的字符。</param>
-        /// <returns>返回添加指定字符后的新坐标。</returns>
-        public int alignChar(int x, char ch) {
-            return ch == '\t' ? alignTab(x) : (x + measureString(ch));
-        }
 
         /// <summary>
         /// 计算加上指定字符串后新坐标。
@@ -504,6 +480,20 @@ namespace Teal.CodeEditor {
         /// <param name="length">要绘制的长度。</param>
         /// <param name="pt">绘制的位置。</param>
         public unsafe void drawString(char[] value, int startIndex, int length, int x, int y) {
+            fixed (char* p = value)
+            {
+                drawString(p + startIndex, length, x, y);
+            }
+        }
+
+        /// <summary>
+        /// 绘制单行字符串。
+        /// </summary>
+        /// <param name="value">要绘制的字符数组。</param>
+        /// <param name="startIndex">开始绘制的索引。</param>
+        /// <param name="length">要绘制的长度。</param>
+        /// <param name="pt">绘制的位置。</param>
+        public unsafe void drawString(string value, int startIndex, int length, int x, int y) {
             fixed (char* p = value)
             {
                 drawString(p + startIndex, length, x, y);

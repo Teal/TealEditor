@@ -5,11 +5,35 @@ using System.Windows.Forms;
 namespace Teal.CodeEditor {
 
     /// <summary>
+    /// 表示一个文档。
+    /// </summary>
+    public sealed partial class Document {
+
+        /// <summary>
+        /// 获取或设置当前视图的配置。
+        /// </summary>
+        public DocumentConfigs configs {
+            get;
+            set;
+        } = new DocumentConfigs();
+
+        private SyntaxBinding _syntaxBinding;
+
+    }
+
+    /// <summary>
     /// 表示编辑器的默认配置。
     /// </summary>
-    public class CodeEditorConfigs {
+    public class DocumentConfigs {
 
         #region 渲染
+
+        public const int defaultTabWidth = 40;
+
+        /// <summary>
+        /// 获取或设置 TAB 字符宽度。如果是负数表示强制宽度值，不允许自动对齐。
+        /// </summary>
+        public int tabWidth = defaultTabWidth;
 
         //#region 边界
 
@@ -57,7 +81,7 @@ namespace Teal.CodeEditor {
         //public uint textColor = 0x454545;
 
         //public int initialVisualLineCount = 100;
-        //public int defaultTabWidth = 4;
+
 
         ///// <summary>
         ///// 自动换行后新行是否自动继承上行的缩进。
@@ -68,6 +92,11 @@ namespace Teal.CodeEditor {
         ///// 当自动换行后新行的缩进空格数。
         ///// </summary>
         //public int defaultWrapIndentCount = 2;
+
+        /// <summary>
+        /// 当自动换行后新行的缩进空格数。
+        /// </summary>
+        public int wrapIndentCount;
 
         //public int documentPaddingLeft = 2;
         //public int documentPaddingRight = 2;

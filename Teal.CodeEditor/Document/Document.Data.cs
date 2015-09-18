@@ -22,14 +22,14 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 存储当前文档的行数。
         /// </summary>
-        private int _linesLength;
+        private int _lineCount;
 
         /// <summary>
         /// 获取当前文档的所有行。
         /// </summary>
         public IEnumerable<DocumentLine> lines {
             get {
-                for (int i = 0; i < _linesLength; i++) {
+                for (int i = 0; i < _lineCount; i++) {
                     yield return _lines[i];
                 }
             }
@@ -42,7 +42,7 @@ namespace Teal.CodeEditor {
         /// <returns>返回指定的行。</returns>
         public DocumentLine this[int index] {
             get {
-                return index >= 0 && index < _linesLength ? _lines[index] : null;
+                return index >= 0 && index < _lineCount ? _lines[index] : null;
             }
         }
 
@@ -175,6 +175,22 @@ namespace Teal.CodeEditor {
 
         #endregion
 
+        #region 选项
+
+        #endregion
+
+        #region 布局
+
+
+        #endregion
+
+    }
+
+    /// <summary>
+    /// 表示一个文档。
+    /// </summary>
+    public sealed partial class Document {
+
         #region 区域
 
         ///// <summary>
@@ -215,7 +231,7 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 当前文档的换行符。
         /// </summary>
-        private DocumentLineFlags _newLineType = CodeEditorConfigs.defaultNewLineType;
+        private DocumentLineFlags _newLineType = DocumentConfigs.defaultNewLineType;
 
         /// <summary>
         /// 判断当前文档是否包含混合的换行符。
@@ -475,7 +491,7 @@ namespace Teal.CodeEditor {
         //    // 剪切被删除的行尾。
         //    var restCount = currentLine.textLength - column;
         //    if (restCount > 0) {
-        //        rest = new String(currentLine.data, column, restCount);
+        //        rest = new String(currentLine.TextData, column, restCount);
         //        currentLine.remove(column);
         //    }
 

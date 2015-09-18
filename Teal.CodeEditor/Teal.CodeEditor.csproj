@@ -48,9 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\CodeEditorConfigs.cs" />
+    <Compile Include="Document\Document.Configs.cs" />
     <Compile Include="Core\Utility.cs" />
-    <Compile Include="Document\Document.cs" />
+    <Compile Include="Document\Document.Data.cs" />
     <Compile Include="Document\Document.Layout.cs" />
     <Compile Include="Document\BlockType.cs" />
     <Compile Include="Document\DocumentLine.cs" />
@@ -63,6 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="note.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Document\Document.Scrolling.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

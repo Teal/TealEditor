@@ -29,7 +29,7 @@ namespace Teal.CodeEditor {
 
 
 
-            // 获取 documentLine 的 words
+            // 获取 documentLine 的 segments
 
             var x = 0;
 
@@ -293,7 +293,7 @@ namespace Teal.CodeEditor {
 
         void t() {
             DocumentLine line;
-            // line.words.First().type.c
+            // line.segments.First().type.c
 
         }
 
