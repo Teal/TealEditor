@@ -48,22 +48,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\CodeEditorConfigs.cs" />
-    <Compile Include="Core\Utility.cs" />
-    <Compile Include="Document\Document.cs" />
+    <Compile Include="Editing\CodeEditor.Core.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Utility\ArrayList.cs" />
+    <Compile Include="Document\Document.Core.cs" />
+    <Compile Include="Utility\Utility.cs" />
+    <Compile Include="Document\Document.Lines.cs" />
     <Compile Include="Document\Document.Layout.cs" />
     <Compile Include="Document\BlockType.cs" />
     <Compile Include="Document\DocumentLine.cs" />
     <Compile Include="Document\SegmentType.cs" />
+    <Compile Include="Utility\StringBuffer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SyntaxBinding\SyntaxBinding.cs" />
-    <Compile Include="View\CodeView.cs" />
     <Compile Include="Win32\Painter.cs" />
     <Compile Include="Win32\Win32Api.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="note.txt" />
+    <Content Include="_bak.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Document\Document.Scrolling.cs" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

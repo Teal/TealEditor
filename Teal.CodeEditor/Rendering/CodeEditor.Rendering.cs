@@ -379,52 +379,6 @@ namespace Teal.CodeEditor {
         }
 
         /// <summary>
-        /// 引发 <see cref="E:System.Windows.Forms.Control.Paint"/> 事件。
-        /// </summary>
-        /// <param name="e">包含事件数据的 <see cref="T:System.Windows.Forms.PaintEventArgs"/>。</param>
-        protected override void OnPaint(PaintEventArgs e) {
-            Utility.mark(e.ClipRectangle);
-
-            painter.beginPaint(e.Graphics);
-
-            draw(e.ClipRectangle.Left, e.ClipRectangle.Top, e.ClipRectangle.Right, e.ClipRectangle.Bottom);
-
-            painter.endPaint(e.Graphics);
-
-            return;
-            if (!e.ClipRectangle.IsEmpty) {
-                this.painter222.BeginPaint(e.Graphics);
-                try {
-                    this.PaintScrollRect(this.painter222);
-                    Rectangle clientRect = this.GetClientRect(true);
-                    Rectangle rect = clientRect;
-                    rect.Intersect(e.ClipRectangle);
-
-                    int num = 0;
-                    if (this.scrolling.ScrollByPixels) {
-                        if (this.painter222.lineHeight != 0) {
-                            num = this.scrolling.WindowOriginY / this.painter222.lineHeight;
-                            int num2 = this.scrolling.WindowOriginY % this.painter222.lineHeight;
-                            clientRect.Y -= num2;
-                            rect.Height += num2;
-                        }
-                    } else {
-                        num = this.scrolling.WindowOriginY;
-                    }
-
-                    this.syntaxPaint.PaintWindow(this.painter222, num, rect, clientRect.Location, 1f, 1f, this.scrolling.ScrollByPixels, false);
-                    if (this.Gutter.DrawLineBookmarks) {
-                        this.syntaxPaint.PaintLineBookMarks(this.painter222, this.ClientRect);
-                    }
-                } finally {
-                    this.painter222.EndPaint();
-                }
-                this.syntaxPaint.NeedPaint = false;
-                base.OnPaint(e);
-            }
-        }
-
-        /// <summary>
         /// 绘制指定文本。
         /// </summary>
         /// <param name="visualLineText">要绘制的文本。</param>

@@ -1,6 +1,4 @@
-﻿using Teal.CodeEditor.TextSource;
-using Teal.Syntax;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -13,107 +11,159 @@ namespace Teal.CodeEditor {
     public partial class CodeEditor : Control {
 
         /// <summary>
+        /// 获取或设置当前编辑器对应的文档。
+        /// </summary>
+        public Document document = new Document();
+
+        /// <summary>
         /// 获取或设置当前编辑器的配置。
         /// </summary>
-        public CodeEditorConfigs configs = new CodeEditorConfigs();
+        public DocumentConfigs configs {
+            get {
+                return document.configs;
+            }
+            set {
+                document.configs = value;
+            }
+        }
 
-        //        private SyntaxBinding _synataxBinding = new SyntaxBinding();
+        /// <summary>
+        /// 获取或设置当前编辑器的语法绑定。
+        /// </summary>
+        public SyntaxBinding syntaxBinding {
+            get {
+                return document.syntaxBinding;
+            }
+            set {
+                document.syntaxBinding = value;
+            }
+        }
 
-        //        public SyntaxBinding synataxBinding {
-        //            get {
-        //                return _synataxBinding;
-        //            }
-        //        }
+        /// <summary>
+        /// 初始化 <see cref="CodeEditor"/> 类的新实例。
+        /// </summary>
+        public CodeEditor() {
 
-        //        /// <summary>
-        //        /// 初始化 <see cref="CodeEditor"/> 类的新实例。
-        //        /// </summary>
-        //        public CodeEditor() {
+            //            _synataxBinding.codeEditor = this;
 
-        //            _synataxBinding.codeEditor = this;
+            //            SuspendLayout();
 
-        //            SuspendLayout();
+            //            // 设置基本属性。
+            //            base.SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserMouse | ControlStyles.Opaque | ControlStyles.Selectable | ControlStyles.ResizeRedraw, true);
 
-        //            // 设置基本属性。
-        //            base.SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserMouse | ControlStyles.Opaque | ControlStyles.Selectable | ControlStyles.ResizeRedraw, true);
+            //            // 初始化分割按钮。
+            //            _splitButton.MouseDown += splitButton_MouseDown;
+            //            Controls.Add(_splitButton);
 
-        //            // 初始化分割按钮。
-        //            _splitButton.MouseDown += splitButton_MouseDown;
-        //            Controls.Add(_splitButton);
+            //            // 初始化文档。
+            //            _document.update += document_update;
 
-        //            // 初始化文档。
-        //            _document.update += document_update;
+            //            // 初始化布局。
+            //            painter.tabWidth = painter.measureString(' ') * Configs.defaultTabWidth;
+            //            _wrapIndentWidth = painter.measureString(' ') * Configs.defaultWrapIndentCount;
 
-        //            // 初始化布局。
-        //            painter.tabWidth = painter.measureString(' ') * Configs.defaultTabWidth;
-        //            _wrapIndentWidth = painter.measureString(' ') * Configs.defaultWrapIndentCount;
+            //#pragma warning disable 162
+            //            _documentMaxWidth = Configs.defaultWordWrap ? 0 : int.MaxValue;
+            //#pragma warning restore 162
+            //            _maxLineNumberInWidth = (int)Math.Pow(10, _lineNumbersWidth / painter.fontWidth) - _lineNumbersStart + 1;
 
-        //#pragma warning disable 162
-        //            _documentMaxWidth = Configs.defaultWordWrap ? 0 : int.MaxValue;
-        //#pragma warning restore 162
-        //            _maxLineNumberInWidth = (int)Math.Pow(10, _lineNumbersWidth / painter.fontWidth) - _lineNumbersStart + 1;
+            //            // 重新计算文档大小。
+            //            updateDocumentSize();
 
-        //            // 重新计算文档大小。
-        //            updateDocumentSize();
+            //            ResumeLayout(false);
 
-        //            ResumeLayout(false);
+            //            initDefaultActions();
 
-        //            initDefaultActions();
+            //            //_document.text = @"	01234 56789
+            //            //01234 56789" + '\u0002' + "aaa";
 
-        //            //_document.text = @"	01234 56789
-        //            //01234 56789" + '\u0002' + "aaa";
+            //            return;
 
-        //            return;
+            //            this.components = new Container();
+            //            this.codeCompletionAction = new ThreadProc(this.CodeCompletionAction);
+            //            this.codeCompletionStart = new ThreadProc(this.CodeCompletionStart);
+            //            this.codeCompletionEnd = new ThreadProc(this.CodeCompletionEnd);
+            //            this.innerTextSource = new Teal.CodeEditor.TextSource.TextSource();
+            //            this.Source = this.innerTextSource;
+            //            this.source = null;
+            //            this.painter222 = new Painter();
+            //            // return new GdiPlusPainter();
+            //            this.gutter = new Gutter(this);
+            //            this.displayLines = new DisplayStrings(this, this.Lines);
+            //            this.margin = new Margin(this);
+            //            this.selection = new Selection2(this);
+            //            this.scrolling = new Scrolling(this);
+            //            this.whiteSpace = new WhiteSpace(this);
+            //            this.lineSeparator = new LineSeparator(this);
+            //            this.lineStyles = new EditLineStyles(this);
+            //            this.braces = new Braces(this);
+            //            this.hyperText = new EditHyperText(this);
+            //            this.outlining = new Outlining(this);
+            //            this.spelling = new EditSpelling(this);
+            //            this.keyList = new KeyList(this);
+            //            this.macroRecords = new MacroKeyList();
+            //            this.syntaxPaint = new EditSyntaxPaint(this.painter222, this);
+            //            this.printing = this.CreatePrinting();
+            //            this.syntaxSettings = new Teal.CodeEditor.Dialogs.SyntaxSettings();
+            //            this.notifyEventArgs = new NotifyEventArgs();
+            //            this.autoCorrectEventArgs = new AutoCorrectEventArgs();
+            //            base.QueryContinueDrag += new QueryContinueDragEventHandler(this.QueryEndDrag);
+            //            //  this.Font = new Font(FontFamily.GenericMonospace, 30f);
+            //            this.Font = painter.font;
+            //            this.painter222.font = this.Font;
+            //            this.BackColor = Consts.DefaultControlBackColor;
 
-        //            this.components = new Container();
-        //            this.codeCompletionAction = new ThreadProc(this.CodeCompletionAction);
-        //            this.codeCompletionStart = new ThreadProc(this.CodeCompletionStart);
-        //            this.codeCompletionEnd = new ThreadProc(this.CodeCompletionEnd);
-        //            this.innerTextSource = new Teal.CodeEditor.TextSource.TextSource();
-        //            this.Source = this.innerTextSource;
-        //            this.source = null;
-        //            this.painter222 = new Painter();
-        //            // return new GdiPlusPainter();
-        //            this.gutter = new Gutter(this);
-        //            this.displayLines = new DisplayStrings(this, this.Lines);
-        //            this.margin = new Margin(this);
-        //            this.selection = new Selection2(this);
-        //            this.scrolling = new Scrolling(this);
-        //            this.whiteSpace = new WhiteSpace(this);
-        //            this.lineSeparator = new LineSeparator(this);
-        //            this.lineStyles = new EditLineStyles(this);
-        //            this.braces = new Braces(this);
-        //            this.hyperText = new EditHyperText(this);
-        //            this.outlining = new Outlining(this);
-        //            this.spelling = new EditSpelling(this);
-        //            this.keyList = new KeyList(this);
-        //            this.macroRecords = new MacroKeyList();
-        //            this.syntaxPaint = new EditSyntaxPaint(this.painter222, this);
-        //            this.printing = this.CreatePrinting();
-        //            this.syntaxSettings = new Teal.CodeEditor.Dialogs.SyntaxSettings();
-        //            this.notifyEventArgs = new NotifyEventArgs();
-        //            this.autoCorrectEventArgs = new AutoCorrectEventArgs();
-        //            base.QueryContinueDrag += new QueryContinueDragEventHandler(this.QueryEndDrag);
-        //            //  this.Font = new Font(FontFamily.GenericMonospace, 30f);
-        //            this.Font = painter.font;
-        //            this.painter222.font = this.Font;
-        //            this.BackColor = Consts.DefaultControlBackColor;
+        }
 
-        //        }
+        /// <summary>
+        /// 引发 <see cref="E:System.Windows.Forms.Control.Paint"/> 事件。
+        /// </summary>
+        /// <param name="e">包含事件数据的 <see cref="T:System.Windows.Forms.PaintEventArgs"/>。</param>
+        protected override void OnPaint(PaintEventArgs e) {
+            document.draw(e.Graphics, e.ClipRectangle.Top, e.ClipRectangle.Bottom);
 
-        //        #region 继承的事件
+            return;
+            //if (!e.ClipRectangle.IsEmpty) {
+            //    this.painter222.BeginPaint(e.Graphics);
+            //    try {
+            //        this.PaintScrollRect(this.painter222);
+            //        Rectangle clientRect = this.GetClientRect(true);
+            //        Rectangle rect = clientRect;
+            //        rect.Intersect(e.ClipRectangle);
 
-        //        /// <summary>
-        //        /// 获取或设置控件的默认光标。
-        //        /// </summary>
-        //        /// <returns>
-        //        /// 一个 <see cref="T:System.Windows.Forms.Cursor"/> 类型的对象，表示当前默认光标。
-        //        /// </returns>
-        //        protected override Cursor DefaultCursor {
-        //            get {
-        //                return Cursors.IBeam;
-        //            }
-        //        }
+            //        int num = 0;
+            //        if (this.scrolling.ScrollByPixels) {
+            //            if (this.painter222.lineHeight != 0) {
+            //                num = this.scrolling.WindowOriginY / this.painter222.lineHeight;
+            //                int num2 = this.scrolling.WindowOriginY % this.painter222.lineHeight;
+            //                clientRect.Y -= num2;
+            //                rect.Height += num2;
+            //            }
+            //        } else {
+            //            num = this.scrolling.WindowOriginY;
+            //        }
+
+            //        this.syntaxPaint.PaintWindow(this.painter222, num, rect, clientRect.Location, 1f, 1f, this.scrolling.ScrollByPixels, false);
+            //        if (this.Gutter.DrawLineBookmarks) {
+            //            this.syntaxPaint.PaintLineBookMarks(this.painter222, this.ClientRect);
+            //        }
+            //    } finally {
+            //        this.painter222.EndPaint();
+            //    }
+            //    this.syntaxPaint.NeedPaint = false;
+            //    base.OnPaint(e);
+            //}
+        }
+
+        // #region 继承的事件
+
+        /// <summary>
+        /// 获取或设置控件的默认光标。
+        /// </summary>
+        /// <returns>
+        /// 一个 <see cref="T:System.Windows.Forms.Cursor"/> 类型的对象，表示当前默认光标。
+        /// </returns>
+        protected override Cursor DefaultCursor => Cursors.IBeam;
 
         //        #region 布局
 

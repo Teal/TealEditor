@@ -12,66 +12,19 @@ namespace Teal.CodeEditor {
         #region 字符
 
         /// <summary>
-        /// 存储当前行的所有字符数据。
+        /// 获取当前行的所有字符串缓存。
         /// </summary>
-        private string _data;
+        public StringBuffer buffer;
 
         /// <summary>
-        /// 存储当前行的实际字符长度。
+        /// 获取或设置当前行的文本。
         /// </summary>
-        private int _textLength;
-
-        /// <summary>
-        /// 获取当前行的所有字符数据。
-        /// </summary>
-        public string data => _data;
-
-        /// <summary>
-        /// 获取当前行的字符长度。
-        /// </summary>
-        public int textLength {
+        public string text {
             get {
-                return _textLength;
-            }
-            private set {
-
-                // 确保字符串长度足够。
-                // 如果数据长度和字符串长度一致，说明当前行的数据是只读的。
-                // 此次必须重新创建一份长度不一致的字符串缓存对象。
-                if (_data.Length == _textLength || value >= _data.Length) {
-                    capacity = Math.Max(_textLength << 1, value + 2);
-                }
-
-                _textLength = value;
-
-            }
-        }
-
-        /// <summary>
-        /// 获取或设置当前行最多可容纳的字符数。
-        /// </summary>
-        public int capacity {
-            get {
-                return _data.Length;
+                return buffer.ToString();
             }
             set {
-                // 无法设置容器大小比字符串更短。
-                if (value < _textLength) {
-                    value = _textLength;
-                }
-
-                var oldData = _data;
-                _data = Utility.allocateString(value);
-                unsafe
-                {
-                    fixed (char* src = oldData)
-                    {
-                        fixed (char* dest = _data)
-                        {
-                            Utility.wstrcpy(dest, src, _textLength);
-                        }
-                    }
-                }
+                buffer.set(value);
             }
         }
 
@@ -82,24 +35,10 @@ namespace Teal.CodeEditor {
         /// <returns>返回对应的字符。</returns>
         public char this[int index] {
             get {
-                return index >= 0 && index < _textLength ? _data[index] : '\0';
+                return buffer[index];
             }
             set {
-                if (index < 0) {
-                    return;
-                }
-                if (index < _textLength) {
-                    unsafe
-                    {
-                        fixed (char* dest = _data)
-                        {
-                            dest[index] = value;
-                        }
-                    }
-                    onUpdate();
-                } else {
-                    append(value);
-                }
+                buffer[index] = value;
             }
         }
 
@@ -111,333 +50,41 @@ namespace Teal.CodeEditor {
         /// <returns>返回子字符串。</returns>
         public string this[int startIndex, int endIndex] {
             get {
-                if (startIndex < 0) {
-                    startIndex = 0;
-                }
-
-                if (endIndex > _textLength) {
-                    endIndex = _textLength;
-                }
-
-                return startIndex >= endIndex ? String.Empty : _data.Substring(startIndex, endIndex - startIndex);
+                return buffer[startIndex, endIndex];
             }
             set {
-                remove(startIndex, endIndex - startIndex);
-                insert(startIndex, value);
+                buffer[startIndex, endIndex] = value;
             }
         }
 
         /// <summary>
-        /// 获取或设置当前行的文本。
+        /// 获取当前行的实际字符长度。
         /// </summary>
-        public string text {
-            get {
-                return _textLength == 0 ? String.Empty : _data.Substring(0, _textLength);
-            }
-            set {
-                _data = value;
-            }
-        }
+        public int textLength => buffer.length;
 
         /// <summary>
         /// 初始化 <see cref="DocumentLine"/> 类的新实例。
         /// </summary>
         /// <param name="value">初始化的值。</param>
         public DocumentLine(string value) {
-            this._data = value;
-            this._textLength = value.Length;
+            buffer = new StringBuffer(value);
+            segments = new ArrayList<SegmentSplitter>(value.Length >> 4);
         }
 
         /// <summary>
         /// 初始化 <see cref="DocumentLine" /> 类的新实例。
         /// </summary>
         /// <param name="capacity">初始化容量。</param>
-        public DocumentLine(int capacity = 16)
-            : this(new string('\0', capacity)) { }
+        public DocumentLine(int capacity = 16) {
+            buffer = new StringBuffer(capacity);
+            segments = new ArrayList<SegmentSplitter>(capacity >> 4);
+        }
 
         /// <summary>
         /// 返回当前行的字符串形式。
         /// </summary>
         /// <returns>表示当前对象的字符串。</returns>
-        public override string ToString() {
-            return text;
-        }
-
-        /// <summary>
-        /// 获取从指定位置开始指定长度的子字符串。
-        /// </summary>
-        /// <param name="startIndex">开始的索引。</param>
-        /// <param name="length">获取的字符串长度。</param>
-        /// <returns>返回子字符串。</returns>
-        public string substring(int startIndex, int length) {
-            return _data.Substring(startIndex, length);
-        }
-
-        /// <summary>
-        /// 获取从指定位置开始指定长度的子字符串。
-        /// </summary>
-        /// <param name="startIndex">开始的索引。</param>
-        /// <returns>返回子字符串。</returns>
-        public string substring(int startIndex) {
-            return substring(startIndex, textLength - startIndex);
-        }
-
-        private void onUpdate() {
-
-        }
-
-        #endregion
-
-        #region 追加
-
-        /// <summary>
-        /// 向当前行追加字符。
-        /// </summary>
-        /// <param name="value">要追加的字符。</param>
-        public void append(char value) {
-            var currentLength = _textLength;
-            textLength++;
-            unsafe
-            {
-                fixed (char* n = _data)
-                {
-                    n[currentLength] = value;
-                }
-            }
-            onUpdate();
-        }
-
-        /// <summary>
-        /// 向当前行追加字符。
-        /// </summary>
-        /// <param name="value">要追加的字符。</param>
-        /// <param name="repeatCount">字符重复的次数。</param>
-        public void append(char value, int repeatCount) {
-            int currentLength = textLength;
-            textLength += repeatCount;
-            unsafe
-            {
-                fixed (char* n = _data)
-                {
-                    while (repeatCount-- > 0) {
-                        n[currentLength++] = value;
-                    }
-                }
-            }
-            onUpdate();
-        }
-
-        /// <summary>
-        /// 向当前行追加字符。
-        /// </summary>
-        /// <param name="value">要追加的字符指针。</param>
-        /// <param name="charCount">要追加的字符数。</param>
-        public unsafe void append(char* value, int charCount) {
-            var currentLength = textLength;
-            textLength += charCount;
-            fixed (char* n = _data)
-            {
-                Utility.wstrcpy(n + currentLength, value, charCount);
-            }
-            onUpdate();
-        }
-
-        /// <summary>
-        /// 向当前行追加字符。
-        /// </summary>
-        /// <param name="value">要追加的字符串。</param>
-        public void append(string value) {
-            append(value, 0, value.Length);
-        }
-
-        /// <summary>
-        /// 向当前字符串缓存追加数据。
-        /// </summary>
-        /// <param name="value">要追加的字符串。</param>
-        /// <param name="startIndex">插入的起始位置。</param>
-        /// <param name="charCount">插入的个数。</param>
-        public void append(string value, int startIndex, int charCount) {
-            Debug.Assert(startIndex >= 0);
-            Debug.Assert(startIndex + charCount <= value.Length);
-            unsafe
-            {
-                fixed (char* src = value)
-                {
-                    append(src + startIndex, charCount);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 向当前行追加字符。
-        /// </summary>
-        /// <param name="value">要追加的字符数组。</param>
-        /// <param name="startIndex">数组的起始位置。</param>
-        /// <param name="charCount">要追加的字符数。</param>
-        public void append(char[] value, int startIndex, int charCount) {
-            Debug.Assert(startIndex >= 0);
-            Debug.Assert(startIndex + charCount <= value.Length);
-            unsafe
-            {
-                fixed (char* src = value)
-                {
-                    append(src + startIndex, charCount);
-                }
-            }
-        }
-
-        #endregion
-
-        #region 插入
-
-        /// <summary>
-        /// 在指定位置插入一个字符。
-        /// </summary>
-        /// <param name="index">插入的位置。</param>
-        /// <param name="value">要插入的字符串。</param>
-        /// <param name="charCount">插入的长度。</param>
-        public unsafe void insert(int index, char* value, int charCount) {
-            Debug.Assert(index >= 0);
-            if (index >= _textLength) {
-                append(value, charCount);
-                return;
-            }
-            textLength += charCount;
-            fixed (char* c = _data)
-            {
-                var cs = c + textLength;
-                var cd = cs + charCount;
-
-                var ce = c + index;
-
-                while (cs >= ce) {
-                    *--cd = *--cs;
-                }
-
-                Utility.wstrcpy(ce, value, charCount);
-
-            }
-            onUpdate();
-        }
-
-        /// <summary>
-        /// 在指定位置插入一个字符。
-        /// </summary>
-        /// <param name="index">插入的位置。</param>
-        /// <param name="value">要插入的字符。</param>
-        public unsafe void insert(int index, char value) {
-            if (index >= _textLength) {
-                append(value);
-                return;
-            }
-            var currentLength = textLength;
-            textLength++;
-            fixed (char* c = _data)
-            {
-
-                var cs = c + textLength;
-                var cd = cs + 1;
-
-                var ce = c + index;
-
-                while (cs >= ce) {
-                    *--cd = *--cs;
-                }
-
-                *ce = value;
-
-            }
-        }
-
-        /// <summary>
-        /// 在指定位置插入一个字符串。
-        /// </summary>
-        /// <param name="index">插入的位置。</param>
-        /// <param name="value">要插入的字符串。</param>
-        /// <param name="startIndex">开始的索引。</param>
-        /// <param name="charCount">插入的长度。</param>
-        public unsafe void insert(int index, string value, int startIndex, int charCount) {
-            Debug.Assert(startIndex >= 0);
-            Debug.Assert(startIndex + charCount <= value.Length);
-            fixed (char* p = value)
-            {
-                insert(index, p + startIndex, charCount);
-            }
-        }
-
-        /// <summary>
-        /// 在指定位置插入一个字符串。
-        /// </summary>
-        /// <param name="index">插入的位置。</param>
-        /// <param name="value">要插入的字符串。</param>
-        public void insert(int index, string value) {
-            insert(index, value, 0, value.Length);
-        }
-
-        /// <summary>
-        /// 在指定位置插入一个字符数组。
-        /// </summary>
-        /// <param name="index">插入的位置。</param>
-        /// <param name="value">要插入的字符数组。</param>
-        /// <param name="startIndex">开始的索引。</param>
-        /// <param name="charCount">插入的长度。</param>
-        public unsafe void insert(int index, char[] value, int startIndex, int charCount) {
-            Debug.Assert(startIndex >= 0);
-            Debug.Assert(startIndex + charCount <= value.Length);
-            fixed (char* p = value)
-            {
-                insert(index, p + startIndex, charCount);
-            }
-        }
-
-        /// <summary>
-        /// 在指定位置插入一个字符数组。
-        /// </summary>
-        /// <param name="index">插入的位置。</param>
-        /// <param name="value">要插入的字符数组。</param>
-        public void insert(int index, char[] value) {
-            insert(index, value, 0, value.Length);
-        }
-
-        #endregion
-
-        #region 删除
-
-        /// <summary>
-        /// 清空当前行内容。
-        /// </summary>
-        public void clear() {
-            _textLength = 0;
-            onUpdate();
-        }
-
-        /// <summary>
-        /// 从当前缓存删除指定索引的字符串。
-        /// </summary>
-        /// <param name="startIndex">开始的索引。</param>
-        /// <param name="charCount">删除的长度。</param>
-        public unsafe void remove(int startIndex, int charCount) {
-            Debug.Assert(startIndex >= 0);
-            Debug.Assert(startIndex + charCount <= _textLength);
-            fixed (char* p = _data)
-            {
-                var ps = p + startIndex;
-
-                var copyLength = textLength - startIndex - charCount;
-                Utility.wstrcpy(ps, ps + charCount, copyLength);
-
-                _textLength -= charCount;
-            }
-            onUpdate();
-        }
-
-        /// <summary>
-        /// 从当前缓存删除指定索引的字符串。
-        /// </summary>
-        /// <param name="startIndex">开始的索引。</param>
-        public void remove(int startIndex) {
-            remove(startIndex, _textLength - startIndex);
-        }
+        public override string ToString() => buffer.ToString();
 
         #endregion
 
@@ -472,8 +119,8 @@ namespace Teal.CodeEditor {
         /// </summary>
         public int indentCount {
             get {
-                for (var i = 0; i < _textLength; i++) {
-                    if (!Utility.isIndentChar(_data[i])) {
+                for (var i = 0; i < buffer.length; i++) {
+                    if (!Utility.isIndentChar(buffer.data[i])) {
                         return i;
                     }
                 }
@@ -499,12 +146,6 @@ namespace Teal.CodeEditor {
         ////}
 
         #endregion
-
-        //#region 布局
-
-
-
-        //#endregion
 
         #region 区块
 
@@ -558,160 +199,144 @@ namespace Teal.CodeEditor {
 
         #endregion
 
-        #region 单词
+        #region 片段
 
         /// <summary>
-        /// 存储所有的单词列表。
+        /// 获取当前行的所有片段分隔符。
         /// </summary>
-        private Word[] _words = new Word[2];
+        public ArrayList<SegmentSplitter> segments;
 
-        /// <summary>
-        /// 所有的片段列表实际长度。
-        /// </summary>
-        private int _wordLength;
+        ///// <summary>
+        ///// 更新当前行的片段列表。
+        ///// </summary>
+        ///// <param name="parentBlockSegment">当前行所在的块。</param>
+        //public void parseSegments(Block parentBlockSegment) {
 
-        /// <summary>
-        /// 获取属于当前行的所有单词。
-        /// </summary>
-        public IEnumerable<Word> words {
-            get {
-                for (int i = 0; i < _wordLength; i++) {
-                    yield return _words[i];
-                }
-            }
-        }
+        //    //// 清空片段列表。
+        //    //_segmentLength = 1;
+        //    //_segments[0].type = parentBlockSegment.type;
+        //    //_segments[0].startIndex = -1;
+        //    //_segments[0].endIndex = -1;
 
-        /// <summary>
-        /// 更新当前行的片段列表。
-        /// </summary>
-        /// <param name="parentBlockSegment">当前行所在的块。</param>
-        public void parseSegments(Block parentBlockSegment) {
+        //    parseSegments(ref parentBlockSegment, 0, _textLength);
 
-            //// 清空片段列表。
-            //_segmentLength = 1;
-            //_segments[0].type = parentBlockSegment.type;
-            //_segments[0].startIndex = -1;
-            //_segments[0].endIndex = -1;
+        //}
 
-            parseSegments(ref parentBlockSegment, 0, _textLength);
+        //private int parseSegments(ref Block parentBlockSegment, int startIndex, int endIndex) {
+        //    while (startIndex < endIndex) {
+        //        // 每次解析到当前块的结束。
+        //        var lastStartIndex = startIndex;
+        //        startIndex = parseSegment(ref parentBlockSegment, parentBlockSegment.type, startIndex, endIndex);
+        //        if (startIndex < 0) {
+        //            return lastStartIndex;
+        //        }
+        //    }
+        //    return startIndex;
+        //}
 
-        }
+        ///// <summary>
+        ///// 解析一个块级的子类型。
+        ///// </summary>
+        ///// <param name="parentBlockSegment">上级块级。</param>
+        ///// <param name="parentSegmentType上级片段类型。</param>
+        ///// <param name="startIndex">解析的开始位置。</param>
+        ///// <param name="endIndex">解析的结束位置。</param>
+        ///// <returns>返回当前块的关闭位置。如果当前块未关闭则返回 -1。</returns>
+        //private int parseSegment(ref Block parentBlockSegment, SegmentType parentSegmentType, int startIndex, int endIndex) {
+        //redo:
 
-        private int parseSegments(ref Block parentBlockSegment, int startIndex, int endIndex) {
-            while (startIndex < endIndex) {
-                // 每次解析到当前块的结束。
-                var lastStartIndex = startIndex;
-                startIndex = parseSegment(ref parentBlockSegment, parentBlockSegment.type, startIndex, endIndex);
-                if (startIndex < 0) {
-                    return lastStartIndex;
-                }
-            }
-            return startIndex;
-        }
+        //    // 1. 查找父块的结束标志。
+        //    var parentBlockEnd = parentBlockSegment?.type.end.match(textData, startIndex, endIndex) ?? new PatternMatchResult(-1, -1);
 
-        /// <summary>
-        /// 解析一个块级的子类型。
-        /// </summary>
-        /// <param name="parentBlockSegment">上级块级。</param>
-        /// <param name="parentSegmentType上级片段类型。</param>
-        /// <param name="startIndex">解析的开始位置。</param>
-        /// <param name="endIndex">解析的结束位置。</param>
-        /// <returns>返回当前块的关闭位置。如果当前块未关闭则返回 -1。</returns>
-        private int parseSegment(ref Block parentBlockSegment, SegmentType parentSegmentType, int startIndex, int endIndex) {
-            redo:
+        //    // 2. 查找子块开始标志。
+        //    Word childSegment;
+        //    childSegment.type = null;
+        //    childSegment.startIndex = parentBlockEnd.success ? parentBlockEnd.startIndex : int.MaxValue;
+        //    childSegment.endIndex = 0;
 
-            // 1. 查找父块的结束标志。
-            var parentBlockEnd = parentBlockSegment?.type.end.match(_data, startIndex, endIndex) ?? new PatternMatchResult(-1, -1);
+        //    // 遍历所有子片段类型，找到匹配的子片段类型。
+        //    // 如果发现多个匹配项，则匹配位置最前的生效。
+        //    // 子片段可能是完全匹配一个单词或仅仅匹配其开始标记。
+        //    if (parentSegmentType.children != null) {
+        //        foreach (var segmentType in parentSegmentType.children) {
+        //            var matchResult = segmentType.start.match(textData, startIndex, endIndex);
+        //            if (matchResult.success && matchResult.startIndex < childSegment.startIndex) {
+        //                childSegment.type = segmentType;
+        //                childSegment.startIndex = matchResult.startIndex;
+        //                childSegment.endIndex = matchResult.endIndex;
+        //            }
+        //        }
+        //    }
 
-            // 2. 查找子块开始标志。
-            Word childSegment;
-            childSegment.type = null;
-            childSegment.startIndex = parentBlockEnd.success ? parentBlockEnd.startIndex : int.MaxValue;
-            childSegment.endIndex = 0;
+        //    // 3. 处理子块开始。
+        //    if (childSegment.type != null) {
 
-            // 遍历所有子片段类型，找到匹配的子片段类型。
-            // 如果发现多个匹配项，则匹配位置最前的生效。
-            // 子片段可能是完全匹配一个单词或仅仅匹配其开始标记。
-            if (parentSegmentType.children != null) {
-                foreach (var segmentType in parentSegmentType.children) {
-                    var matchResult = segmentType.start.match(_data, startIndex, endIndex);
-                    if (matchResult.success && matchResult.startIndex < childSegment.startIndex) {
-                        childSegment.type = segmentType;
-                        childSegment.startIndex = matchResult.startIndex;
-                        childSegment.endIndex = matchResult.endIndex;
-                    }
-                }
-            }
+        //        // 添加片段信息。
+        //        var segmentIndex = _segmentSplitterCount;
+        //        Utility.appendArrayList(ref segmentSplitterData, ref _segmentSplitterCount);
+        //        segmentSplitterData[segmentIndex] = childSegment;
 
-            // 3. 处理子块开始。
-            if (childSegment.type != null) {
+        //        // 区分是块级片段还是内联片段。
+        //        if (childSegment.type.isBlock) {
 
-                // 添加片段信息。
-                int segmentIndex = _wordLength;
-                Utility.appendArrayList(ref _words, ref _wordLength);
-                _words[segmentIndex] = childSegment;
+        //            // 创建一个子块。
+        //            var block = new Block(parentBlockSegment, (SegmentSegmentType)childSegment.type, this);
 
-                // 区分是块级片段还是内联片段。
-                if (childSegment.type.isBlock) {
+        //            // 继续解析内部区块。
+        //            var childBlockEnd = parseSegment(ref block, childSegment.type, childSegment.endIndex, endIndex);
+        //            segmentSplitterData[segmentIndex].endIndex = childBlockEnd;
+        //            if (childBlockEnd < 0) {
+        //                if (!childSegment.type.isMultiLine) {
+        //                    segmentSplitterData[segmentIndex].endIndex = endIndex;
+        //                }
+        //                return childBlockEnd;
+        //            }
 
-                    // 创建一个子块。
-                    var block = new Block(parentBlockSegment, (SegmentSegmentType)childSegment.type, this);
+        //            // 跳过当前内部块继续解析剩余内容。
+        //            startIndex = childBlockEnd;
+        //            goto redo;
+        //        } else {
 
-                    // 继续解析内部区块。
-                    int childBlockEnd = parseSegment(ref block, childSegment.type, childSegment.endIndex, endIndex);
-                    _words[segmentIndex].endIndex = childBlockEnd;
-                    if (childBlockEnd < 0) {
-                        if (!childSegment.type.isMultiLine) {
-                            _words[segmentIndex].endIndex = endIndex;
-                        }
-                        return childBlockEnd;
-                    }
+        //            // 内联区块：childSegment.endIndex 表示当前区块的结束点。
+        //            Block blockSegment = null;
 
-                    // 跳过当前内部块继续解析剩余内容。
-                    startIndex = childBlockEnd;
-                    goto redo;
-                } else {
+        //            // 在内部继续查找子片段。
+        //            parseSegment(ref blockSegment, childSegment.type, childSegment.startIndex, childSegment.endIndex);
 
-                    // 内联区块：childSegment.endIndex 表示当前区块的结束点。
-                    Block blockSegment = null;
+        //            // 跳过当前内部块继续解析剩余内容。
+        //            startIndex = childSegment.endIndex;
+        //            goto redo;
 
-                    // 在内部继续查找子片段。
-                    parseSegment(ref blockSegment, childSegment.type, childSegment.startIndex, childSegment.endIndex);
+        //        }
 
-                    // 跳过当前内部块继续解析剩余内容。
-                    startIndex = childSegment.endIndex;
-                    goto redo;
+        //    }
 
-                }
+        //    // 4. 处理父块结束。
+        //    if (parentBlockEnd.success) {
 
-            }
+        //        // 如果当前行自之前的行开始则插入一个片段。
+        //        if (parentBlockSegment.startLine != this) {
+        //            var segmentIndex = _segmentSplitterCount;
+        //            Utility.prependArrayList(ref segmentSplitterData, ref _segmentSplitterCount);
+        //            segmentSplitterData[0].type = parentSegmentType;
+        //            segmentSplitterData[0].startIndex = -1;
+        //            segmentSplitterData[0].endIndex = parentBlockEnd.endIndex;
+        //        }
 
-            // 4. 处理父块结束。
-            if (parentBlockEnd.success) {
+        //        // 设置块的结束行。
+        //        parentBlockSegment.endLine = this;
 
-                // 如果当前行自之前的行开始则插入一个片段。
-                if (parentBlockSegment.startLine != this) {
-                    var segmentIndex = _wordLength;
-                    Utility.prependArrayList(ref _words, ref _wordLength);
-                    _words[0].type = parentSegmentType;
-                    _words[0].startIndex = -1;
-                    _words[0].endIndex = parentBlockEnd.endIndex;
-                }
+        //        // 回溯到父级块。
+        //        parentBlockSegment = parentBlockSegment.parent;
 
-                // 设置块的结束行。
-                parentBlockSegment.endLine = this;
+        //        // 返回结束行。
+        //        return parentBlockEnd.endIndex;
+        //    }
 
-                // 回溯到父级块。
-                parentBlockSegment = parentBlockSegment.parent;
+        //    // 5. 当前块未结束。
+        //    return -1;
 
-                // 返回结束行。
-                return parentBlockEnd.endIndex;
-            }
-
-            // 5. 当前块未结束。
-            return -1;
-
-        }
+        //}
 
         ///// <summary>
         ///// 解析一个片段类型的子类型。
@@ -732,7 +357,7 @@ namespace Teal.CodeEditor {
         //    for (var i = 0; i < parentSegmentType.children.Length; i++) {
         //        var currentSegmentType = parentSegmentType.children[i];
         //        int startIndex, end;
-        //        currentSegmentType.startIndex.match(_data, startIndex, endIndex, out startIndex, out end);
+        //        currentSegmentType.startIndex.match(textData, startIndex, endIndex, out startIndex, out end);
         //        if (startIndex > 0 && childSegment.startIndex > startIndex) {
         //            childSegment.type = currentSegmentType;
         //            childSegment.startIndex = startIndex;
@@ -785,31 +410,8 @@ namespace Teal.CodeEditor {
 
         #endregion
 
-        #region 布局
-
-        internal void draw(ref LayoutInfo layoutInfo, int startColumn) {
-            Document document = layoutInfo.document;
-            Painter painter = document.painter;
-
-            // 绘制当前行的所有折叠块。
-
-            foreach (var startBlock in startBlocks) {
-                if (startBlock.collapsed) {
-
-                }
-            }
-
-            drawWithoutCollapsed(ref layoutInfo, layoutInfo.column, _textLength);
-
-        }
-
-        private void drawWithoutCollapsed(ref LayoutInfo layoutInfo, int startIndex, int endIndex) {
-
-        }
-
-        #endregion
-
     }
+
 
     public struct DocumentLayoutInfo {
 
@@ -850,6 +452,7 @@ namespace Teal.CodeEditor {
     /// <summary>
     /// 表示一个文档行标记。
     /// </summary>
+    [Flags]
     public enum DocumentLineFlags {
 
         /// <summary>
@@ -947,8 +550,26 @@ namespace Teal.CodeEditor {
     //}
 
     /// <summary>
+    /// 表示一个行内片段分割器。同一行的文本可能被多个分割器分成多个部分。
+    /// </summary>
+    public struct SegmentSplitter {
+
+        /// <summary>
+        /// 获取当前分割列号之前的样式。
+        /// </summary>
+        public SegmentType type;
+
+        /// <summary>
+        /// 获取当前分割的列号。
+        /// </summary>
+        public int index;
+
+    }
+
+    /// <summary>
     /// 表示一个行内的片段。
     /// </summary>
+    [DebuggerStepThrough]
     public struct Segment {
 
         /// <summary>
@@ -957,31 +578,16 @@ namespace Teal.CodeEditor {
         public SegmentType type;
 
         /// <summary>
-        /// 获取当前片段在行内的开始位置。如果开始位置属于上一行，则返回 -1。
-        /// </summary>
-        public int index;
-
-    }
-
-    [DebuggerStepThrough]
-    public struct Word {
-
-        /// <summary>
-        /// 获取当前片段的类型。
-        /// </summary>
-        public SegmentType type;
-
-        /// <summary>
-        /// 获取当前片段在行内的开始位置。如果开始位置属于上一行，则返回 -1。
+        /// 获取当前片段在行内的开始位置。
         /// </summary>
         public int startIndex;
 
         /// <summary>
-        /// 获取当前片段在行内的结束位置。如果结束位置属于下一行，则返回 -1。
+        /// 获取当前片段在行内的结束位置。
         /// </summary>
         public int endIndex;
 
-        public Word(SegmentType type, int startIndex, int endIndex) {
+        public Segment(SegmentType type, int startIndex, int endIndex) {
             this.startIndex = startIndex;
             this.endIndex = endIndex;
             this.type = type;
