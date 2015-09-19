@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Teal.CodeEditor {
 
@@ -8,6 +9,7 @@ namespace Teal.CodeEditor {
     /// 表示一个可动态扩展长度的数组。
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [DebuggerDisplay("length = {length}"), DebuggerTypeProxy(typeof(ArrayList<>.DebugView)),]
     public struct ArrayList<T> : IList<T> {
 
         /// <summary>
@@ -94,7 +96,9 @@ namespace Teal.CodeEditor {
         /// </summary>
         /// <param name="item">要添加的项。</param>
         public void add(T item) {
-            data[length++] = item;
+            var last = _length;
+            length = last + 1;
+            data[last] = item;
         }
 
         /// <summary>
@@ -184,6 +188,16 @@ namespace Teal.CodeEditor {
         /// <param name="item">要查找的项。</param>
         /// <returns></returns>
         public bool contains(T item) => indexOf(item) >= 0;
+
+        /// <summary>
+        /// 返回当前列表的等效数组。
+        /// </summary>
+        /// <returns></returns>
+        public T[] toArray() {
+            var result = new T[_length];
+            data.CopyTo(result, 0);
+            return result;
+        }
 
         #region 迭代器
 
@@ -295,6 +309,21 @@ namespace Teal.CodeEditor {
         /// 如果 <see cref="T:System.Collections.Generic.ICollection`1"/> 为只读，则为 true；否则为 false。
         /// </returns>
         bool ICollection<T>.IsReadOnly => false;
+
+        #endregion
+
+        #region 调试视图
+
+        class DebugView {
+            private ArrayList<T> arrayList;
+
+            [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+            public T[] items => arrayList.toArray();
+
+            public DebugView(ArrayList<T> arrayList) {
+                this.arrayList = arrayList;
+            }
+        }
 
         #endregion
 

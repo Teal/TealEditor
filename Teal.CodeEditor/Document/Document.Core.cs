@@ -10,14 +10,14 @@ namespace Teal.CodeEditor {
     public sealed partial class Document {
 
         /// <summary>
-        /// 获取或设置当前视图的配置。
+        /// 获取或设置当前文档的配置。
         /// </summary>
-        public DocumentConfigs configs {
-            get;
-            set;
-        } = new DocumentConfigs();
+        public DocumentConfigs configs = new DocumentConfigs();
 
-        private SyntaxBinding _syntaxBinding;
+        /// <summary>
+        /// 获取或设置当前文档的语法绑定。
+        /// </summary>
+        public SyntaxBinding syntaxBinding = new SyntaxBinding();
 
     }
 

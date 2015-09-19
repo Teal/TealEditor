@@ -204,7 +204,7 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 获取当前行的所有片段分隔符。
         /// </summary>
-        public readonly ArrayList<SegmentSplitter> segments;
+        public ArrayList<SegmentSplitter> segments;
 
         ///// <summary>
         ///// 更新当前行的片段列表。

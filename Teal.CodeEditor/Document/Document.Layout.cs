@@ -46,6 +46,18 @@ namespace Teal.CodeEditor {
         }
 
         /// <summary>
+        /// 将当前文档绘制在指定图形上。
+        /// </summary>
+        /// <param name="graphics">要绘制的目标图形。</param>
+        /// <param name="top">开始绘制的垂直位置。</param>
+        /// <param name="bottom">结束绘制的垂直位置。</param>
+        public void draw(Graphics graphics, int top, int bottom) {
+            _painter.beginPaint(graphics);
+            draw(0, top, bottom, 0, lines.length);
+            _painter.endPaint(graphics);
+        }
+
+        /// <summary>
         /// 重绘指定区域内的行。
         /// </summary>
         /// <param name="left">开始绘制的水平位置。</param>
@@ -53,7 +65,7 @@ namespace Teal.CodeEditor {
         /// <param name="startLine">开始绘制的行。</param>
         /// <param name="bottom">结束绘制的垂直位置。</param>
         /// <param name="endLine">结束绘制的行。</param>
-        private void draw(int left, int top, int startLine, int bottom, int endLine) {
+        private void draw(int left, int top, int bottom, int startLine, int endLine) {
 
             LayoutInfo layoutInfo;
             layoutInfo.line = startLine;
@@ -89,7 +101,7 @@ namespace Teal.CodeEditor {
                 }
 
                 // 当前行无折叠，直接绘制整行。
-                drawLine(ref layoutInfo, documentLine.textLength);
+                drawLine(ref layoutInfo, documentLine.buffer.length);
 
                 // 换行。
                 layoutInfo.line++;
@@ -279,7 +291,7 @@ namespace Teal.CodeEditor {
             var wrapPoint = endIndex - 1;
 
             // 如果此字符是单词组成部分，则不强制分割单词，找到单词之前的首字符。
-            for (; wrapPoint > startIndex && _syntaxBinding.isWordPart(textData[wrapPoint]); wrapPoint--) {
+            for (; wrapPoint > startIndex && syntaxBinding.isWordPart(textData[wrapPoint]); wrapPoint--) {
                 Debug.Assert(textData[wrapPoint] != '\t', "TAB 不能是标识符");
                 Debug.Assert(textData[wrapPoint] != ' ', "空格不能是标识符");
             }

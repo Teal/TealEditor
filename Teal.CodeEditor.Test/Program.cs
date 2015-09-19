@@ -13,7 +13,7 @@ namespace Teal.CodeEditor.Test {
         static void Main() {
 
 
-            new DocumentLineTest().run();
+          //  new DocumentLineTest().run();
 
 
             Application.EnableVisualStyles();
