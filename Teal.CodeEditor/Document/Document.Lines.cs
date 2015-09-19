@@ -12,42 +12,23 @@ namespace Teal.CodeEditor {
     /// </summary>
     public sealed partial class Document {
 
-        #region 行
-
-        /// <summary>
-        /// 存储文档的所有行。
-        /// </summary>
-        private DocumentLine[] _lines = new DocumentLine[0];
-
-        /// <summary>
-        /// 存储当前文档的行数。
-        /// </summary>
-        private int _lineCount;
-
         /// <summary>
         /// 获取当前文档的所有行。
         /// </summary>
-        public IEnumerable<DocumentLine> lines {
-            get {
-                for (int i = 0; i < _lineCount; i++) {
-                    yield return _lines[i];
-                }
-            }
-        }
+        public ArrayList<DocumentLine> lines = new ArrayList<DocumentLine>(2);
 
         /// <summary>
-        /// 获取指定索引的行。
+        /// 获取或设置指定索引的行。
         /// </summary>
         /// <param name="index">要获取的行号。行号从 0 开始。</param>
         /// <returns>返回指定的行。</returns>
         public DocumentLine this[int index] {
             get {
-                return index >= 0 && index < _lineCount ? _lines[index] : null;
+                return lines[index];
             }
-        }
-
-        private int indexOf(DocumentLine endLine, DocumentLine startLine) {
-            throw new NotImplementedException();
+            set {
+                lines[index] = value;
+            }
         }
 
         ///// <summary>
@@ -173,58 +154,12 @@ namespace Teal.CodeEditor {
         //    return text;
         //}
 
-        #endregion
-
-        #region 选项
-
-        #endregion
-
-        #region 布局
-
-
-        #endregion
-
     }
 
     /// <summary>
     /// 表示一个文档。
     /// </summary>
     public sealed partial class Document {
-
-        #region 区域
-
-        ///// <summary>
-        ///// 表示一个 Range 对象弱引用。
-        ///// </summary>
-        //private class RangeWeakReference : WeakReference {
-
-        //    private RangeWeakReference prev;
-
-        //    public RangeWeakReference(Range range)
-        //        : base(range) {
-
-        //    }
-
-        //}
-
-        ///// <summary>
-        ///// 所有 Range 对象列，文档更新后需同时更新所有 Range 对象。
-        ///// </summary>
-        //RangeWeakReference _ranges;
-
-        ///// <summary>
-        ///// 创建一个文档区域对象。
-        ///// </summary>
-        ///// <returns></returns>
-        //public Range createRange() {
-        //    var range = new Range();
-
-        //    // todo: 添加列表
-
-        //    return range;
-        //}
-
-        #endregion
 
         #region 换行
 
@@ -271,17 +206,17 @@ namespace Teal.CodeEditor {
         /// </summary>
         public DocumentLineFlags newLineType {
             get {
-                if (lines.Count == 0) {
+                if (lines.length == 0) {
                     return _newLineType;
                 }
 
-                return lines[lines.Count - 1].newLineType;
+                return lines[lines.length - 1].newLineType;
 
             }
             set {
                 if (newLineType != value || hasMixedNewLine) {
                     _newLineType = value;
-                    for (var i = 1; i < lines.Count; i++) {
+                    for (var i = 1; i < lines.length; i++) {
                         lines[i].newLineType = value;
                     }
                     modifyState = ModifyState.modified;
@@ -388,21 +323,21 @@ namespace Teal.CodeEditor {
 
             // 拷贝继承缩进。
             if (inheritIndents) {
-                newDocumentLine.append(oldDocumentLine.data, 0, oldDocumentLine.indentCount);
+                newDocumentLine.buffer.append(oldDocumentLine.buffer.data, 0, oldDocumentLine.indentCount);
             }
 
             // 生成新列。
             var newColumn = indentCount = newDocumentLine.textLength;
 
             // 将原行数据分成两行。
-            var restCount = oldDocumentLine.length - column;
+            var restCount = oldDocumentLine.buffer.length - column;
             if (restCount > 0) {
-                newDocumentLine.append(oldDocumentLine.data, column, restCount);
-                oldDocumentLine.remove(column);
+                newDocumentLine.buffer.append(oldDocumentLine.buffer.data, column, restCount);
+                oldDocumentLine.buffer.remove(column);
             }
 
             // 保存新行。
-            lines.Insert(line + 1, newDocumentLine);
+            lines.insert(line + 1, newDocumentLine);
 
             onUpdate(line, column, 0, 1, column, newColumn);
 
@@ -421,10 +356,10 @@ namespace Teal.CodeEditor {
             }
 
             var oldLine = lines[line];
-            lines[line - 1].append(oldLine.data, column, oldLine.length - column);
-            lines.RemoveAt(line);
+            lines[line - 1].buffer.append(oldLine.buffer.data, column, oldLine.buffer.length - column);
+            lines.removeAt(line);
 
-            onUpdate(line, column, 1, 0, column, lines[line - 1].length - column);
+            onUpdate(line, column, 1, 0, column, lines[line - 1].buffer.length - column);
 
             return oldLine;
         }
@@ -436,7 +371,7 @@ namespace Teal.CodeEditor {
         /// <param name="column">插入的列号。</param>
         /// <param name="value">插入的字符。不允许插入换行符。</param>
         public void insert(int line, int column, char value) {
-            lines[line].insert(column, value);
+            lines[line].buffer.insert(column, value);
             onUpdate(line, column, 0, 0, 0, 1);
         }
 
@@ -457,7 +392,7 @@ namespace Teal.CodeEditor {
         /// <param name="line">删除的行号。</param>
         /// <param name="column">删除的列号。</param>
         public void delete(int line, int column) {
-            lines[line].remove(column, 1);
+            lines[line].buffer.remove(column, 1);
             onUpdate(line, column, 0, 0, 1, 0);
         }
 

@@ -186,21 +186,21 @@ namespace Teal.CodeEditor {
                 // 32 - 127
                 Win32Api.getCharABCWidths(hdc, 32, 127, charWidths, 32);
 
-                // 设置控制字符宽度。 0 - 32
-                for (var i = 0; i < 32; i++) {
-                    charWidths[i] = 0;
-                    foreach (char c in c0Table[i]) {
-                        charWidths[i] += charWidths[c];
-                    }
-                }
+                //// 设置控制字符宽度。 0 - 32
+                //for (var i = 0; i < 32; i++) {
+                //    charWidths[i] = 0;
+                //    foreach (char c in Utility.c0Table[i]) {
+                //        charWidths[i] += charWidths[c];
+                //    }
+                //}
 
-                // 127 - 160
-                for (var i = 127; i < 160; i++) {
-                    charWidths[i] = 0;
-                    foreach (char c in delAndC1Table[i - 127]) {
-                        charWidths[i] += charWidths[c];
-                    }
-                }
+                //// 127 - 160
+                //for (var i = 127; i < 160; i++) {
+                //    charWidths[i] = 0;
+                //    foreach (char c in Utility.delAndC1Table[i - 127]) {
+                //        charWidths[i] += charWidths[c];
+                //    }
+                //}
 
             }
 
@@ -315,67 +315,9 @@ namespace Teal.CodeEditor {
             }
         }
 
-        private static readonly string[] c0Table = {
-            "NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL", "BS", "HT",
-            "LF", "VT", "FF", "CR", "SO", "SI", "DLE", "DC1", "DC2", "DC3",
-            "DC4", "NAK", "SYN", "ETB", "CAN", "EM", "SUB", "ESC", "FS", "GS",
-            "RS", "US"
-        };
-
-        private static readonly string[] delAndC1Table = {
-            "DEL",
-            "PAD", "HOP", "BPH", "NBH", "IND", "NEL", "SSA", "ESA", "HTS", "HTJ",
-            "VTS", "PLD", "PLU", "RI", "SS2", "SS3", "DCS", "PU1", "PU2", "STS",
-            "CCH", "MW", "SPA", "EPA", "SOS", "SGCI", "SCI", "CSI", "ST", "OSC",
-            "PM", "APC"
-        };
-
-        /// <summary>
-        /// 获取控制字符名。
-        /// </summary>
-        public static string getControlCharacterName(char controlCharacter) {
-            if (controlCharacter < 32) {
-                return c0Table[controlCharacter];
-            }
-
-            if (controlCharacter >= 127 && controlCharacter <= 159) {
-                return delAndC1Table[controlCharacter - 127];
-            }
-
-            return null;
-        }
-
         #endregion
 
         #region 绘制和测量文本
-
-        /// <summary>
-        /// 计算加上指定字符串后新坐标。
-        /// </summary>
-        /// <param name="x">当前的左边距。</param>
-        /// <param name="s">追加的字符。</param>
-        /// <returns>返回添加指定字符后的新坐标。</returns>
-        public int alignString(int x, string s) {
-            for (var i = 0; i < s.Length; i++) {
-                x = alignChar(x, s[i]);
-            }
-            return x;
-        }
-
-        /// <summary>
-        /// 计算加上指定字符串后新坐标。
-        /// </summary>
-        /// <param name="x">当前的左边距。</param>
-        /// <param name="s">追加的字符数组。</param>
-        /// <param name="startIndex">开始的索引。</param>
-        /// <param name="endIndex">结束的索引。</param>
-        /// <returns>返回添加指定字符后的新坐标。</returns>
-        public int alignChars(int x, char[] chars, int startIndex, int endIndex) {
-            for (var i = startIndex; i < endIndex; i++) {
-                x = alignChar(x, chars[i]);
-            }
-            return x;
-        }
 
         /// <summary>
         /// 测量指定字符的宽度。
@@ -392,7 +334,6 @@ namespace Teal.CodeEditor {
                 }
                 _currentFontInfo.charWidths[c] = width = size.Width;
             }
-
             return width;
         }
 
@@ -455,7 +396,8 @@ namespace Teal.CodeEditor {
         /// </summary>
         /// <param name="value">要绘制的字符串。</param>
         /// <param name="length">要绘制的长度。</param>
-        /// <param name="pt">绘制的位置。</param>
+        /// <param name="x">绘制的水平位置。</param>
+        /// <param name="y">绘制的垂直位置。</param>
         public unsafe void drawString(char* value, int length, int x, int y) {
             Win32Api.ExtTextOut(_hdc, x, y, 0, null, value, length, null);
         }
@@ -464,7 +406,8 @@ namespace Teal.CodeEditor {
         /// 绘制单行字符串。
         /// </summary>
         /// <param name="value">要绘制的字符数组。</param>
-        /// <param name="pt">绘制的位置。</param>
+        /// <param name="x">绘制的水平位置。</param>
+        /// <param name="y">绘制的垂直位置。</param>
         public unsafe void drawString(string value, int x, int y) {
             fixed (char* p = value)
             {
@@ -478,7 +421,8 @@ namespace Teal.CodeEditor {
         /// <param name="value">要绘制的字符数组。</param>
         /// <param name="startIndex">开始绘制的索引。</param>
         /// <param name="length">要绘制的长度。</param>
-        /// <param name="pt">绘制的位置。</param>
+        /// <param name="x">绘制的水平位置。</param>
+        /// <param name="y">绘制的垂直位置。</param>
         public unsafe void drawString(char[] value, int startIndex, int length, int x, int y) {
             fixed (char* p = value)
             {

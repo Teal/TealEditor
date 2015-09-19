@@ -63,7 +63,7 @@ namespace Teal.CodeEditor {
 
             // 如果存在对应的行，且当前行正在重绘区域内，则继续往下绘制。
             while (layoutInfo.line < endLine && layoutInfo.top < bottom) {
-                var documentLine = _lines[layoutInfo.line];
+                var documentLine = lines.data[layoutInfo.line];
 
                 // 绘制一行。
 
@@ -78,7 +78,7 @@ namespace Teal.CodeEditor {
                     drawCollapsedBlock(ref layoutInfo, block);
 
                     // 更新行号。
-                    layoutInfo.line = indexOf(block.endLine, block.startLine);
+                    layoutInfo.line = lines.indexOf(block.endLine, layoutInfo.line);
                     layoutInfo.column = block.endColumn;
 
                     Debug.Assert(layoutInfo.line >= 0, "block.endLine 指向了一个被删除的行。");
@@ -101,32 +101,35 @@ namespace Teal.CodeEditor {
         }
 
         /// <summary>
-        /// 重新绘制指定未折叠的文本域，绘制时可能自动换行。
+        /// 重绘指定行的文本域，忽略折叠，检测自动换行。
         /// </summary>
         /// <param name="layoutInfo">布局相关的参数。</param>
-        /// <param name="endColumn">当前需要布局的结束列。</param>
+        /// <param name="endColumn">当前绘制的结束列。</param>
         private void drawLine(ref LayoutInfo layoutInfo, int endColumn) {
 
-            var documentLine = _lines[layoutInfo.line];
-            var textData = documentLine.textData;
+            // NOTE: endColumn 必须是 segmentSplitter 所在位置。
 
+            // 当前要绘制的行数据。
+            var documentLine = lines.data[layoutInfo.line];
+            var textData = documentLine.buffer.data;
+
+            // 记录当前的最新值。
+            var column = layoutInfo.column;
+            var left = layoutInfo.left;
+
+            // 记录当前绘制的片段进度。
             var segmentSplitterIndex = 0;
 
             // 1. 跳过 layoutInfo.column 之前的分割器，一般地，这些分割器是已被折叠的代码。
-            for (; segmentSplitterIndex < documentLine.segmentSplitterCount && documentLine.segmentSplitterData[segmentSplitterIndex].index < layoutInfo.column; segmentSplitterIndex++)
+            for (; segmentSplitterIndex < documentLine.segments.length && documentLine.segments.data[segmentSplitterIndex].index < column; segmentSplitterIndex++)
                 ;
 
             // 2. 绘制所有片段。
-            for (; segmentSplitterIndex < documentLine.segmentSplitterCount; segmentSplitterIndex++) {
+            for (; segmentSplitterIndex < documentLine.segments.length; segmentSplitterIndex++) {
 
                 // 超出绘制范围停止绘制。
-                if (layoutInfo.column >= endColumn) {
+                if (column >= endColumn) {
                     break;
-                }
-
-                // TODO: 绘制缩进线。
-                if (layoutInfo.column == 0) {
-
                 }
 
                 // 绘制单一片段。
@@ -134,99 +137,155 @@ namespace Teal.CodeEditor {
                 // 使用 documentLine.segmentSplitterData[segmentSplitterIndex].type 风格。
                 // 考虑自动换行。
 
-                var end = documentLine.segmentSplitterData[segmentSplitterIndex].index;
-                int newLeft;
+                var end = documentLine.segments.data[segmentSplitterIndex].index;
+
+                // TODO: 绘制缩进线。
+                if (column == 0) {
+
+                }
 
                 // 设置本次绘制的风格。
-                setStyle(documentLine.segmentSplitterData[segmentSplitterIndex].type);
+                setStyle(documentLine.segments.data[segmentSplitterIndex].type);
 
-            drawRest:
+                // 一次绘制一个单词。
 
-                // BUG: 需要优先绘制空格。
+                for (; column < end; column++) {
+                    var c = textData[column];
+                    var controlName = Utility.getControlCharName(c);
 
-                // 计算本次可以绘制的最大列。
-                var column = getMaxLayoutColumn(layoutInfo.left, textData, layoutInfo.column, end, out newLeft);
+                    // 碰到特殊字符则直接绘制。
+                    if (controlName != null) {
 
-                // 绘制折行之前的内容。
-                _painter.drawString(textData, layoutInfo.column, column, layoutInfo.left, layoutInfo.top);
+                        // 首先绘制特殊字符之前的字符串。
+                        _painter.drawString(textData, layoutInfo.column, column, layoutInfo.top, layoutInfo.left);
+                        layoutInfo.left = left;
+                        layoutInfo.column = column;
 
-                // 更新当前绘制状态。
+                        // 计算字符的宽度。
+                        switch (c) {
+                            case '\t':
+                                left = alignTab(left);
+                                break;
+                            case ' ':
+                                left += _painter.measureString(c);
+                                break;
+                            default:
+                                left += _painter.measureString(controlName);
+                                break;
+                        }
+
+                        // 如果超界，则在新行重新绘制。
+                        if (left >= _offsetRight && layoutInfo.column > 0) {
+                            drawWrap(layoutInfo.top, left);
+                            layoutInfo.top += _painter.lineHeight;
+                            layoutInfo.left = (documentLine.indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
+
+                            // 重新加上宽度。
+                            switch (c) {
+                                case '\t':
+                                    left = alignTab(left);
+                                    break;
+                                case ' ':
+                                    left += _painter.measureString(c);
+                                    break;
+                                default:
+                                    left += _painter.measureString(controlName);
+                                    break;
+                            }
+
+                        }
+
+                        switch (c) {
+                            case '\t':
+                                drawTab(layoutInfo.top, layoutInfo.left);
+                                break;
+                            case ' ':
+                                drawWhitespace(layoutInfo.top, layoutInfo.left);
+                                break;
+                            default:
+                                drawControlChar(controlName, layoutInfo.top, layoutInfo.left);
+                                break;
+                        }
+
+                    } else {
+
+                        left += _painter.measureString(c);
+
+                        // 如果超界，则返回搜索
+                        if (left >= _offsetRight && layoutInfo.column > 0) {
+
+                            // 获取合适的中断点。
+                            var oldColumn = column;
+                            column = getWrapPoint(textData, layoutInfo.column, oldColumn);
+
+                            // 减去被中断的大小。
+                            for (; oldColumn > column; oldColumn--) {
+                                left -= _painter.measureString(textData[oldColumn]);
+                            }
+
+                            // 绘制之前的字符串。
+                            _painter.drawString(textData, layoutInfo.column, column, layoutInfo.top, layoutInfo.left);
+                            layoutInfo.left = left;
+                            layoutInfo.column = column;
+
+                            // 换行。
+                            drawWrap(layoutInfo.top, left);
+                            layoutInfo.top += _painter.lineHeight;
+                            layoutInfo.left = (documentLine.indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
+
+                        }
+
+                    }
+
+                }
+
+                // 绘制最后一个特殊字符或开头到结尾的字符串。
+                _painter.drawString(textData, layoutInfo.column, column, layoutInfo.top, layoutInfo.left);
+                layoutInfo.left = left;
                 layoutInfo.column = column;
-                layoutInfo.left = newLeft;
-
-                // 判断是否存在换行。
-                if (column < end) {
-
-                    // TODO: 绘制自动换行标记。
-
-                    // 换行。
-                    layoutInfo.top += _painter.lineHeight;
-                    layoutInfo.left = (documentLine.indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
-
-                    goto drawRest;
-
-                }
-
             }
+        }
+
+        private void setStyle(SegmentType type) {
+
+        }
+
+        private void drawWrap(int top, int left) {
+
+        }
+
+        private void drawControlChar(string controlName, int top, int left) {
+            _painter.drawString(controlName, top, left);
+        }
+
+        private void drawWhitespace(int top, int left) {
+
+        }
+
+        private void drawTab(int top, int left) {
 
         }
 
         /// <summary>
-        /// 获取指定文本在不换行的条件下所能布局的最大列。
+        /// 计算最合适的自动换行中断位置。如 "hello world" 的最合适中断点是 'w'。
         /// </summary>
-        /// <param name="left">当前布局的水平坐标。</param>
-        /// <param name="textData">要计算的文本。</param>
-        /// <param name="startIndex">计算的开始索引。</param>
-        /// <param name="endIndex">计算的结束索引。</param>
-        /// <param name="newLeft">返回布局后的新左值。</param>
-        /// <returns>返回最大布局的结束索引。</returns>
-        private int getMaxLayoutColumn(int left, string textData, int startIndex, int endIndex, out int newLeft) {
+        /// <param name="textData">当前的文本数据。</param>
+        /// <param name="startIndex">开始处理的位置。</param>
+        /// <param name="endIndex">结束处理的位置。</param>
+        /// <returns>返回最合适的中端位置。</returns>
+        private int getWrapPoint(string textData, int startIndex, int endIndex) {
 
-            // 保存当前索引。
-            var index = startIndex;
+            // 往前回溯寻找最合算的换行点。
+            var wrapPoint = endIndex - 1;
 
-            for (; index < endIndex; index++) {
-
-                // 追加当前字符宽度。
-                left = alignChar(left, textData[index]);
-
-                // 宽度合适继续布局下一个字符。
-                if (left < _offsetRight)
-                    continue;
-
-                // 加上当前字符导致需要换行。往前回溯寻找最合算的换行点。
-                var splitIndex = index - 1;
-
-                // 如果此字符是单词组成部分，则不强制分割单词，找到单词之前的首字符。
-                for (; splitIndex > startIndex && _syntaxBinding.isWordPart(textData[splitIndex]); splitIndex--) {
-                    Debug.Assert(textData[splitIndex] != '\t', "TAB 不能是标识符");
-                    Debug.Assert(textData[splitIndex] != ' ', "空格不能是标识符");
-                }
-
-                // 减去中断点之后字符的宽度。
-                // 此处可以放心使用 _painter.measureString 因为
-                // 中间不会出现 '\t' 。
-                for (; index > splitIndex; index--) {
-                    left -= _painter.measureString(textData[index]);
-                }
-
-                newLeft = left;
-                return splitIndex;
+            // 如果此字符是单词组成部分，则不强制分割单词，找到单词之前的首字符。
+            for (; wrapPoint > startIndex && _syntaxBinding.isWordPart(textData[wrapPoint]); wrapPoint--) {
+                Debug.Assert(textData[wrapPoint] != '\t', "TAB 不能是标识符");
+                Debug.Assert(textData[wrapPoint] != ' ', "空格不能是标识符");
             }
 
-            newLeft = left;
-            return index;
-
-        }
-
-        /// <summary>
-        /// 计算加上指定字符后新坐标。
-        /// </summary>
-        /// <param name="left">当前的左边距。</param>
-        /// <param name="ch">追加的字符。</param>
-        /// <returns>返回添加指定字符后的新坐标。</returns>
-        private int alignChar(int left, char ch) {
-            return ch == '\t' ? alignTab(left) : (left + _painter.measureString(ch));
+            // 无法找到合适的单词边界，则强行从行尾中端。
+            return wrapPoint == startIndex ? endIndex - 1 : wrapPoint;
         }
 
         /// <summary>
@@ -254,44 +313,36 @@ namespace Teal.CodeEditor {
 
         private int _offsetRight;
 
-        private void drawSegment(ref LayoutInfo layoutInfo, DocumentLine documentLine, Block parentBlock, int endIndex) {
-
-        }
-
         /// <summary>
-        /// 对指定折叠域进行布局，考虑可能自动换行。
+        /// 重绘指定已折叠块进行布局，检测是否自动换行。
         /// </summary>
-        /// <param name="foldingRange">要布局的折叠域。</param>
-        /// <param name="layoutInfo">布局相关的参数。</param>
+        /// <param name="layoutInfo">存储布局相关的参数。绘制结束后将更新位置。</param>
+        /// <param name="block">当前的块。</param>
         private void drawCollapsedBlock(ref LayoutInfo layoutInfo, Block block) {
 
-            // 隐藏折叠区域之间的全部行。
-            for (var line = layoutInfo.line; line <= foldingRange.endLine; line++) {
-                _layoutLines[line].bottom = -1;
-            }
+            // 获取折叠后显示的文本。假设无 '\t' 和 特殊字符。
+            var collapsedText = getCollapsedText(block);
 
-            // 创建下一个折叠域。
-            layoutInfo.layoutBreakPoint = layoutInfo.layoutBreakPoint.next = new LayoutFoldingBlock(foldingRange);
-
+            // 计算添加折叠域后的新位置。
             var oldLeft = layoutInfo.left;
+            layoutInfo.left = _painter.measureString(collapsedText);
 
-            // 计算折叠域的宽度。
-            layoutInfo.left = painter.alignString(oldLeft, foldingRange.text);
+            // 自动换行。
+            if (layoutInfo.left >= _offsetRight && layoutInfo.column > 0) {
+                drawWrap(layoutInfo.top, oldLeft);
 
-            // 正常显示。
-            if (layoutInfo.left < _documentMaxWidth || foldingRange.startColumn <= 0) {
-                return;
+                var collapsedTextWidth = layoutInfo.left - oldLeft;
+                oldLeft = (lines.data[layoutInfo.line].indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
+                layoutInfo.top += _painter.lineHeight;
+                layoutInfo.left = oldLeft + collapsedTextWidth;
             }
 
-            // 如果加上折叠区域后的宽度超限，则当前行计算完成，折叠区域应换行显示。
-            var foldWidth = layoutInfo.left - oldLeft;
-
-            layoutWrap(ref layoutInfo);
-
-            layoutInfo.left += foldWidth;
-
+            _painter.drawString(collapsedText, layoutInfo.top, oldLeft);
         }
 
+        private string getCollapsedText(Block block) {
+            return "{...}";
+        }
     }
 
 }

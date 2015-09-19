@@ -1,0 +1,73 @@
+﻿
+        #region 区域
+
+        ///// <summary>
+        ///// 表示一个 Range 对象弱引用。
+        ///// </summary>
+        //private class RangeWeakReference : WeakReference {
+
+        //    private RangeWeakReference prev;
+
+        //    public RangeWeakReference(Range range)
+        //        : base(range) {
+
+        //    }
+
+        //}
+
+        ///// <summary>
+        ///// 所有 Range 对象列，文档更新后需同时更新所有 Range 对象。
+        ///// </summary>
+        //RangeWeakReference _ranges;
+
+        ///// <summary>
+        ///// 创建一个文档区域对象。
+        ///// </summary>
+        ///// <returns></returns>
+        //public Range createRange() {
+        //    var range = new Range();
+
+        //    // todo: 添加列表
+
+        //    return range;
+        //}
+
+        #endregion
+
+        /// <summary>
+        /// 计算加上指定字符串后新坐标。
+        /// </summary>
+        /// <param name="x">当前的左边距。</param>
+        /// <param name="s">追加的字符。</param>
+        /// <returns>返回添加指定字符后的新坐标。</returns>
+        public int alignString(int x, string s) {
+            for (var i = 0; i < s.Length; i++) {
+                x = alignChar(x, s[i]);
+            }
+            return x;
+        }
+
+        /// <summary>
+        /// 计算加上指定字符串后新坐标。
+        /// </summary>
+        /// <param name="x">当前的左边距。</param>
+        /// <param name="s">追加的字符数组。</param>
+        /// <param name="startIndex">开始的索引。</param>
+        /// <param name="endIndex">结束的索引。</param>
+        /// <returns>返回添加指定字符后的新坐标。</returns>
+        public int alignChars(int x, char[] chars, int startIndex, int endIndex) {
+            for (var i = startIndex; i < endIndex; i++) {
+                x = alignChar(x, chars[i]);
+            }
+            return x;
+        }
+
+        /// <summary>
+        /// 计算加上指定字符后新坐标。
+        /// </summary>
+        /// <param name="left">当前的左边距。</param>
+        /// <param name="ch">追加的字符。</param>
+        /// <returns>返回添加指定字符后的新坐标。</returns>
+        private int alignChar(int left, char ch) {
+            return ch == '\t' ? alignTab(left) : (left + _painter.measureString(ch));
+        }
