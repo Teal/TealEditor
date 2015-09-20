@@ -46,10 +46,11 @@ namespace Teal.CodeEditor {
         /// </summary>
         public bool collapsed;
 
-        public Block(Block parent, BlockType type, DocumentLine startLine) {
+        public Block(Block parent, BlockType type, DocumentLine startLine, int startColumn) {
             this.parent = parent;
             this.type = type;
             this.startLine = startLine;
+            this.startColumn = startColumn;
         }
 
         public override string ToString() {

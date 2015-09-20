@@ -14,6 +14,10 @@ namespace Teal.CodeEditor {
         /// </summary>
         public DocumentConfigs configs = new DocumentConfigs();
 
+        public Document() {
+            
+        }
+
     }
 
     /// <summary>

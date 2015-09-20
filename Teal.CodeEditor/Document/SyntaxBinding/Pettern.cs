@@ -168,10 +168,10 @@ namespace Teal.CodeEditor {
             var match = content.Match(text, startIndex, endIndex - startIndex);
             PatternMatchResult result;
             if (match.Success) {
-                result.startIndex = result.endIndex = -1;
-            } else {
                 result.startIndex = match.Index;
                 result.endIndex = result.startIndex + match.Length;
+            } else {
+                result.startIndex = result.endIndex = -1;
             }
             return result;
         }

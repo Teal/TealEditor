@@ -57,14 +57,14 @@ namespace Teal.CodeEditor {
     /// <summary>
     /// 表示一个内联块级类型。
     /// </summary>
-    public sealed class SingleLineSegmentSegmentType : BlockType {
+    public sealed class SingleLineBlockType : BlockType {
 
         /// <summary>
         /// 判断当前片段类型是否是跨行的。
         /// </summary>
         public override bool isMultiLine => false;
 
-        public SingleLineSegmentSegmentType(string name, Pettern start, Pettern end, SegmentType[] children = null)
+        public SingleLineBlockType(string name, Pettern start, Pettern end, SegmentType[] children = null)
                 : base(name, start, end, children) {
 
         }

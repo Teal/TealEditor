@@ -272,11 +272,11 @@ namespace Teal.CodeEditor {
 
         #region 接口实现
 
-        int IList<T>.IndexOf(T item) => indexOf(item);
+        public int IndexOf(T item) => indexOf(item);
 
-        void IList<T>.Insert(int index, T item) => insert(index, item);
+        public void Insert(int index, T item) => insert(index, item);
 
-        void IList<T>.RemoveAt(int index) => removeAt(index);
+        public void RemoveAt(int index) => removeAt(index);
 
         /// <summary>
         /// 返回循环访问集合的枚举数。
@@ -290,13 +290,13 @@ namespace Teal.CodeEditor {
         /// 将某项添加到 <see cref="T:System.Collections.Generic.ICollection`1"/> 中。
         /// </summary>
         /// <param name="item">要添加到 <see cref="T:System.Collections.Generic.ICollection`1"/> 的对象。</param><exception cref="T:System.NotSupportedException"><see cref="T:System.Collections.Generic.ICollection`1"/> 为只读。</exception>
-        void ICollection<T>.Add(T item) => add(item);
+        public void Add(T item) => add(item);
 
         /// <summary>
         /// 从 <see cref="T:System.Collections.Generic.ICollection`1"/> 中移除所有项。
         /// </summary>
         /// <exception cref="T:System.NotSupportedException"><see cref="T:System.Collections.Generic.ICollection`1"/> 为只读。</exception>
-        void ICollection<T>.Clear() => clear();
+        public void Clear() => clear();
 
         /// <summary>
         /// 确定 <see cref="T:System.Collections.Generic.ICollection`1"/> 是否包含特定值。
@@ -305,13 +305,13 @@ namespace Teal.CodeEditor {
         /// 如果在 <see cref="T:System.Collections.Generic.ICollection`1"/> 中找到 <paramref name="item"/>，则为 true；否则为 false。
         /// </returns>
         /// <param name="item">要在 <see cref="T:System.Collections.Generic.ICollection`1"/> 中定位的对象。</param>
-        bool ICollection<T>.Contains(T item) => contains(item);
+        public bool Contains(T item) => contains(item);
 
         /// <summary>
         /// 从特定的 <see cref="T:System.Array"/> 索引开始，将 <see cref="T:System.Collections.Generic.ICollection`1"/> 的元素复制到一个 <see cref="T:System.Array"/> 中。
         /// </summary>
         /// <param name="array">作为从 <see cref="T:System.Collections.Generic.ICollection`1"/> 复制的元素的目标的一维 <see cref="T:System.Array"/>。<see cref="T:System.Array"/> 必须具有从零开始的索引。</param><param name="arrayIndex"><paramref name="array"/> 中从零开始的索引，从此索引处开始进行复制。</param><exception cref="T:System.ArgumentNullException"><paramref name="array"/> 为 null。</exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="arrayIndex"/> 小于 0。</exception><exception cref="T:System.ArgumentException">源 <see cref="T:System.Collections.Generic.ICollection`1"/> 中的元素数目大于从 <paramref name="arrayIndex"/> 到目标 <paramref name="array"/> 末尾之间的可用空间。</exception>
-        void ICollection<T>.CopyTo(T[] array, int arrayIndex) => Array.Copy(data, 0, array, arrayIndex, _length);
+        public void CopyTo(T[] array, int arrayIndex) => Array.Copy(data, 0, array, arrayIndex, _length);
 
         /// <summary>
         /// 从 <see cref="T:System.Collections.Generic.ICollection`1"/> 中移除特定对象的第一个匹配项。
@@ -320,7 +320,7 @@ namespace Teal.CodeEditor {
         /// 如果已从 <see cref="T:System.Collections.Generic.ICollection`1"/> 中成功移除 <paramref name="item"/>，则为 true；否则为 false。如果在原始 <see cref="T:System.Collections.Generic.ICollection`1"/> 中没有找到 <paramref name="item"/>，该方法也会返回 false。
         /// </returns>
         /// <param name="item">要从 <see cref="T:System.Collections.Generic.ICollection`1"/> 中移除的对象。</param><exception cref="T:System.NotSupportedException"><see cref="T:System.Collections.Generic.ICollection`1"/> 为只读。</exception>
-        bool ICollection<T>.Remove(T item) => remove(item);
+        public bool Remove(T item) => remove(item);
 
         /// <summary>
         /// 获取 <see cref="T:System.Collections.Generic.ICollection`1"/> 中包含的元素数。
@@ -328,7 +328,7 @@ namespace Teal.CodeEditor {
         /// <returns>
         /// <see cref="T:System.Collections.Generic.ICollection`1"/> 中包含的元素个数。
         /// </returns>
-        int ICollection<T>.Count => _length;
+        public int Count => _length;
 
         /// <summary>
         /// 获取一个值，该值指示 <see cref="T:System.Collections.Generic.ICollection`1"/> 是否为只读。

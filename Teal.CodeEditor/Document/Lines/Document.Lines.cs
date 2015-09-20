@@ -15,7 +15,7 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 获取当前文档的所有行。
         /// </summary>
-        public ArrayList<DocumentLine> lines = new ArrayList<DocumentLine>(2);
+        public ArrayList<DocumentLine> lines = new ArrayList<DocumentLine>(2) { new DocumentLine() };
 
         /// <summary>
         /// 获取或设置指定索引的行。

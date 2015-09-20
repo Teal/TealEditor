@@ -174,7 +174,7 @@ namespace Teal.CodeEditor {
                     if (controlName != null) {
 
                         // 首先绘制特殊字符之前的字符串。
-                        _painter.drawString(textData, layoutInfo.column, column, layoutInfo.top, layoutInfo.left);
+                        _painter.drawString(textData, layoutInfo.column, column, layoutInfo.left, layoutInfo.top);
                         layoutInfo.left = left;
                         layoutInfo.column = column;
 
@@ -241,7 +241,7 @@ namespace Teal.CodeEditor {
                             }
 
                             // 绘制之前的字符串。
-                            _painter.drawString(textData, layoutInfo.column, column, layoutInfo.top, layoutInfo.left);
+                            _painter.drawString(textData, layoutInfo.column, column, layoutInfo.left, layoutInfo.top);
                             layoutInfo.left = left;
                             layoutInfo.column = column;
 
@@ -257,22 +257,23 @@ namespace Teal.CodeEditor {
                 }
 
                 // 绘制最后一个特殊字符或开头到结尾的字符串。
-                _painter.drawString(textData, layoutInfo.column, column, layoutInfo.top, layoutInfo.left);
+                _painter.drawString(textData, layoutInfo.column, column, layoutInfo.left, layoutInfo.top);
                 layoutInfo.left = left;
                 layoutInfo.column = column;
             }
         }
 
         private void setStyle(SegmentType type) {
-
+            _painter.textColor = type.foreColor;
+            _painter.backColor = type.backColor;
         }
 
         private void drawWrap(int top, int left) {
 
         }
 
-        private void drawControlChar(string controlName, int top, int left) {
-            _painter.drawString(controlName, top, left);
+        private void drawControlChar(string controlName, int left, int top) {
+            _painter.drawString(controlName, left, top);
         }
 
         private void drawWhitespace(int top, int left) {
@@ -328,7 +329,7 @@ namespace Teal.CodeEditor {
 
         private int _offsetBottom;
 
-        private int _offsetRight;
+        private int _offsetRight = 400;
 
         /// <summary>
         /// 重绘指定已折叠块进行布局，检测是否自动换行。
@@ -354,7 +355,7 @@ namespace Teal.CodeEditor {
                 layoutInfo.left = oldLeft + collapsedTextWidth;
             }
 
-            _painter.drawString(collapsedText, layoutInfo.top, oldLeft);
+            _painter.drawString(collapsedText, oldLeft, layoutInfo.top);
         }
 
         private string getCollapsedText(Block block) {

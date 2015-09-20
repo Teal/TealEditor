@@ -265,13 +265,12 @@ namespace Teal.CodeEditor {
         public ArrayList<SegmentSplitter> segments;
 
         /// <summary>
-        /// 添加一个已找到的片段。
+        /// 添加一个已找到的片段节点。
         /// </summary>
-        /// <param name="startIndex"></param>
-        /// <param name="endIndex"></param>
+        /// <param name="index"></param>
         /// <param name="type"></param>
-        private void addSegment(int startIndex, int endIndex, SegmentType type) {
-            Console.WriteLine($"{startIndex}-{endIndex}: {type}");
+        private void addSegmentSplitter(int index, SegmentType type) {
+            segments.add(new SegmentSplitter(index, type));
         }
 
         /// <summary>
@@ -333,12 +332,15 @@ namespace Teal.CodeEditor {
                 // 3. 处理子片段的开始。
                 if (childSegmentType != null) {
 
+                    // 保存之前的样式。
+                    addSegmentSplitter(matchResult.startIndex, parentBlockType);
+
                     if (childSegmentType.isBlock) {
                         // 如果子片段是另一个块，则递归处理。
-                        parentBlock = new Block(parentBlock, (BlockType)childSegmentType, this);
+                        parentBlock = new Block(parentBlock, (BlockType)childSegmentType, this, matchResult.startIndex);
                     } else {
-                        // 保存 子块.开始 -> 子块.结束 的样式。
-                        addSegment(matchResult.startIndex, matchResult.endIndex, childSegmentType);
+                        // 保存当前片段的样式。
+                        addSegmentSplitter(matchResult.endIndex, childSegmentType);
                     }
 
                     index = matchResult.endIndex;
@@ -349,8 +351,8 @@ namespace Teal.CodeEditor {
                 // 4. 处理父块的结束。
                 if (matchResult.success) {
 
-                    // 保存 块.开始 -> 块.结束 的样式。
-                    addSegment(parentBlock.startLine == this ? parentBlock.startColumn : 0, matchResult.endIndex, parentBlockType);
+                    // 保存之前的样式。
+                    addSegmentSplitter(matchResult.endIndex, parentBlockType);
 
                     // 设置块的结束行。
                     parentBlock.endLine = this;
@@ -366,8 +368,9 @@ namespace Teal.CodeEditor {
 
                 // 5. 剩下字符不满足任意部分，则处理为父块的最后部分。
 
-                // 保存 块.开始 -> 块.结束 的样式。
-                addSegment(parentBlock.startLine == this ? parentBlock.startColumn : 0, buffer.length, parentBlockType);
+                // 保存之前的样式。
+                addSegmentSplitter(buffer.length, parentBlockType);
+
                 break;
 
             }
@@ -438,23 +441,6 @@ namespace Teal.CodeEditor {
     //    tab,
 
     //}
-
-    /// <summary>
-    /// 表示一个行内片段分割器。同一行的文本可能被多个分割器分成多个部分。
-    /// </summary>
-    public struct SegmentSplitter {
-
-        /// <summary>
-        /// 获取当前分割列号之前的样式。
-        /// </summary>
-        public SegmentType type;
-
-        /// <summary>
-        /// 获取当前分割的列号。
-        /// </summary>
-        public int index;
-
-    }
 
     ///// <summary>
     ///// 表示一个行内的片段。
