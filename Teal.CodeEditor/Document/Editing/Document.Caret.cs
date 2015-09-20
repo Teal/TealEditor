@@ -19,164 +19,46 @@ namespace Teal.CodeEditor {
         /// </summary>
         private int _caretColumn;
 
-        ///// <summary>
-        ///// 将当前光标左移一位。
-        ///// </summary>
-        //private MoveOperation moveLeftCore() {
+        /// <summary>
+        /// 将当前光标左移一位。
+        /// </summary>
+        public MoveOperation moveLeft() {
 
-        //    clearSelections();
+            //clearSelections();
 
-        //    MoveOperation op;
+            //MoveOperation op;
 
-        //    // 如果当前光标等于起始列，则切换到上一行。
-        //    if (_caretColumn == 0) {
-        //        if (_caretLine == 0) {
-        //            return MoveOperation.none;
-        //        }
+            //// 如果当前光标等于起始列，则切换到上一行。
+            //if (_caretColumn == 0) {
+            //    if (_caretLine == 0) {
+            //        return MoveOperation.none;
+            //    }
 
-        //        _caretColumn = document.lines[--_caretLine].length;
-        //        op = MoveOperation.line;
-        //    } else {
-        //        var foldingRange = getFoldingRangeByEnd(_caretLine, _caretColumn);
-        //        if (foldingRange != null && foldingRange.isFolded) {
-        //            _caretLine = foldingRange.startLine;
-        //            _caretColumn = foldingRange.startColumn;
-        //            op = MoveOperation.block;
-        //        } else {
-        //            _caretColumn--;
-        //            op = MoveOperation.column;
-        //        }
-        //    }
+            //    _caretColumn = document.lines[--_caretLine].length;
+            //    op = MoveOperation.line;
+            //} else {
+            //    var foldingRange = getFoldingRangeByEnd(_caretLine, _caretColumn);
+            //    if (foldingRange != null && foldingRange.isFolded) {
+            //        _caretLine = foldingRange.startLine;
+            //        _caretColumn = foldingRange.startColumn;
+            //        op = MoveOperation.block;
+            //    } else {
+            //        _caretColumn--;
+            //        op = MoveOperation.column;
+            //    }
+            //}
 
-        //    updateCaret();
+            //updateCaret();
 
-        //    return op;
+            // return op;
 
-        //}
-
-
-
+            return MoveOperation.none;
+        }
 
         ///// <summary>
         ///// 表示一个代码编辑器。
         ///// </summary>
         //public partial class CodeEditor {
-
-        //    #region 绘制光标
-
-        //    /// <summary>
-        //    /// 指示当前光标是否需要重绘。
-        //    /// </summary>
-        //    private const bool customDrawCaret = false;
-
-        //    /// <summary>
-        //    /// 创建一个新的光标。
-        //    /// </summary>
-        //    private void createCaret(int width) {
-        //        Win32Api.CreateCaret(Handle, width, painter.lineHeight);
-        //        updateCaret();
-        //        showCaret();
-        //        if (!isCaretVisible) {
-        //            hideCaret();
-        //        }
-        //    }
-
-        //    /// <summary>
-        //    /// 判断当前光标是否是显示状态。
-        //    /// </summary>
-        //    public bool isCaretVisible {
-        //        get {
-        //            return Focused;
-        //        }
-        //    }
-
-        //    /// <summary>
-        //    /// 销毁光标。
-        //    /// </summary>
-        //    private void destroyCaret() {
-        //        Win32Api.DestroyCaret();
-        //    }
-
-        //    /// <summary>
-        //    /// 显示当前标记的光标。
-        //    /// </summary>
-        //    public void showCaret() {
-        //        Win32Api.ShowCaret(Handle);
-        //    }
-
-        //    /// <summary>
-        //    /// 隐藏当前标记的光标。
-        //    /// </summary>
-        //    public void hideCaret() {
-        //        Win32Api.HideCaret(Handle);
-        //    }
-
-        //    /// <summary>
-        //    /// 设置光标的位置。
-        //    /// </summary>
-        //    /// <param name="x"></param>
-        //    /// <param name="y"></param>
-        //    private void setCaretPosition(int x, int y) {
-        //        Win32Api.SetCaretPos(x, y);
-        //    }
-
-        //    /// <summary>
-        //    /// 获取光标的位置。
-        //    /// </summary>
-        //    private Point getCaretPosition() {
-        //        Point p;
-        //        Win32Api.GetCaretPos(out p);
-        //        return p;
-        //    }
-
-        //    /// <summary>
-        //    /// 绘制光标。
-        //    /// </summary>
-        //    private void drawCaret() {
-        //        // WIN32 系统绘制光标，不需要自动绘制。
-        //    }
-
-        //    #endregion
-
-        //    #region 光标模式
-
-        //    /// <summary>
-        //    /// 光标模式。
-        //    /// </summary>
-        //    private CaretMode _caretMode;
-
-        //    /// <summary>
-        //    /// 判断或设置当前编辑器光标模式。
-        //    /// </summary>
-        //    public CaretMode caretMode {
-        //        get {
-        //            return _caretMode;
-        //        }
-        //        set {
-        //            if (_caretMode != value) {
-        //                _caretMode = value;
-        //                destroyCaret();
-        //                createCaret(_caretMode == CaretMode.overwriteMode ? painter.fontWidth : Configs.caretWidth);
-        //                if (caretModeChanged != null) {
-        //                    caretModeChanged();
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    /// <summary>
-        //    /// 当光标模式改变后触发。
-        //    /// </summary>
-        //    public event Action caretModeChanged;
-
-        //    /// <summary>
-        //    /// 切换编辑器的光标模式。
-        //    /// </summary>
-        //    public void toggleCaretMode() {
-        //        caretMode = caretMode == CaretMode.overwriteMode ? CaretMode.insertMode : CaretMode.overwriteMode;
-        //    }
-
-        //    #endregion
 
         //    #region 光标坐标
 
@@ -192,7 +74,7 @@ namespace Teal.CodeEditor {
 
         //    /// <summary>
         //    /// 获取或设置当前光标的所在实际行号。
-        //    /// </summary>
+        //    /// </summary>updateCaret
         //    public int caretLine {
         //        get {
         //            return _caretLine;
@@ -279,20 +161,6 @@ namespace Teal.CodeEditor {
         //    /// 光标位置改变后事件。
         //    /// </summary>
         //    public event Action<int, int> caretPositionChanged;
-
-        //    /// <summary>
-        //    /// 根据当前光标行列号更新光标位置。
-        //    /// </summary>
-        //    private void updateCaret() {
-        //        if (_updateCount > 0) {
-        //            return;
-        //        }
-        //        // setCaretPositionCore(getLeftFromVisualLocation(_caretVisualLine, _caretLine, _caretColumn), visualLineToTop(_caretVisualLine));
-
-        //        int x, y;
-        //        locationToPosition(caretLine, caretColumn, out x, out y);
-        //        setCaretPositionCore(x, y);
-        //    }
 
         //    #endregion
 
@@ -699,26 +567,5 @@ namespace Teal.CodeEditor {
 
         //}
 
-        ///// <summary>
-        ///// 表示折叠域的操作。
-        ///// </summary>
-        //public enum FoldBlockOperation {
-
-        //    /// <summary>
-        //    /// 无操作。
-        //    /// </summary>
-        //    none,
-
-        //    /// <summary>
-        //    /// 选择折叠区域。
-        //    /// </summary>
-        //    select,
-
-        //    /// <summary>
-        //    /// 展开折叠区域。
-        //    /// </summary>
-        //    expand,
-
-        //}
     }
 }

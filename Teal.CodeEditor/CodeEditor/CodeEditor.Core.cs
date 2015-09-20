@@ -14,12 +14,7 @@ namespace Teal.CodeEditor {
         /// 存储当前编辑器的文档。
         /// </summary>
         private Document _document = new Document();
-
-        ///// <summary>
-        ///// 获取或设置当前编辑器对应的文档。
-        ///// </summary>
-        //public Document document = new Document();
-
+        
         /// <summary>
         /// 获取或设置当前编辑器所编辑的文档。
         /// </summary>
@@ -42,10 +37,10 @@ namespace Teal.CodeEditor {
         /// </summary>
         public DocumentConfigs configs {
             get {
-                return document.configs;
+                return _document.configs;
             }
             set {
-                document.configs = value;
+                _document.configs = value;
             }
         }
 
@@ -54,10 +49,10 @@ namespace Teal.CodeEditor {
         /// </summary>
         public SyntaxBinding syntaxBinding {
             get {
-                return document.syntaxBinding;
+                return _document.syntaxBinding;
             }
             set {
-                document.syntaxBinding = value;
+                _document.syntaxBinding = value;
             }
         }
 
@@ -189,17 +184,13 @@ namespace Teal.CodeEditor {
 
         //        #region 布局
 
-        //        /// <summary>
-        //        /// 获取控件的默认大小。
-        //        /// </summary>
-        //        /// <returns>
-        //        /// 控件的默认 <see cref="T:System.Drawing.Size"/>。
-        //        /// </returns>
-        //        protected override Size DefaultSize {
-        //            get {
-        //                return new Size(Configs.defaultWidth, Configs.defaultHeight);
-        //            }
-        //        }
+        /// <summary>
+        /// 获取控件的默认大小。
+        /// </summary>
+        /// <returns>
+        /// 控件的默认 <see cref="T:System.Drawing.Size"/>。
+        /// </returns>
+        protected override Size DefaultSize => new Size(DocumentConfigs.defaultWidth, DocumentConfigs.defaultHeight);
 
         //        /// <summary>
         //        /// 引发 <see cref="E:System.Windows.Forms.Control.Resize"/> 事件。

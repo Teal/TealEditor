@@ -65,16 +65,12 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 获取或设置当前片段的背景色。
         /// </summary>
-        public uint backColor { get; set; }
+        public uint backColor;
 
         /// <summary>
         /// 获取或设置当前片段的前景色。
         /// </summary>
-        public uint foreColor { get; set; }
-        public bool acceptTabs {
-            get;
-            internal set;
-        }
+        public uint foreColor;
 
         #endregion
 

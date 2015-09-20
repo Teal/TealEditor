@@ -48,9 +48,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Document\Editing\CaretMode.cs" />
+    <Compile Include="CodeEditor\CodeEditor.Actions.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CodeEditor\CodeEditor.Editing.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CodeEditor\CaretMode.cs" />
+    <Compile Include="Document\DocumentConfigs.cs" />
     <Compile Include="Document\Editing\Document.Caret.cs" />
     <Compile Include="Document\Editing\MoveOperation.cs" />
+    <Compile Include="Document\Folding\FoldBlockOperation.cs" />
     <Compile Include="Document\Lines\DocumentLineFlags.cs" />
     <Compile Include="Document\Lines\SegmentSplitter.cs" />
     <Compile Include="Document\Selection\Document.Selections.cs" />
@@ -62,7 +70,7 @@
     <Compile Include="Document\SyntaxBinding\Document.Syntax.cs" />
     <Compile Include="Document\SyntaxBinding\InternalSegmentTypes.cs" />
     <Compile Include="Document\SyntaxBinding\Pettern.cs" />
-    <Compile Include="Editing\CodeEditor.Core.cs">
+    <Compile Include="CodeEditor\CodeEditor.Core.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Utility\ArrayList.cs" />

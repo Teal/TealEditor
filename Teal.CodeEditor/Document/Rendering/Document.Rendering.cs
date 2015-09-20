@@ -19,6 +19,11 @@ namespace Teal.CodeEditor {
         private readonly Painter _painter = new Painter(new Font(DocumentConfigs.defaultFontName, DocumentConfigs.defaultFontSize));
 
         /// <summary>
+        /// 获取用于绘制整个编辑器的绘图器。
+        /// </summary>
+        public Painter painter => _painter;
+
+        /// <summary>
         /// 存储布局需要的全部参数。
         /// </summary>
         private struct LayoutInfo {
