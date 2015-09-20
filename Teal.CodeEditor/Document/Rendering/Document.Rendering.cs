@@ -191,22 +191,22 @@ namespace Teal.CodeEditor {
             // 设置本次绘制的风格。
             setStyle(type);
 
-            // 一次绘制一个单词。
-
+            // 遍历数组，如果碰到特殊字符则直接绘制，否则所有单词连在一起绘制。
             for (; column < endColumn; column++) {
                 var c = textData[column];
                 var controlName = Utility.getControlCharName(c);
 
                 // 碰到特殊字符则直接绘制。
                 if (controlName != null) {
-                    // 首先绘制特殊字符之前的字符串。
+
+                    // 首先绘制之前未绘制的特殊字符之前的字符串。
                     if (column > layoutInfo.column) {
-                        _painter.drawString(textData, layoutInfo.column, column - layoutInfo.column, layoutInfo.left, layoutInfo.top);
+                        drawString(textData, layoutInfo.column, column, layoutInfo.top, layoutInfo.left);
                         layoutInfo.left = left;
                         layoutInfo.column = column;
                     }
 
-                    // 计算字符的宽度。
+                    // 计算特殊字符的宽度。
                     switch (c) {
                         case '\t':
                             left = alignTab(left);
@@ -219,11 +219,11 @@ namespace Teal.CodeEditor {
                             break;
                     }
 
-                    // 如果超界，则在新行重新绘制。
+                    // 如果特殊字符超界，则重定位到新行。
                     if (left >= _offsetRight && layoutInfo.column > 0) {
                         drawWrap(layoutInfo.top, left);
                         layoutInfo.top += _painter.lineHeight;
-                        layoutInfo.left = left =(documentLine.indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
+                        layoutInfo.left = left = (documentLine.indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
 
                         // 重新加上宽度。
                         switch (c) {
@@ -239,6 +239,7 @@ namespace Teal.CodeEditor {
                         }
                     }
 
+                    // 绘制特殊字符。
                     switch (c) {
                         case '\t':
                             drawTab(layoutInfo.top, layoutInfo.left, left);
@@ -251,13 +252,18 @@ namespace Teal.CodeEditor {
                             break;
                     }
 
+                    // 更新绘制后的数据。
                     layoutInfo.left = left;
                     layoutInfo.column = column;
                 } else {
+
+                    // 假设追加当前字符的宽度。
                     left += _painter.measureString(c);
 
-                    // 如果超界，则返回搜索
-                    if (left >= _offsetRight && layoutInfo.column > 0) {
+                    // 如果当前字符串超界，则返回搜索合适的位置换行。
+                    // 如果当前列本身已超限，则强制在不换行。
+                    if (left >= _offsetRight && column > layoutInfo.column) {
+
                         // 获取合适的中断点。
                         var oldColumn = column;
                         column = getWrapPoint(textData, layoutInfo.column, oldColumn);
@@ -268,20 +274,20 @@ namespace Teal.CodeEditor {
                         }
 
                         // 绘制之前的字符串。
-                        _painter.drawString(textData, layoutInfo.column, column - layoutInfo.column, layoutInfo.left, layoutInfo.top);
+                        drawString(textData, layoutInfo.column, column, layoutInfo.top, layoutInfo.left);
                         layoutInfo.left = left;
                         layoutInfo.column = column;
 
                         // 换行。
                         drawWrap(layoutInfo.top, left);
                         layoutInfo.top += _painter.lineHeight;
-                        layoutInfo.left = (documentLine.indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
+                        layoutInfo.left = left = (documentLine.indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
                     }
                 }
             }
 
             // 绘制最后一个特殊字符或开头到结尾的字符串。
-            _painter.drawString(textData, layoutInfo.column, column - layoutInfo.column, layoutInfo.left, layoutInfo.top);
+            drawString(textData, layoutInfo.column, column, layoutInfo.top, layoutInfo.left);
             layoutInfo.left = left;
             layoutInfo.column = column;
         }
@@ -308,6 +314,18 @@ namespace Teal.CodeEditor {
         }
 
         /// <summary>
+        /// 底层绘制一个字符串。
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
+        /// <param name="top"></param>
+        /// <param name="left"></param>
+        private void drawString(string value, int startIndex, int endIndex, int top, int left) {
+            _painter.drawString(value, startIndex, endIndex - startIndex, left, top);
+        }
+
+        /// <summary>
         /// 计算最合适的自动换行中断位置。如 "hello world" 的最合适中断点是 'w'。
         /// </summary>
         /// <param name="textData">当前的文本数据。</param>
@@ -326,7 +344,7 @@ namespace Teal.CodeEditor {
             }
 
             // 无法找到合适的单词边界，则强行从行尾中端。
-            return wrapPoint <= startIndex ? startIndex >= endIndex ? endIndex : endIndex - 1 : wrapPoint;
+            return wrapPoint < startIndex ? endIndex - 1 : wrapPoint;
         }
 
         /// <summary>

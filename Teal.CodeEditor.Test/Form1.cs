@@ -60,7 +60,7 @@ namespace Teal.CodeEditor.Test {
 
             ce.document.syntaxBinding.rootBlock = new Block(null, blocks.body, null, 0);
 
-            ce.document.insert(0, 0,"aff\t" + @"a'b'c""cc\""c""d /*
+            ce.document.insert(0, 0,"affgujgjhkjhnkjk\t" + @"a'b'c""cc\""c""d ghuihik hkj/*
 sasas
   // aaaa
  */    asasss // asdasd");
