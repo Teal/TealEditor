@@ -34,7 +34,7 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 阻止手动创建 Range 对象。
         /// </summary>
-        internal Range() {}
+        internal Range() { }
 
         /// <summary>
         /// 判断指定的行是否包含在此区间。
@@ -121,7 +121,7 @@ namespace Teal.CodeEditor {
 
         private void update(ref int currentLine, ref int currentColumn, int line, int column, int deltaLine, int deltaColumn) {
             if (currentLine < line || (currentLine == line && currentColumn < column)) {
-                
+
             }
         }
 
@@ -137,4 +137,5 @@ namespace Teal.CodeEditor {
         }
 
     }
+
 }

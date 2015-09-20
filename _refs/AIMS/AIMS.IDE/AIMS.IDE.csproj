@@ -55,5 +55,19 @@
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIMS.CodeEditor\CodeEditor.csproj">
+      <Project>{94bfa44a-f4d0-4605-88e6-3add498f5e16}</Project>
+      <Name>CodeEditor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AIMS.SyntaxFiles\CodeEditor.SyntaxFiles.csproj">
+      <Project>{3814f627-858a-42a3-9aaf-cd649413f2a8}</Project>
+      <Name>CodeEditor.SyntaxFiles</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SyntaxDocument\CodeEditor.SyntaxDocument.csproj">
+      <Project>{3f43bab0-22b4-4fd6-9655-8ba214a093a5}</Project>
+      <Name>CodeEditor.SyntaxDocument</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

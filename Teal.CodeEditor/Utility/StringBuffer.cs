@@ -479,15 +479,15 @@ namespace Teal.CodeEditor {
         /// <param name="index">插入的位置。</param>
         /// <param name="value">要插入的字符串。</param>
         /// <param name="startIndex">开始的索引。</param>
-        /// <param name="charCount">插入的长度。</param>
-        public void insert(int index, string value, int startIndex, int charCount) {
+        /// <param name="length">插入的长度。</param>
+        public void insert(int index, string value, int startIndex, int length) {
             Debug.Assert(startIndex >= 0);
-            Debug.Assert(startIndex + charCount <= value.Length);
+            Debug.Assert(startIndex + length <= value.Length);
             unsafe
             {
                 fixed (char* p = value)
                 {
-                    insert(index, p + startIndex, charCount);
+                    insert(index, p + startIndex, length);
                 }
             }
         }
@@ -505,15 +505,15 @@ namespace Teal.CodeEditor {
         /// <param name="index">插入的位置。</param>
         /// <param name="value">要插入的字符数组。</param>
         /// <param name="startIndex">开始的索引。</param>
-        /// <param name="charCount">插入的长度。</param>
-        public void insert(int index, char[] value, int startIndex, int charCount) {
+        /// <param name="length">插入的长度。</param>
+        public void insert(int index, char[] value, int startIndex, int length) {
             Debug.Assert(startIndex >= 0);
-            Debug.Assert(startIndex + charCount <= value.Length);
+            Debug.Assert(startIndex + length <= value.Length);
             unsafe
             {
                 fixed (char* p = value)
                 {
-                    insert(index, p + startIndex, charCount);
+                    insert(index, p + startIndex, length);
                 }
             }
         }

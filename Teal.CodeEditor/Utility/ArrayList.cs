@@ -10,7 +10,7 @@ namespace Teal.CodeEditor {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [DebuggerDisplay("length = {length}"), DebuggerTypeProxy(typeof(ArrayList<>.DebugView)),]
-    public struct ArrayList<T> : IList<T> {
+    public struct ArrayList<T> : IList<T> where T : new() {
 
         /// <summary>
         /// 获取当前列表的所有数据。
@@ -67,7 +67,15 @@ namespace Teal.CodeEditor {
         /// <returns>返回值。</returns>
         public T this[int index] {
             get {
-                return index >= 0 && index < _length ? data[index] : default(T);
+                if (index < 0) {
+                    index = 0;
+                }
+
+                if (index >= _length) {
+                    return this[index] = new T();
+                }
+
+                return data[index];
             }
             set {
                 if (index < 0) {

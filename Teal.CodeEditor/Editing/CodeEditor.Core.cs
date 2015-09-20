@@ -11,9 +11,31 @@ namespace Teal.CodeEditor {
     public partial class CodeEditor : Control {
 
         /// <summary>
-        /// 获取或设置当前编辑器对应的文档。
+        /// 存储当前编辑器的文档。
         /// </summary>
-        public Document document = new Document();
+        private Document _document = new Document();
+
+        ///// <summary>
+        ///// 获取或设置当前编辑器对应的文档。
+        ///// </summary>
+        //public Document document = new Document();
+
+        /// <summary>
+        /// 获取或设置当前编辑器所编辑的文档。
+        /// </summary>
+        [Description("获取或设置当前编辑器所编辑的文档。")]
+        public Document document {
+            get {
+                return _document;
+            }
+            set {
+                if (_document != value) {
+                    //_document.update -= document_update;
+                    _document = value;
+                    //_document.update += document_update;
+                }
+            }
+        }
 
         /// <summary>
         /// 获取或设置当前编辑器的配置。

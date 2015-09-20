@@ -8,7 +8,7 @@ namespace Teal.CodeEditor {
     /// <summary>
     /// 提供 WIN32 API 的调用。
     /// </summary>
-    public static class Win32Api {
+    public static partial class Win32Api {
 
         /// <summary>
         /// 表示一个矩形的位置和大小。

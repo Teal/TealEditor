@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Teal.CodeEditor {
 
@@ -12,221 +12,7 @@ namespace Teal.CodeEditor {
     /// </summary>
     public sealed partial class Document {
 
-        /// <summary>
-        /// 获取当前文档的所有行。
-        /// </summary>
-        public ArrayList<DocumentLine> lines = new ArrayList<DocumentLine>(2);
-
-        /// <summary>
-        /// 获取或设置指定索引的行。
-        /// </summary>
-        /// <param name="index">要获取的行号。行号从 0 开始。</param>
-        /// <returns>返回指定的行。</returns>
-        public DocumentLine this[int index] {
-            get {
-                return lines[index];
-            }
-            set {
-                lines[index] = value;
-            }
-        }
-
-        ///// <summary>
-        ///// 创建用于读取当前文档内容的读取器。
-        ///// </summary>
-        ///// <returns></returns>
-        //public TextReader createReader() {
-        //    return new DocumentReader(this);
-        //}
-
-        ///// <summary>
-        ///// 创建用于写入到当前文档的写入器。
-        ///// </summary>
-        ///// <returns></returns>
-        //public TextWriter createWriter() {
-        //    return new DocumentWriter(this);
-        //}
-
-        ///// <summary>
-        ///// 从指定的读取器载入文档。
-        ///// </summary>
-        ///// <param name="reader">要载入的读取器。</param>
-        //public void load(TextReader reader) {
-        //    lines.Clear();
-
-        //    DocumentLine currentLine = new DocumentLine();
-        //    lines.Add(currentLine);
-        //    int c;
-        //    while ((c = reader.Read()) > 0) {
-        //        if (c == '\r') {
-        //            currentLine = new DocumentLine();
-        //            if (reader.Peek() == '\n') {
-        //                reader.Read();
-        //            } else {
-        //                currentLine.flags |= DocumentLineFlags.newLineTypeMac;
-        //            }
-        //            lines.Add(currentLine);
-        //            continue;
-        //        }
-
-        //        if (c == '\n') {
-        //            currentLine = new DocumentLine();
-        //            currentLine.flags |= DocumentLineFlags.newLineTypeUnix;
-        //            lines.Add(currentLine);
-        //            continue;
-        //        }
-
-        //        currentLine.append((char)c);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 将当前文档的数据写到指定的输出器。
-        ///// </summary>
-        ///// <param name="writer">要写入的输出器。</param>
-        //public void save(TextWriter writer) {
-        //    for (var i = 0; i < lines.Count; i++) {
-        //        var line = lines[i];
-        //        if (line.newLine != null) {
-        //            writer.Write(line.newLine);
-        //        }
-        //        writer.Write(line.chars, 0, line.textLength);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 获取或设置当前文档的全部文本。
-        ///// </summary>
-        //public string text {
-        //    get {
-        //        var writer = new StringWriter();
-        //        save(writer);
-        //        return writer.ToString();
-        //    }
-        //    set {
-        //        load(new StringReader(value));
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 获取指定区间的文本。
-        ///// </summary>
-        ///// <param name="startLine"></param>
-        ///// <param name="startColumn"></param>
-        ///// <param name="endLine"></param>
-        ///// <param name="endColumn"></param>
-        ///// <returns></returns>
-        //public string getText(int startLine, int startColumn, int endLine, int endColumn) {
-        //    StringBuilder sb = new StringBuilder();
-        //    write(sb, startLine, startColumn, endLine, endColumn);
-        //    return sb.ToString();
-        //}
-
-        ///// <summary>
-        ///// 将指定区间的文本写入缓存器。
-        ///// </summary>
-        ///// <param name="sb"></param>
-        ///// <param name="startLine"></param>
-        ///// <param name="startColumn"></param>
-        ///// <param name="endLine"></param>
-        ///// <param name="endColumn"></param>
-        //public void write(StringBuilder sb, int startLine, int startColumn, int endLine, int endColumn) {
-        //    if (endLine == startLine) {
-        //        sb.Append(lines[startLine].chars, startColumn, endColumn - startColumn);
-        //    } else {
-        //        sb.Append(lines[startLine].chars, startColumn, lines[startLine].textLength - startColumn);
-        //        for (var i = startLine + 1; i < endLine; i++) {
-        //            sb.Append(lines[i].newLine);
-        //            sb.Append(lines[i].chars, 0, lines[i].textLength);
-        //        }
-        //        sb.Append(lines[endLine].newLine);
-        //        sb.Append(lines[endLine].chars, 0, endColumn);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 返回表示当前对象的字符串。
-        ///// </summary>
-        ///// <returns>
-        ///// 表示当前对象的字符串。
-        ///// </returns>
-        //public override string ToString() {
-        //    return text;
-        //}
-
-    }
-
-    /// <summary>
-    /// 表示一个文档。
-    /// </summary>
-    public sealed partial class Document {
-
-        #region 换行
-
-        /// <summary>
-        /// 当前文档的换行符。
-        /// </summary>
-        private DocumentLineFlags _newLineType = DocumentConfigs.defaultNewLineType;
-
-        /// <summary>
-        /// 判断当前文档是否包含混合的换行符。
-        /// </summary>
-        public bool hasMixedNewLine {
-            get {
-                //if (lines.Count == 0) {
-                //    return false;
-                //}
-
-                //var lastLine = lines[lines.Count - 1].newLineType;
-                //for (var i = 1; i < lines.Count; i++) {
-                //    if (lines[i].newLineType != lastLine) {
-                //        return false;
-                //    }
-                //}
-
-
-                return true;
-            }
-        }
-
-        /// <summary>
-        /// 获取或设置当前文档的换行符。
-        /// </summary>
-        public string newLine {
-            get {
-                return Utility.newlineTypeToNewLine(newLineType);
-            }
-            set {
-                newLineType = Utility.newlineToNewLineType(value);
-            }
-        }
-
-        /// <summary>
-        /// 获取或设置当前文档的换行符。
-        /// </summary>
-        public DocumentLineFlags newLineType {
-            get {
-                if (lines.length == 0) {
-                    return _newLineType;
-                }
-
-                return lines[lines.length - 1].newLineType;
-
-            }
-            set {
-                if (newLineType != value || hasMixedNewLine) {
-                    _newLineType = value;
-                    for (var i = 1; i < lines.length; i++) {
-                        lines[i].newLineType = value;
-                    }
-                    modifyState = ModifyState.modified;
-                }
-            }
-        }
-
-        #endregion
-
-        #region 编辑
+        #region 修改状态
 
         /// <summary>
         /// 当前文档的修改状态。
@@ -250,9 +36,7 @@ namespace Teal.CodeEditor {
             set {
                 if (_modifyState != value) {
                     _modifyState = value;
-                    if (modifyStateChange != null) {
-                        modifyStateChange();
-                    }
+                    modifyStateChange?.Invoke();
                 }
             }
         }
@@ -261,6 +45,35 @@ namespace Teal.CodeEditor {
         /// 当文档被更新时触发。
         /// </summary>
         public event Action<int, int, int, int, int, int> update;
+
+        /// <summary>
+        /// 触发文档被更新事件。
+        /// </summary>
+        /// <param name="startLine"></param>
+        /// <param name="endLine"></param>
+        private void ononDocumentUpdated(int startLine, int endLine) {
+
+        }
+
+        /// <summary>
+        /// 触发文档被更新事件。
+        /// </summary>
+        /// <param name="line">发生改变的行。</param>
+        /// <param name="column">发生改变的列。</param>
+        /// <param name="deleteLineCount">删除的行数。</param>
+        /// <param name="insertLineCount">插入的行数。</param>
+        /// <param name="deleteColumnCount">删除的列数。</param>
+        /// <param name="insertColumnCount">插入的列数。</param>
+        private void onLineUpdated(int startLine, int endLine) {
+
+            // 更新文档修改状态。
+            modifyState = ModifyState.modified;
+
+            //if (update != null) {
+            //    update(line, column, deleteLineCount, insertLineCount, deleteColumnCount, insertColumnCount);
+            //}
+
+        }
 
         /// <summary>
         /// 触发文档被更新事件。
@@ -284,7 +97,160 @@ namespace Teal.CodeEditor {
 
         #endregion
 
-        #region 修改
+        /// <summary>
+        /// 在指定位置插入一个非换行字符。
+        /// </summary>
+        /// <param name="line">插入的行号。</param>
+        /// <param name="column">插入的列号。</param>
+        /// <param name="value">插入的字符。不允许插入换行符。</param>
+        public void insert(int line, int column, char value) {
+
+            // 插入数据。
+            lines[line].buffer.insert(column, value);
+
+            // 保存操作记录。
+            if (undoStack.isUndoEnabled) {
+                addUndo(new InsertCharOperation(_caretLine, _caretColumn, value));
+            }
+
+            // 更新光标位置。
+            _caretLine = line;
+            _caretColumn = column + 1;
+
+            // 同步更新位置。
+            onUpdate(line, column, 0, 0, 0, 1);
+        }
+
+        ///// <summary>
+        ///// 在指定区域插入一个字符串。
+        ///// </summary>
+        ///// <param name="line">插入的行号。</param>
+        ///// <param name="column">插入的列号。</param>
+        ///// <param name="value">要插入的字符串。</param>
+        ///// <param name="enableUndo">指示是否将当前操作添加到撤销列表。</param>
+        //public void insert(int line, int column, string value, bool enableUndo = true) {
+        //    var newEnd = document.insert(line, column, value);
+        //    addUndo(new InsertBlockOperation(line, column, newEnd.Y, newEnd.X, value));
+        //    setCaretLocation(newEnd.Y, newEnd.X);
+        //}
+
+        /// <summary>
+        /// 在指定位置插入一个多行字符串。
+        /// </summary>
+        /// <param name="line">插入的行号。</param>
+        /// <param name="column">插入的列号。</param>
+        /// <param name="value">插入的字符串。</param>
+        public void insert(int line, int column, string value) => insert(line, column, value, 0, value.Length);
+
+        /// <summary>
+        /// 在指定位置插入一个多行字符串。
+        /// </summary>
+        /// <param name="line">插入的行号。</param>
+        /// <param name="column">插入的列号。</param>
+        /// <param name="value">插入的字符串。</param>
+        /// <param name="startIndex">插入的字符串起始位置。</param>
+        /// <param name="length">插入的字符串长度。</param>
+        public void insert(int line, int column, string value, int startIndex, int length) {
+
+            // 如果 value 中不包含换行，则可以加速插入。
+
+            string lineContent;
+            DocumentLineFlags newLineStyle;
+
+            var firstLineBreak = readLine(value, startIndex, length, out lineContent, out newLineStyle);
+
+            // 加速不存在换行的情况。
+            if (firstLineBreak < 0) {
+                lines[line].buffer.insert(column, value, startIndex, length);
+            }
+
+            var currentLineNumber = line;
+            var currentLine = lines[currentLineNumber];
+
+            // 当前行将被截断。
+
+            // 保存当前行被
+            string rest = null;
+
+            string restNewLine = currentLine.newLine;
+
+            // 剪切被删除的行尾。
+            var restCount = currentLine.textLength - column;
+            if (restCount > 0) {
+                rest = new String(currentLine.TextData, column, restCount);
+                currentLine.remove(column);
+            }
+
+            // 插入行。
+            int index = startIndex, count;
+            string newLine;
+            while ((count = Utility.readLine(value, length, ref index, out newLine)) > 0) {
+
+                // 插入当前行字符串。
+                currentLine.append(value, startIndex, count);
+                startIndex = index;
+
+                // 如果发现了换行符，则进行换行。
+                if (newLine != null) {
+
+                    // 更新当前行的换行符。
+                    currentLine.newLine = newLine;
+
+                    // 创建新行。
+                    currentLine = new DocumentLine();
+                    lines.Insert(++currentLineNumber, currentLine);
+
+                }
+
+            }
+
+            var newColumn = currentLine.textLength;
+
+            // 重新复制被粘贴的末尾。
+            if (rest != null) {
+                currentLine.append(rest);
+            }
+
+            // 重新设置新换行符。
+            currentLine.newLine = restNewLine;
+
+            // 保存操作记录。
+            if (undoStack.isUndoEnabled) {
+                addUndo(new InsertBlockOperation(_caretLine, _caretColumn, value));
+            }
+
+            onUpdate(line, column, 0, currentLineNumber - line, 0, newColumn - column);
+
+        }
+
+        private static int readLine(string value, int startIndex, int length, out string line, out DocumentLineFlags newLineStyle) {
+            for (var i = index; i < length; i++) {
+                if (value[i] == '\r') {
+                    var c = i - index;
+                    index = i + 1;
+                    if (index < length && value[index] == '\n') {
+                        index++;
+                        newLine = "\r\n";
+                    } else {
+                        newLine = "\r";
+                    }
+                    return c;
+                }
+                if (value[i] == '\n') {
+                    var c = i - index;
+                    index = i + 1;
+                    newLine = "\n";
+                    return c;
+                }
+            }
+
+            var t = length - index;
+            index = length;
+            newLine = null;
+            return t;
+        }
+
+
 
         /// <summary>
         /// 在指定位置插入一行。
@@ -365,17 +331,6 @@ namespace Teal.CodeEditor {
         }
 
         /// <summary>
-        /// 在指定位置插入一个非换行字符。
-        /// </summary>
-        /// <param name="line">插入的行号。</param>
-        /// <param name="column">插入的列号。</param>
-        /// <param name="value">插入的字符。不允许插入换行符。</param>
-        public void insert(int line, int column, char value) {
-            lines[line].buffer.insert(column, value);
-            onUpdate(line, column, 0, 0, 0, 1);
-        }
-
-        /// <summary>
         /// 替换指定位置的字符。
         /// </summary>
         /// <param name="line">插入的行号。</param>
@@ -395,78 +350,6 @@ namespace Teal.CodeEditor {
             lines[line].buffer.remove(column, 1);
             onUpdate(line, column, 0, 0, 1, 0);
         }
-
-        ///// <summary>
-        ///// 在指定位置插入一个多行字符串。
-        ///// </summary>
-        ///// <param name="line">插入的行号。</param>
-        ///// <param name="column">插入的列号。</param>
-        ///// <param name="value">插入的字符串。</param>
-        ///// <returns>返回插入后的新位置。</returns>
-        //public Point insert(int line, int column, string value) {
-        //    return insert(line, column, value, 0, value.Length);
-        //}
-
-        ///// <summary>
-        ///// 在指定位置插入一个多行字符串。
-        ///// </summary>
-        ///// <param name="line">插入的行号。</param>
-        ///// <param name="column">插入的列号。</param>
-        ///// <param name="value">插入的字符串。</param>
-        ///// <param name="startIndex">插入的字符串起始位置。</param>
-        ///// <param name="textLength">插入的字符串长度。</param>
-        ///// <returns>返回插入后的新位置。</returns>
-        //public Point insert(int line, int column, string value, int startIndex, int textLength) {
-
-        //    var currentLineNumber = line;
-        //    var currentLine = lines[currentLineNumber];
-        //    string restNewLine = currentLine.newLine;
-        //    string rest = null;
-
-        //    // 剪切被删除的行尾。
-        //    var restCount = currentLine.textLength - column;
-        //    if (restCount > 0) {
-        //        rest = new String(currentLine.TextData, column, restCount);
-        //        currentLine.remove(column);
-        //    }
-
-        //    // 插入行。
-        //    int index = startIndex, count;
-        //    string newLine;
-        //    while ((count = Utility.readLine(value, textLength, ref index, out newLine)) > 0) {
-
-        //        // 插入当前行字符串。
-        //        currentLine.append(value, startIndex, count);
-        //        startIndex = index;
-
-        //        // 如果发现了换行符，则进行换行。
-        //        if (newLine != null) {
-
-        //            // 更新当前行的换行符。
-        //            currentLine.newLine = newLine;
-
-        //            // 创建新行。
-        //            currentLine = new DocumentLine();
-        //            lines.Insert(++currentLineNumber, currentLine);
-
-        //        }
-
-        //    }
-
-        //    var newColumn = currentLine.textLength;
-
-        //    // 重新复制被粘贴的末尾。
-        //    if (rest != null) {
-        //        currentLine.append(rest);
-        //    }
-
-        //    // 重新设置新换行符。
-        //    currentLine.newLine = restNewLine;
-
-        //    onUpdate(line, column, 0, currentLineNumber - line, 0, newColumn - column);
-
-        //    return new Point(newColumn, currentLineNumber);
-        //}
 
         ///// <summary>
         ///// 替换指定位置的多行字符串。
@@ -580,29 +463,88 @@ namespace Teal.CodeEditor {
 
         //}
 
+        /// <summary>
+        /// 在当前光标位置插入换行符。
+        /// </summary>
+        public void breakLine() {
+            int indentCount;
+            _document.breakLine(caretLine, caretColumn, inheritIndents, DocumentLineFlags.NEW_LINE_TYPE, out indentCount);
+            addUndo(new BreakLineOperation(caretLine, caretColumn, indentCount));
+            setCaretLocation(caretLine + 1, indentCount);
+        }
+
+        /// <summary>
+        /// 在指定位置插入一个多行字符串。
+        /// </summary>
+        /// <param name="line">插入的行号。</param>
+        /// <param name="column">插入的列号。</param>
+        /// <param name="value">插入的字符串。</param>
+        public void insertBlock(int line, int column, string value) {
+            //var undo = new InsertBlockUndoableOperation() {
+            //    line = line,
+            //    column = column,
+            //    value = value
+            //};
+            //addUndo(undo);
+            //undo.endLocation = _document.insertBlock(line, column, value);
+        }
+
+        /// <summary>
+        /// 将指定的行将和上一行合并为一行。
+        /// </summary>
+        /// <param name="line">要删除的行号。</param>
+        public void unbreakLine(int line) {
+            //addUndo(new UnbreakLineUndoableOperation() {
+            //    line = line
+            //});
+
+            _document.unbreakLine(line);
+        }
+
+        #region 通用编辑处理程序
+
+        /// <summary>
+        /// 替换当前选区内容为指定内容。
+        /// </summary>
+        /// <param name="value"></param>
+        private void replaceSelections(string value, bool select) {
+
+        }
+
+        /// <summary>
+        /// 删除指定区域的字符串。
+        /// </summary>
+        /// <param name="caretLine">操作之前的光标所在行，用于撤销后回复光标位置。</param>
+        /// <param name="caretColumn">操作之前的光标所在列，用于撤销后回复光标位置。</param>
+        /// <param name="startLine">替换的起始行。</param>
+        /// <param name="startColumn">替换的起始列。</param>
+        /// <param name="endLine">替换的结束行。</param>
+        /// <param name="endColumn">替换的结束列。</param>
+        public void delete(int caretLine, int caretColumn, int startLine, int startColumn, int endLine, int endColumn) {
+            var oldValue = document.getText(startLine, startColumn, endLine, endColumn);
+            document.delete(startLine, startColumn, endLine, endColumn);
+            addUndo(new DeleteBlockOperation(caretLine, caretColumn, startLine, startColumn, endLine, endColumn, oldValue));
+            setCaretLocation(startLine, startColumn);
+        }
+
+        /// <summary>
+        /// 替换指定区域的字符串。
+        /// </summary>
+        /// <param name="caretLine">操作之前的光标所在行，用于撤销后回复光标位置。</param>
+        /// <param name="caretColumn">操作之前的光标所在列，用于撤销后回复光标位置。</param>
+        /// <param name="startLine">替换的起始行。</param>
+        /// <param name="startColumn">替换的起始列。</param>
+        /// <param name="endLine">替换的结束行。</param>
+        /// <param name="endColumn">替换的结束列。</param>
+        /// <param name="value">替换的字符串。</param>
+        public void replace(int caretLine, int caretColumn, int startLine, int startColumn, int endLine, int endColumn, string value) {
+            var oldValue = document.getText(startLine, startColumn, endLine, endColumn);
+            var newEnd = document.replace(startLine, startColumn, endLine, endColumn, value);
+            addUndo(new ReplaceBlockOperation(caretLine, caretColumn, startLine, startColumn, endLine, endColumn, oldValue, newEnd.Y, newEnd.X, value));
+            setCaretLocation(newEnd.Y, newEnd.X);
+        }
+
         #endregion
-
-    }
-
-    /// <summary>
-    /// 表示文档的修改状态。
-    /// </summary>
-    public enum ModifyState {
-
-        /// <summary>
-        /// 文档未修改。
-        /// </summary>
-        unmodified,
-
-        /// <summary>
-        /// 文档已修改。
-        /// </summary>
-        modified,
-
-        /// <summary>
-        /// 文档已修改并保存。
-        /// </summary>
-        modifiedAndSaved,
 
     }
 

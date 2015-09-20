@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Teal.CodeEditor {
 
     /// <summary>
-    /// 表示一个代码编辑器。
+    /// 表示一个文档。
     /// </summary>
-    public partial class CodeEditor {
+    public sealed partial class Document {
 
         /// <summary>
         /// 获取当前的编辑撤销列表。

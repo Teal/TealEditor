@@ -70,32 +70,32 @@ namespace Teal.CodeEditor {
 
         //}
 
-        public static int readLine(string value, int length, ref int index, out string newLine) {
-            for (var i = index; i < length; i++) {
-                if (value[i] == '\r') {
-                    var c = i - index;
-                    index = i + 1;
-                    if (index < length && value[index] == '\n') {
-                        index++;
-                        newLine = "\r\n";
-                    } else {
-                        newLine = "\r";
-                    }
-                    return c;
-                }
-                if (value[i] == '\n') {
-                    var c = i - index;
-                    index = i + 1;
-                    newLine = "\n";
-                    return c;
-                }
-            }
+        //public static int readLine(string value, int length, ref int index, out DocumentLineFlags newLine) {
+        //    for (var i = index; i < length; i++) {
+        //        if (value[i] == '\r') {
+        //            var c = i - index;
+        //            index = i + 1;
+        //            if (index < length && value[index] == '\n') {
+        //                index++;
+        //                newLine = "\r\n";
+        //            } else {
+        //                newLine = "\r";
+        //            }
+        //            return c;
+        //        }
+        //        if (value[i] == '\n') {
+        //            var c = i - index;
+        //            index = i + 1;
+        //            newLine = "\n";
+        //            return c;
+        //        }
+        //    }
 
-            var t = length - index;
-            index = length;
-            newLine = null;
-            return t;
-        }
+        //    var t = length - index;
+        //    index = length;
+        //    newLine = null;
+        //    return t;
+        //}
 
         internal static void mark(params object[] values) {
             StackTrace stack = new StackTrace();
