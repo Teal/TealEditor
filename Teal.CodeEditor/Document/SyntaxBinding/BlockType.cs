@@ -7,17 +7,12 @@ namespace Teal.CodeEditor {
     /// <summary>
     /// 表示一个代码块类型。代码块可以包含多个片段。
     /// </summary>
-    public abstract class BlockType : SegmentType {
+    public class BlockType : SegmentType {
 
         /// <summary>
         /// 当前块的结束模式表达式。
         /// </summary>
-        public Pettern end;
-
-        /// <summary>
-        /// 判断当前片段类型是否是跨行的。
-        /// </summary>
-        public abstract bool isMultiLine { get; }
+        public Pattern end;
 
         /// <summary>
         /// 获取或设置当前片段类型的子片段类型。
@@ -29,44 +24,36 @@ namespace Teal.CodeEditor {
         /// </summary>
         public sealed override bool isBlock => true;
 
-        protected BlockType(string name, Pettern start, Pettern end, SegmentType[] children = null)
+        /// <summary>
+        /// 判断当前块是否可折叠。
+        /// </summary>
+        public virtual bool canFold => false;
+
+        public BlockType(string name, Pattern start, Pattern end)
                 : base(name, start) {
             this.end = end;
-            this.children = children;
         }
 
     }
 
     /// <summary>
-    /// 表示一个块级类型。
+    /// 表示一个可折叠的块级类型。
     /// </summary>
-    public sealed class MultiLineBlockType : BlockType {
+    public sealed class FoldingBlockType : BlockType {
 
         /// <summary>
-        /// 判断当前片段类型是否是跨行的。
+        /// 获取当前折叠块类型折叠后的文本。
         /// </summary>
-        public override bool isMultiLine => true;
-
-        public MultiLineBlockType(string name, Pettern start, Pettern end, SegmentType[] children = null)
-                : base(name, start, end, children) {
-
-        }
-
-    }
-
-    /// <summary>
-    /// 表示一个内联块级类型。
-    /// </summary>
-    public sealed class SingleLineBlockType : BlockType {
+        public string foldingText;
 
         /// <summary>
-        /// 判断当前片段类型是否是跨行的。
+        /// 判断当前块是否可折叠。
         /// </summary>
-        public override bool isMultiLine => false;
+        public override bool canFold => true;
 
-        public SingleLineBlockType(string name, Pettern start, Pettern end, SegmentType[] children = null)
-                : base(name, start, end, children) {
-
+        public FoldingBlockType(string name, Pattern start, Pattern end, string foldingText = "...")
+                : base(name, start, end) {
+            this.foldingText = foldingText;
         }
 
     }

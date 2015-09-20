@@ -22,27 +22,33 @@ namespace Teal.CodeEditor.Test {
 
             var blocks = new {
 
-                body = new MultiLineBlockType("body", new AnyDismatchPettern(), null),
+                body = new BlockType("body", Pattern.starting, Pattern.none),
 
-                //comment_multiLine = new MultiLineBlockType("comment_multiLine", new CaseSensitiveStringPettern("/*"), new CaseSensitiveStringPettern("*/")),
+                comment_multiLine = new BlockType("comment_multiLine", new CaseSensitiveStringPattern("/*"), new CaseSensitiveStringPattern("*/")) {
+                    foreColor = 0x00FF00F0
+                },
 
-                //comment_singleLine = new SingleLineBlockType("comment_singleLine", new CaseSensitiveStringPettern("//"), null),
+                comment_singleLine = new BlockType("comment_singleLine", new CaseSensitiveStringPattern("//"), Pattern.ending) {
+                    foreColor = 0x0023677D
+                },
 
-                string_doubleQuote = new SingleLineBlockType("string_doubleQuote", new CaseSensitiveStringPettern("\""), new CaseSensitiveStringPettern("\"")) {
+                string_doubleQuote = new BlockType("string_doubleQuote", new CaseSensitiveStringPattern("\""), new CaseSensitiveStringPattern("\"")) {
                     foreColor = 0x00FF0000
                 },
 
-                string_singleQuote = new SingleLineBlockType("string_singleQuote", new CaseSensitiveStringPettern("\'"), new CaseSensitiveStringPettern("\'")) {
+                string_singleQuote = new BlockType("string_singleQuote", new CaseSensitiveStringPattern("\'"), new CaseSensitiveStringPattern("\'")) {
                     foreColor = 0x0000FF00
                 },
 
-                string_escapedChar = new SegmentType("string_escapedChar", new RegexPettern(@"\\((u[\da-fA-F]{4})|(x[\da-fA-F]{2})|.)")) {
+                string_escapedChar = new SegmentType("string_escapedChar", new RegexPattern(@"\\((u[\da-fA-F]{4})|(x[\da-fA-F]{2})|.)")) {
                     foreColor = 0x000000FF
                 },
 
             };
 
             blocks.body.children = new SegmentType[] {
+                blocks.comment_multiLine,
+                blocks.comment_singleLine,
                blocks. string_doubleQuote,
                blocks. string_singleQuote
             };
@@ -54,7 +60,10 @@ namespace Teal.CodeEditor.Test {
 
             ce.document.syntaxBinding.rootBlock = new Block(null, blocks.body, null, 0);
 
-            ce.document.insert(0, 0, "a'b'c\"cc\\\"c\"d");
+            ce.document.insert(0, 0,"aff\t" + @"a'b'c""cc\""c""d /*
+sasas
+  // aaaa
+ */    asasss // asdasd");
             //ce.document.lines[0].segments.add(new SegmentSplitter() {
             //    type = null,
             //    index = ce.document.lines[0].textLength

@@ -44,7 +44,7 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 获取或设置当前片段类型的开始部分的模式表达式。
         /// </summary>
-        public Pettern start;
+        public Pattern start;
 
         /// <summary>
         /// 判断当前片段是否属于块级片段。块级片段即可能横跨多行的块，一般会拥有一个折叠域。
@@ -53,7 +53,7 @@ namespace Teal.CodeEditor {
 
         public SegmentType() { }
 
-        public SegmentType(string name, Pettern start) {
+        public SegmentType(string name, Pattern start) {
             this.name = name;
             this.start = start;
         }

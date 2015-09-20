@@ -309,7 +309,7 @@ namespace Teal.CodeEditor {
                 var parentBlockType = parentBlock.type;
 
                 // 1. 查找父块的结束标志。
-                var matchResult = parentBlockType.end?.match(buffer.data, index, buffer.length) ?? (parentBlockType.isMultiLine ? new PatternMatchResult(-1, -1) : new PatternMatchResult(buffer.length, buffer.length));
+                var matchResult = parentBlockType.end.match(buffer.data, index, buffer.length);
 
                 // 2. 查找子块开始标志。
                 var childSegmentType = (SegmentType)null;
@@ -368,12 +368,13 @@ namespace Teal.CodeEditor {
 
                 // 5. 剩下字符不满足任意部分，则处理为父块的最后部分。
 
-                // 保存之前的样式。
-                addSegmentSplitter(buffer.length, parentBlockType);
-
                 break;
 
             }
+
+            // NOTE: 不需要保存最后一个分割器。
+            // 保存之前的样式。
+            //addSegmentSplitter(buffer.length, parentBlock.type);
 
             return parentBlock;
 

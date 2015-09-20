@@ -69,7 +69,7 @@
     <Compile Include="Document\SyntaxBinding\Block.cs" />
     <Compile Include="Document\SyntaxBinding\Document.Syntax.cs" />
     <Compile Include="Document\SyntaxBinding\InternalSegmentTypes.cs" />
-    <Compile Include="Document\SyntaxBinding\Pettern.cs" />
+    <Compile Include="Document\SyntaxBinding\Pattern.cs" />
     <Compile Include="CodeEditor\CodeEditor.Core.cs">
       <SubType>Component</SubType>
     </Compile>

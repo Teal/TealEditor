@@ -120,7 +120,8 @@ namespace Teal.CodeEditor {
 
             if (index < _length) {
                 length++;
-                Array.Copy(data, index, data, index + 1, _length - index);
+                Array.Copy(data, index, data, index + 1, _length - index - 1);
+                data[index] = item;
                 return;
             }
 

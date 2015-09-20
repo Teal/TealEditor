@@ -20,12 +20,12 @@ namespace Teal.CodeEditor.Test {
 
         public void run() {
 
-            //var multiComment = new MultiLineSegmentSegmentType("comment.multiLine", new CaseSensitiveStringPettern("/*"), new CaseSensitiveStringPettern("*/"), null);
-            //var signleComment = new SingleLineSegmentSegmentType("comment.s", new CaseSensitiveStringPettern("//"), new AnyDismatchPettern(), null);
-            //var keyword_if = new WordSegmentType("keyword_if", new CaseSensitiveStringPettern("if"), null);
-            //var keyword_else = new WordSegmentType("keyword_else", new CaseSensitiveStringPettern("else"));
-            //var keyword_for = new WordSegmentType("keyword_for", new CaseSensitiveStringPettern("for"), null);
-            //var str = new SingleLineSegmentSegmentType("str", new CaseSensitiveStringPettern("'"), new CaseSensitiveStringPettern("'"), new SegmentType[] { keyword_if, keyword_else });
+            //var multiComment = new MultiLineSegmentSegmentType("comment.multiLine", new CaseSensitiveStringPattern("/*"), new CaseSensitiveStringPattern("*/"), null);
+            //var signleComment = new SingleLineSegmentSegmentType("comment.s", new CaseSensitiveStringPattern("//"), new AnyDismatchPettern(), null);
+            //var keyword_if = new WordSegmentType("keyword_if", new CaseSensitiveStringPattern("if"), null);
+            //var keyword_else = new WordSegmentType("keyword_else", new CaseSensitiveStringPattern("else"));
+            //var keyword_for = new WordSegmentType("keyword_for", new CaseSensitiveStringPattern("for"), null);
+            //var str = new SingleLineSegmentSegmentType("str", new CaseSensitiveStringPattern("'"), new CaseSensitiveStringPattern("'"), new SegmentType[] { keyword_if, keyword_else });
 
             //var allChildren = new SegmentType[5]{
             //    multiComment,
@@ -35,7 +35,7 @@ namespace Teal.CodeEditor.Test {
             //    null
             //};
 
-            //var block = new MultiLineSegmentSegmentType("block", new CaseSensitiveStringPettern("{"), new CaseSensitiveStringPettern("}"), allChildren);
+            //var block = new MultiLineSegmentSegmentType("block", new CaseSensitiveStringPattern("{"), new CaseSensitiveStringPattern("}"), allChildren);
 
             //allChildren[4] = block;
 

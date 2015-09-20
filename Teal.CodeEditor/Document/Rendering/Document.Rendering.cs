@@ -48,6 +48,16 @@ namespace Teal.CodeEditor {
             /// </summary>
             public int left;
 
+            /// <summary>
+            /// 返回表示当前对象的字符串。
+            /// </summary>
+            /// <returns>
+            /// 表示当前对象的字符串。
+            /// </returns>
+            public override string ToString() {
+                return $"line={line}, column={column}, left={left}, top={top}";
+            }
+
         }
 
         /// <summary>
@@ -133,57 +143,89 @@ namespace Teal.CodeEditor {
 
             // 当前要绘制的行数据。
             var documentLine = lines.data[layoutInfo.line];
+
+            // 记录当前绘制的片段进度。
+            var segmentSplitterIndex = 0;
+
+            // 1. 跳过 layoutInfo.startIndex 之前的分割器，一般地，这些分割器是已被折叠的代码。
+            for (; segmentSplitterIndex < documentLine.segments.length && documentLine.segments.data[segmentSplitterIndex].index < layoutInfo.column; segmentSplitterIndex++)
+                ;
+
+            // 2. 绘制所有片段。
+            for (; segmentSplitterIndex < documentLine.segments.length; segmentSplitterIndex++) {
+
+                // 判断是否超过限制。
+                var currentEnd = documentLine.segments.data[segmentSplitterIndex].index;
+                if (currentEnd > endColumn) {
+                    drawSegment(ref layoutInfo, endColumn, documentLine.segments.data[segmentSplitterIndex].type);
+                    return;
+                }
+
+                // 绘制片段。
+                drawSegment(ref layoutInfo, currentEnd, documentLine.segments.data[segmentSplitterIndex].type);
+            }
+
+            // 绘制最后一块内容。
+            drawSegment(ref layoutInfo, endColumn, documentLine.endingBlock.type);
+
+        }
+
+        /// <summary>
+        /// 绘制文档内的一个片段。
+        /// </summary>
+        /// <param name="layoutInfo">布局相关的参数。</param>
+        /// <param name="endColumn">当前绘制的结束列。</param>
+        /// <param name="type">当前绘制使用的样式。</param>
+        private void drawSegment(ref LayoutInfo layoutInfo, int endColumn, SegmentType type) {
+
+            var documentLine = lines.data[layoutInfo.line];
             var textData = documentLine.buffer.data;
 
             // 记录当前的最新值。
             var column = layoutInfo.column;
             var left = layoutInfo.left;
 
-            // 记录当前绘制的片段进度。
-            var segmentSplitterIndex = 0;
+            // TODO: 绘制缩进线。
+            if (column == 0) { }
 
-            // 1. 跳过 layoutInfo.column 之前的分割器，一般地，这些分割器是已被折叠的代码。
-            for (; segmentSplitterIndex < documentLine.segments.length && documentLine.segments.data[segmentSplitterIndex].index < column; segmentSplitterIndex++)
-                ;
+            // 设置本次绘制的风格。
+            setStyle(type);
 
-            // 2. 绘制所有片段。
-            for (; segmentSplitterIndex < documentLine.segments.length; segmentSplitterIndex++) {
+            // 一次绘制一个单词。
 
-                // 超出绘制范围停止绘制。
-                if (column >= endColumn) {
-                    break;
-                }
+            for (; column < endColumn; column++) {
+                var c = textData[column];
+                var controlName = Utility.getControlCharName(c);
 
-                // 绘制单一片段。
-                // 任务：从 layoutInfo.column 到 documentLine.segmentSplitterData[segmentSplitterIndex].index
-                // 使用 documentLine.segmentSplitterData[segmentSplitterIndex].type 风格。
-                // 考虑自动换行。
-
-                var end = documentLine.segments.data[segmentSplitterIndex].index;
-
-                // TODO: 绘制缩进线。
-                if (column == 0) {
-
-                }
-
-                // 设置本次绘制的风格。
-                setStyle(documentLine.segments.data[segmentSplitterIndex].type);
-
-                // 一次绘制一个单词。
-
-                for (; column < end; column++) {
-                    var c = textData[column];
-                    var controlName = Utility.getControlCharName(c);
-
-                    // 碰到特殊字符则直接绘制。
-                    if (controlName != null) {
-
-                        // 首先绘制特殊字符之前的字符串。
-                        _painter.drawString(textData, layoutInfo.column, column, layoutInfo.left, layoutInfo.top);
+                // 碰到特殊字符则直接绘制。
+                if (controlName != null) {
+                    // 首先绘制特殊字符之前的字符串。
+                    if (column > layoutInfo.column) {
+                        _painter.drawString(textData, layoutInfo.column, column - layoutInfo.column, layoutInfo.left, layoutInfo.top);
                         layoutInfo.left = left;
                         layoutInfo.column = column;
+                    }
 
-                        // 计算字符的宽度。
+                    // 计算字符的宽度。
+                    switch (c) {
+                        case '\t':
+                            left = alignTab(left);
+                            break;
+                        case ' ':
+                            left += _painter.measureString(c);
+                            break;
+                        default:
+                            left += _painter.measureString(controlName);
+                            break;
+                    }
+
+                    // 如果超界，则在新行重新绘制。
+                    if (left >= _offsetRight && layoutInfo.column > 0) {
+                        drawWrap(layoutInfo.top, left);
+                        layoutInfo.top += _painter.lineHeight;
+                        layoutInfo.left = left =(documentLine.indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
+
+                        // 重新加上宽度。
                         switch (c) {
                             case '\t':
                                 left = alignTab(left);
@@ -195,77 +237,53 @@ namespace Teal.CodeEditor {
                                 left += _painter.measureString(controlName);
                                 break;
                         }
-
-                        // 如果超界，则在新行重新绘制。
-                        if (left >= _offsetRight && layoutInfo.column > 0) {
-                            drawWrap(layoutInfo.top, left);
-                            layoutInfo.top += _painter.lineHeight;
-                            layoutInfo.left = (documentLine.indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
-
-                            // 重新加上宽度。
-                            switch (c) {
-                                case '\t':
-                                    left = alignTab(left);
-                                    break;
-                                case ' ':
-                                    left += _painter.measureString(c);
-                                    break;
-                                default:
-                                    left += _painter.measureString(controlName);
-                                    break;
-                            }
-
-                        }
-
-                        switch (c) {
-                            case '\t':
-                                drawTab(layoutInfo.top, layoutInfo.left);
-                                break;
-                            case ' ':
-                                drawWhitespace(layoutInfo.top, layoutInfo.left);
-                                break;
-                            default:
-                                drawControlChar(controlName, layoutInfo.top, layoutInfo.left);
-                                break;
-                        }
-
-                    } else {
-
-                        left += _painter.measureString(c);
-
-                        // 如果超界，则返回搜索
-                        if (left >= _offsetRight && layoutInfo.column > 0) {
-
-                            // 获取合适的中断点。
-                            var oldColumn = column;
-                            column = getWrapPoint(textData, layoutInfo.column, oldColumn);
-
-                            // 减去被中断的大小。
-                            for (; oldColumn > column; oldColumn--) {
-                                left -= _painter.measureString(textData[oldColumn]);
-                            }
-
-                            // 绘制之前的字符串。
-                            _painter.drawString(textData, layoutInfo.column, column, layoutInfo.left, layoutInfo.top);
-                            layoutInfo.left = left;
-                            layoutInfo.column = column;
-
-                            // 换行。
-                            drawWrap(layoutInfo.top, left);
-                            layoutInfo.top += _painter.lineHeight;
-                            layoutInfo.left = (documentLine.indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
-
-                        }
-
                     }
 
-                }
+                    switch (c) {
+                        case '\t':
+                            drawTab(layoutInfo.top, layoutInfo.left, left);
+                            break;
+                        case ' ':
+                            drawWhitespace(layoutInfo.top, layoutInfo.left);
+                            break;
+                        default:
+                            drawControlChar(controlName, layoutInfo.top, layoutInfo.left);
+                            break;
+                    }
 
-                // 绘制最后一个特殊字符或开头到结尾的字符串。
-                _painter.drawString(textData, layoutInfo.column, column, layoutInfo.left, layoutInfo.top);
-                layoutInfo.left = left;
-                layoutInfo.column = column;
+                    layoutInfo.left = left;
+                    layoutInfo.column = column;
+                } else {
+                    left += _painter.measureString(c);
+
+                    // 如果超界，则返回搜索
+                    if (left >= _offsetRight && layoutInfo.column > 0) {
+                        // 获取合适的中断点。
+                        var oldColumn = column;
+                        column = getWrapPoint(textData, layoutInfo.column, oldColumn);
+
+                        // 减去被中断的大小。
+                        for (; oldColumn > column; oldColumn--) {
+                            left -= _painter.measureString(textData[oldColumn]);
+                        }
+
+                        // 绘制之前的字符串。
+                        _painter.drawString(textData, layoutInfo.column, column - layoutInfo.column, layoutInfo.left, layoutInfo.top);
+                        layoutInfo.left = left;
+                        layoutInfo.column = column;
+
+                        // 换行。
+                        drawWrap(layoutInfo.top, left);
+                        layoutInfo.top += _painter.lineHeight;
+                        layoutInfo.left = (documentLine.indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
+                    }
+                }
             }
+
+            // 绘制最后一个特殊字符或开头到结尾的字符串。
+            _painter.drawString(textData, layoutInfo.column, column - layoutInfo.column, layoutInfo.left, layoutInfo.top);
+            layoutInfo.left = left;
+            layoutInfo.column = column;
         }
 
         private void setStyle(SegmentType type) {
@@ -285,7 +303,7 @@ namespace Teal.CodeEditor {
 
         }
 
-        private void drawTab(int top, int left) {
+        private void drawTab(int top, int left, int right) {
 
         }
 
@@ -308,7 +326,7 @@ namespace Teal.CodeEditor {
             }
 
             // 无法找到合适的单词边界，则强行从行尾中端。
-            return wrapPoint == startIndex ? endIndex - 1 : wrapPoint;
+            return wrapPoint <= startIndex ? startIndex >= endIndex ? endIndex : endIndex - 1 : wrapPoint;
         }
 
         /// <summary>
@@ -334,7 +352,7 @@ namespace Teal.CodeEditor {
 
         private int _offsetBottom;
 
-        private int _offsetRight = 400;
+        internal int _offsetRight = 400;
 
         /// <summary>
         /// 重绘指定已折叠块进行布局，检测是否自动换行。

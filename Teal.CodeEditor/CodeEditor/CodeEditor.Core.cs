@@ -192,24 +192,26 @@ namespace Teal.CodeEditor {
         /// </returns>
         protected override Size DefaultSize => new Size(DocumentConfigs.defaultWidth, DocumentConfigs.defaultHeight);
 
-        //        /// <summary>
-        //        /// 引发 <see cref="E:System.Windows.Forms.Control.Resize"/> 事件。
-        //        /// </summary>
-        //        /// <param name="e">一个 <see cref="T:System.EventArgs"/>，其中包含事件数据。</param>
-        //        protected override void OnResize(EventArgs e) {
-        //            return;
-        //            bool flag = this.gutter.InvalidateLineNumberArea(false);
-        //            base.OnResize(e);
-        //            if (this.displayLines != null) {
-        //                if (!flag && this.WordWrap && this.GetWrapMargin() != this.WrapMargin) {
-        //                    this.UpdateWordWrap();
-        //                }
-        //                if (this.IsTransparent) {
-        //                    base.Invalidate();
-        //                }
-        //                this.scrolling.UpdateScroll(true);
-        //            }
-        //        }
+        /// <summary>
+        /// 引发 <see cref="E:System.Windows.Forms.Control.Resize"/> 事件。
+        /// </summary>
+        /// <param name="e">一个 <see cref="T:System.EventArgs"/>，其中包含事件数据。</param>
+        protected override void OnResize(EventArgs e) {
+                document._offsetRight = Width;
+             Invalidate();
+            //return;
+            //bool flag = this.gutter.InvalidateLineNumberArea(false);
+            base.OnResize(e);
+            //if (this.displayLines != null) {
+            //    if (!flag && this.WordWrap && this.GetWrapMargin() != this.WrapMargin) {
+            //        this.UpdateWordWrap();
+            //    }
+            //    if (this.IsTransparent) {
+            //        base.Invalidate();
+            //    }
+            //    this.scrolling.UpdateScroll(true);
+            //}
+        }
 
         //        #endregion
 

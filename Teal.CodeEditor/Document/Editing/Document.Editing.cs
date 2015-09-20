@@ -114,7 +114,7 @@ namespace Teal.CodeEditor {
             var currentLineNumber = line;
             for (var currentIndex = firstLineBreak; currentIndex < endIndex;) {
                 currentLine = readLine(value, currentIndex, endIndex, ref currentIndex);
-                lines.insert(currentLineNumber++, currentLine);
+                lines.insert(++currentLineNumber, currentLine);
             }
 
             Debug.Assert(currentLine != null);
