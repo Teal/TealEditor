@@ -16,9 +16,9 @@ namespace Teal.CodeEditor {
         #region 修改状态
 
         /// <summary>
-        /// 当前文档的修改状态。
+        /// 当前文档的标记。
         /// </summary>
-        private ModifyState _modifyState;
+        public DocumentLineFlags flags = DocumentConfigs.defaultNewLineType;
 
         /// <summary>
         /// 当文档修改状态更改时触发。
@@ -26,90 +26,52 @@ namespace Teal.CodeEditor {
         public event Action modifyStateChange;
 
         /// <summary>
-        /// 判断或设置当前文档的修改状态。
+        /// 获取或设置当前文档的修改状态。
         /// </summary>
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ModifyState modifyState {
+        public DocumentLineFlags modifyState {
             get {
-                return _modifyState;
+                return flags & DocumentLineFlags.modifiedAndSaved;
             }
             set {
-                if (_modifyState != value) {
-                    _modifyState = value;
+                if ((flags & DocumentLineFlags.modifiedAndSaved) != value) {
+                    flags = (flags & ~DocumentLineFlags.modifiedAndSaved) | value;
+                    if (value == DocumentLineFlags.saved) {
+                        foreach (var line in lines) {
+                            line.modifyState |= DocumentLineFlags.saved;
+                        }
+                    }
                     modifyStateChange?.Invoke();
                 }
             }
         }
 
         /// <summary>
+        /// 存储当前文档的修改版本。
+        /// </summary>
+        public int version;
+
+        /// <summary>
         /// 当文档被更新时触发。
         /// </summary>
-        public event Action<int, int, int, int, int, int> update;
+        public event Action<int, int> update;
 
         /// <summary>
-        /// 触发文档被更新事件。
-        /// </summary>
-        /// <param name="startLine"></param>
-        /// <param name="endLine"></param>
-        private void ononDocumentUpdated(int startLine, int endLine) {
-
-        }
-
-        /// <summary>
-        /// 触发文档被更新事件。
+        /// 触发文档更新事件。
         /// </summary>
         /// <param name="line">发生改变的行。</param>
         /// <param name="column">发生改变的列。</param>
-        /// <param name="deleteLineCount">删除的行数。</param>
-        /// <param name="insertLineCount">插入的行数。</param>
-        /// <param name="deleteColumnCount">删除的列数。</param>
-        /// <param name="insertColumnCount">插入的列数。</param>
-        private void onLineUpdated(int startLine, int endLine) {
+        private void onUpdate(int line, int column) {
 
             // 更新文档修改状态。
-            modifyState = ModifyState.modified;
+            version++;
+            modifyState = DocumentLineFlags.modified;
 
-            //if (update != null) {
-            //    update(line, column, deleteLineCount, insertLineCount, deleteColumnCount, insertColumnCount);
-            //}
+            var deltaLine = _caretLine - line;
+            var deltaColumn = _caretLine - column;
+
+            update?.Invoke(line, column);
 
         }
-
-        /// <summary>
-        /// 避免在调用 endUpdate() 方法之前描述控件。
-        /// </summary>
-        public void beginUpdate() {
-            // _updateCount++;
-        }
-
-        /// <summary>
-        /// 在 beginUpdate() 方法挂起描述后，继续描述控件。
-        /// </summary>
-        public void endUpdate() {
-            //_updateCount--;
-            //updateLayout();
-        }
-
-        ///// <summary>
-        ///// 触发文档被更新事件。
-        ///// </summary>
-        ///// <param name="line">发生改变的行。</param>
-        ///// <param name="column">发生改变的列。</param>
-        ///// <param name="deleteLineCount">删除的行数。</param>
-        ///// <param name="insertLineCount">插入的行数。</param>
-        ///// <param name="deleteColumnCount">删除的列数。</param>
-        ///// <param name="insertColumnCount">插入的列数。</param>
-        //private void onUpdate(int line, int column, int deleteLineCount, int insertLineCount, int deleteColumnCount, int insertColumnCount) {
-
-        //    // 更新文档修改状态。
-        //    modifyState = ModifyState.modified;
-
-        //    if (update != null) {
-        //        update(line, column, deleteLineCount, insertLineCount, deleteColumnCount, insertColumnCount);
-        //    }
-
-        //}
 
         #endregion
 
@@ -141,6 +103,7 @@ namespace Teal.CodeEditor {
             // 加速不插入新换行的情况。
             if (firstLineBreak == endIndex) {
                 firstLine.buffer.insert(column, value, startIndex, length);
+                firstLine.modifyState = DocumentLineFlags.modified;
                 _caretLine = line;
                 _caretColumn = column + length;
                 return;
@@ -184,13 +147,15 @@ namespace Teal.CodeEditor {
             _caretLine = startLine;
             _caretColumn = startColumn;
 
+            var firstLine = lines[startLine];
+
             // 加速不删除行的情况。
             if (startLine == endLine) {
-                lines[startLine].buffer.remove(startColumn, endColumn - startColumn);
+                firstLine.buffer.remove(startColumn, endColumn - startColumn);
+                firstLine.modifyState = DocumentLineFlags.modified;
                 return;
             }
 
-            var firstLine = lines[startLine];
             var lastLine = lines[endLine];
 
             // 删除首行末尾字符。
@@ -201,6 +166,7 @@ namespace Teal.CodeEditor {
 
             // 插入尾行末尾字符。
             firstLine.buffer.append(lastLine.buffer.data, endColumn, lastLine.buffer.length - endColumn);
+            firstLine.modifyState = DocumentLineFlags.modified;
 
         }
 
@@ -286,21 +252,6 @@ namespace Teal.CodeEditor {
             return new Location(line, column);
         }
 
-        /// <summary>
-        /// 触发文档更新事件。
-        /// </summary>
-        /// <param name="line">发生改变的行。</param>
-        /// <param name="column">发生改变的列。</param>
-        /// <param name="deltaLine">行号发生的变化量。</param>
-        /// <param name="deltaColumn">列号发生的变化量。</param>
-        private void onUpdate(int line, int column) {
-            // 更新文档修改状态。
-            modifyState = ModifyState.modified;
-
-            var deltaLine = _caretLine - line;
-            var deltaColumn = _caretLine - column;
-        }
-
         #endregion
 
         #region 文档操作
@@ -320,6 +271,7 @@ namespace Teal.CodeEditor {
 
             // 执行操作。
             lines[line].buffer.insert(column, value);
+            lines[line].modifyState = DocumentLineFlags.modified;
 
             // 更新光标位置。
             _caretLine = line;
@@ -393,6 +345,7 @@ namespace Teal.CodeEditor {
             if (restCount > 0) {
                 newDocumentLine.buffer.append(oldDocumentLine.buffer.data, column, restCount);
                 oldDocumentLine.buffer.remove(column);
+                oldDocumentLine.modifyState = DocumentLineFlags.modified;
             }
 
             // 插入换行。
@@ -433,6 +386,7 @@ namespace Teal.CodeEditor {
             _caretColumn = lastDocumentLine.buffer.length;
 
             lastDocumentLine.buffer.append(oldDocumentLine.buffer.data, column, oldDocumentLine.buffer.length - column);
+            lastDocumentLine.modifyState = DocumentLineFlags.modified;
             lines.removeAt(line);
 
             // 执行更新回调。
@@ -462,6 +416,7 @@ namespace Teal.CodeEditor {
 
             // 执行操作并更新光标位置。
             lines[line].buffer.remove(column, 1);
+            lines[line].modifyState = DocumentLineFlags.modified;
             _caretLine = line;
             _caretColumn = column;
 

@@ -1,6 +1,21 @@
 ﻿
         #region 区域
 
+        /// <summary>
+        /// 避免在调用 endUpdate() 方法之前描述控件。
+        /// </summary>
+        public void beginUpdate() {
+            // _updateCount++;
+        }
+
+        /// <summary>
+        /// 在 beginUpdate() 方法挂起描述后，继续描述控件。
+        /// </summary>
+        public void endUpdate() {
+            //_updateCount--;
+            //updateLayout();
+        }
+
         ///// <summary>
         ///// 表示一个 Range 对象弱引用。
         ///// </summary>
@@ -225,6 +240,11 @@
     //    public override bool canChain(Document document, UndoableOperation op) {
     //        return op is ReplaceCharUndoableOperation && !editor.isDelimiter(((ReplaceCharUndoableOperation)op).newValue);
     //    }
+	
+        /// <summary>
+        /// 获取或设置当前片段类型的父级类型。
+        /// </summary>
+        public SegmentType parent;
 
     //    /// <summary>
     //    /// 对指定编辑器执行当前的撤销操作。

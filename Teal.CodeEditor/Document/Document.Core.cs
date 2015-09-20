@@ -14,11 +14,6 @@ namespace Teal.CodeEditor {
         /// </summary>
         public DocumentConfigs configs = new DocumentConfigs();
 
-        /// <summary>
-        /// 获取或设置当前文档的语法绑定。
-        /// </summary>
-        public SyntaxBinding syntaxBinding = new SyntaxBinding();
-
     }
 
     /// <summary>

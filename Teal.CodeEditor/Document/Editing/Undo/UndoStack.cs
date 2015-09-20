@@ -132,7 +132,6 @@ namespace Teal.CodeEditor {
             var wasRedoListEmpty = _redoList == null;
 
             disableUndo();
-            document.beginUpdate();
 
             UndoableOperation op;
 
@@ -159,7 +158,6 @@ namespace Teal.CodeEditor {
                 stateChanged();
             }
 
-            document.endUpdate();
             enableUndo();
 
         }
@@ -178,7 +176,6 @@ namespace Teal.CodeEditor {
             var wasUndoListEmpty = _undoList == null;
 
             disableUndo();
-            document.beginUpdate();
 
             UndoableOperation op;
 
@@ -204,7 +201,6 @@ namespace Teal.CodeEditor {
                 stateChanged();
             }
 
-            document.endUpdate();
             enableUndo();
 
         }

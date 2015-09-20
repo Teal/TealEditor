@@ -42,6 +42,7 @@ namespace Teal.CodeEditor {
             }
         }
 
+
         /// <summary>
         /// 获取或设置当前行指定区域的子字符串。
         /// </summary>
@@ -81,7 +82,7 @@ namespace Teal.CodeEditor {
         /// <param name="startIndex"><paramref name="value"/> 中的起始位置。</param>
         /// <param name="length"><paramref name="value"/> 中的长度。</param>
         public DocumentLine(DocumentLineFlags newLine, string value, int startIndex, int length) {
-            flags = newLine;
+            flags = newLine | DocumentLineFlags.modified;
             buffer = new StringBuffer(length + 2);
             buffer.append(value, startIndex, length);
             segments = new ArrayList<SegmentSplitter>(length >> 4);
@@ -93,7 +94,7 @@ namespace Teal.CodeEditor {
         /// <param name="newLine">当前行的换行符.</param>
         /// <param name="capacity">初始化容量。</param>
         public DocumentLine(DocumentLineFlags newLine, int capacity = DocumentConfigs.defaultLineCapacity) {
-            flags = newLine;
+            flags = newLine | DocumentLineFlags.modified;
             buffer = new StringBuffer(capacity);
             segments = new ArrayList<SegmentSplitter>(capacity >> 4);
         }
@@ -157,17 +158,29 @@ namespace Teal.CodeEditor {
         /// </summary>
         public DocumentLineFlags flags;
 
-        /////// <summary>
-        /////// 获取或设置当前行的状态。
-        /////// </summary>
-        ////public DocumentLineFlags state {
-        ////    get {
-        ////        return flags & DocumentLineFlags.MODIFIE_STATE;
-        ////    }
-        ////    set {
-        ////        flags = (flags & ~DocumentLineFlags.MODIFIE_STATE) | value;
-        ////    }
-        ////}
+        /// <summary>
+        /// 判断当前行是否已解析。
+        /// </summary>
+        public bool parsed {
+            get {
+                return (flags & DocumentLineFlags.parsed) != 0;
+            }
+            set {
+                flags = value ? flags | DocumentLineFlags.parsed : flags & ~DocumentLineFlags.parsed;
+            }
+        }
+
+        /// <summary>
+        /// 获取或设置当前行的状态。
+        /// </summary>
+        public DocumentLineFlags modifyState {
+            get {
+                return flags & DocumentLineFlags.modifiedAndSaved;
+            }
+            set {
+                flags = (flags & ~(DocumentLineFlags.modifiedAndSaved | DocumentLineFlags.parsed)) | value;
+            }
+        }
 
         #endregion
 
@@ -176,14 +189,35 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 存储当前行最后一个字符之后所属的块。其块所属可能属于当前行或之前行。
         /// </summary>
-        private Block _endBlock;
+        private Block _endingBlock;
+
+        /// <summary>
+        /// 获取当前行最开始的块。
+        /// </summary>
+        /// <returns></returns>
+        public Block startingBlock {
+            get {
+                var block = _endingBlock;
+                if (block != null) {
+                    for (; block.parent != null && block.parent.startLine == this; block = block.parent)
+                        ;
+                }
+                return block;
+            }
+        }
+
+        /// <summary>
+        /// 获取当前行最结尾的块。
+        /// </summary>
+        /// <returns></returns>
+        public Block endingBlock => _endingBlock;
 
         /// <summary>
         /// 获取属于从当前行开始的所有折叠块。
         /// </summary>
         public IEnumerable<Block> startBlocks {
             get {
-                for (var block = _endBlock; block != null && block.startLine == this; block = block.parent) {
+                for (var block = _endingBlock; block != null && block.startLine == this; block = block.parent) {
                     yield return block;
                 }
             }
@@ -194,7 +228,7 @@ namespace Teal.CodeEditor {
         /// </summary>
         public IEnumerable<Block> endBlocks {
             get {
-                for (var block = _endBlock; block != null; block = block.parent) {
+                for (var block = _endingBlock; block != null; block = block.parent) {
                     if (block.endLine == this) {
                         yield return block;
                     }
@@ -213,7 +247,7 @@ namespace Teal.CodeEditor {
         /// </summary>
         /// <returns>返回已折叠的块。</returns>
         public Block getCollapsedBlock() {
-            for (var block = _endBlock; block != null && block.startLine == this; block = block.parent) {
+            for (var block = _endingBlock; block != null && block.startLine == this; block = block.parent) {
                 if (block.collapsed) {
                     return block;
                 }
@@ -230,207 +264,117 @@ namespace Teal.CodeEditor {
         /// </summary>
         public ArrayList<SegmentSplitter> segments;
 
-        ///// <summary>
-        ///// 更新当前行的片段列表。
-        ///// </summary>
-        ///// <param name="parentBlockSegment">当前行所在的块。</param>
-        //public void parseSegments(Block parentBlockSegment) {
+        /// <summary>
+        /// 添加一个已找到的片段。
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
+        /// <param name="type"></param>
+        private void addSegment(int startIndex, int endIndex, SegmentType type) {
+            Console.WriteLine($"{startIndex}-{endIndex}: {type}");
+        }
 
-        //    //// 清空片段列表。
-        //    //_segmentLength = 1;
-        //    //_segments[0].type = parentBlockSegment.type;
-        //    //_segments[0].startIndex = -1;
-        //    //_segments[0].endIndex = -1;
+        /// <summary>
+        /// 更新当前行的片段列表。
+        /// </summary>
+        /// <param name="parentBlockSegment">当前行所在的块。</param>
+        public Block parseSegments(Block parentBlockSegment) {
+            flags |= DocumentLineFlags.parsed;
+            segments.clear();
+            return _endingBlock = parseSegmentsCore(parentBlockSegment);
+        }
 
-        //    parseSegments(ref parentBlockSegment, 0, _textLength);
+        /// <summary>
+        /// 解析一个块级的子类型。
+        /// </summary>
+        /// <param name="parentBlock">上级块级。</param>
+        /// <param name="index">解析的开始位置。</param>
+        /// <returns>返回当前块的关闭位置。如果当前块未关闭则返回 -1。</returns>
+        private Block parseSegmentsCore(Block parentBlock, int index = 0) {
 
-        //}
+            // 解析当前行从 startIndex -> endIndex 所有片段的算法：
+            // 1. 查找 parentBlockType 的结束点或 parentBlockType 中任何一个子 segmentType 开始点。
+            // 2. 选取最靠前的 segmentType 。
+            //    2.1 存储子 segmentType 。
+            //    2.2 如果最靠前的是 parentBlockType，则：
+            //        2.2.1 设置 Block 结束点
+            //        2.2.2 退出。
+            //    2.3 如果最靠前的是子 segmentType，则：
+            //        2.3.2 如果子 segmentType 是 blockType 则：
+            //            2.3.2.1 更新 parentBlockType 为子 segmentType 重复步骤 1。
+            //        2.3.3 如果 segmentType 是 segmentType 则： 
+            //            2.3.3.1 存储子 segmentType 。
 
-        //private int parseSegments(ref Block parentBlockSegment, int startIndex, int endIndex) {
-        //    while (startIndex < endIndex) {
-        //        // 每次解析到当前块的结束。
-        //        var lastStartIndex = startIndex;
-        //        startIndex = parseSegment(ref parentBlockSegment, parentBlockSegment.type, startIndex, endIndex);
-        //        if (startIndex < 0) {
-        //            return lastStartIndex;
-        //        }
-        //    }
-        //    return startIndex;
-        //}
+            while (index < buffer.length) {
 
-        ///// <summary>
-        ///// 解析一个块级的子类型。
-        ///// </summary>
-        ///// <param name="parentBlockSegment">上级块级。</param>
-        ///// <param name="parentSegmentType上级片段类型。</param>
-        ///// <param name="startIndex">解析的开始位置。</param>
-        ///// <param name="endIndex">解析的结束位置。</param>
-        ///// <returns>返回当前块的关闭位置。如果当前块未关闭则返回 -1。</returns>
-        //private int parseSegment(ref Block parentBlockSegment, SegmentType parentSegmentType, int startIndex, int endIndex) {
-        //redo:
+                var parentBlockType = parentBlock.type;
 
-        //    // 1. 查找父块的结束标志。
-        //    var parentBlockEnd = parentBlockSegment?.type.end.match(textData, startIndex, endIndex) ?? new PatternMatchResult(-1, -1);
+                // 1. 查找父块的结束标志。
+                var matchResult = parentBlockType.end?.match(buffer.data, index, buffer.length) ?? (parentBlockType.isMultiLine ? new PatternMatchResult(-1, -1) : new PatternMatchResult(buffer.length, buffer.length));
 
-        //    // 2. 查找子块开始标志。
-        //    Word childSegment;
-        //    childSegment.type = null;
-        //    childSegment.startIndex = parentBlockEnd.success ? parentBlockEnd.startIndex : int.MaxValue;
-        //    childSegment.endIndex = 0;
+                // 2. 查找子块开始标志。
+                var childSegmentType = (SegmentType)null;
+                var minStartIndex = matchResult.success ? matchResult.startIndex : int.MaxValue;
 
-        //    // 遍历所有子片段类型，找到匹配的子片段类型。
-        //    // 如果发现多个匹配项，则匹配位置最前的生效。
-        //    // 子片段可能是完全匹配一个单词或仅仅匹配其开始标记。
-        //    if (parentSegmentType.children != null) {
-        //        foreach (var segmentType in parentSegmentType.children) {
-        //            var matchResult = segmentType.start.match(textData, startIndex, endIndex);
-        //            if (matchResult.success && matchResult.startIndex < childSegment.startIndex) {
-        //                childSegment.type = segmentType;
-        //                childSegment.startIndex = matchResult.startIndex;
-        //                childSegment.endIndex = matchResult.endIndex;
-        //            }
-        //        }
-        //    }
+                // 遍历所有子片段类型，找到匹配的子片段类型。
+                // 如果发现多个匹配项，则匹配位置最前的生效。
+                // 子片段可能是完全匹配一个单词或仅仅匹配其开始标记。
+                if (parentBlockType.children != null) {
+                    foreach (var segmentType in parentBlockType.children) {
+                        var r = segmentType.start.match(buffer.data, index, buffer.length);
+                        if (r.success && r.startIndex < minStartIndex) {
+                            childSegmentType = segmentType;
+                            matchResult = r;
+                            minStartIndex = r.startIndex;
+                        }
+                    }
+                }
 
-        //    // 3. 处理子块开始。
-        //    if (childSegment.type != null) {
+                // 3. 处理子片段的开始。
+                if (childSegmentType != null) {
 
-        //        // 添加片段信息。
-        //        var segmentIndex = _segmentSplitterCount;
-        //        Utility.appendArrayList(ref segmentSplitterData, ref _segmentSplitterCount);
-        //        segmentSplitterData[segmentIndex] = childSegment;
+                    if (childSegmentType.isBlock) {
+                        // 如果子片段是另一个块，则递归处理。
+                        parentBlock = new Block(parentBlock, (BlockType)childSegmentType, this);
+                    } else {
+                        // 保存 子块.开始 -> 子块.结束 的样式。
+                        addSegment(matchResult.startIndex, matchResult.endIndex, childSegmentType);
+                    }
 
-        //        // 区分是块级片段还是内联片段。
-        //        if (childSegment.type.isBlock) {
+                    index = matchResult.endIndex;
+                    continue;
 
-        //            // 创建一个子块。
-        //            var block = new Block(parentBlockSegment, (SegmentSegmentType)childSegment.type, this);
+                }
 
-        //            // 继续解析内部区块。
-        //            var childBlockEnd = parseSegment(ref block, childSegment.type, childSegment.endIndex, endIndex);
-        //            segmentSplitterData[segmentIndex].endIndex = childBlockEnd;
-        //            if (childBlockEnd < 0) {
-        //                if (!childSegment.type.isMultiLine) {
-        //                    segmentSplitterData[segmentIndex].endIndex = endIndex;
-        //                }
-        //                return childBlockEnd;
-        //            }
+                // 4. 处理父块的结束。
+                if (matchResult.success) {
 
-        //            // 跳过当前内部块继续解析剩余内容。
-        //            startIndex = childBlockEnd;
-        //            goto redo;
-        //        } else {
+                    // 保存 块.开始 -> 块.结束 的样式。
+                    addSegment(parentBlock.startLine == this ? parentBlock.startColumn : 0, matchResult.endIndex, parentBlockType);
 
-        //            // 内联区块：childSegment.endIndex 表示当前区块的结束点。
-        //            Block blockSegment = null;
+                    // 设置块的结束行。
+                    parentBlock.endLine = this;
+                    parentBlock.endColumn = matchResult.endIndex;
 
-        //            // 在内部继续查找子片段。
-        //            parseSegment(ref blockSegment, childSegment.type, childSegment.startIndex, childSegment.endIndex);
+                    // 回溯到父级块。
+                    parentBlock = parentBlock.parent;
+                    index = matchResult.endIndex;
 
-        //            // 跳过当前内部块继续解析剩余内容。
-        //            startIndex = childSegment.endIndex;
-        //            goto redo;
+                    // 继续解析剩下的块
+                    continue;
+                }
 
-        //        }
+                // 5. 剩下字符不满足任意部分，则处理为父块的最后部分。
 
-        //    }
+                // 保存 块.开始 -> 块.结束 的样式。
+                addSegment(parentBlock.startLine == this ? parentBlock.startColumn : 0, buffer.length, parentBlockType);
+                break;
 
-        //    // 4. 处理父块结束。
-        //    if (parentBlockEnd.success) {
+            }
 
-        //        // 如果当前行自之前的行开始则插入一个片段。
-        //        if (parentBlockSegment.startLine != this) {
-        //            var segmentIndex = _segmentSplitterCount;
-        //            Utility.prependArrayList(ref segmentSplitterData, ref _segmentSplitterCount);
-        //            segmentSplitterData[0].type = parentSegmentType;
-        //            segmentSplitterData[0].startIndex = -1;
-        //            segmentSplitterData[0].endIndex = parentBlockEnd.endIndex;
-        //        }
+            return parentBlock;
 
-        //        // 设置块的结束行。
-        //        parentBlockSegment.endLine = this;
-
-        //        // 回溯到父级块。
-        //        parentBlockSegment = parentBlockSegment.parent;
-
-        //        // 返回结束行。
-        //        return parentBlockEnd.endIndex;
-        //    }
-
-        //    // 5. 当前块未结束。
-        //    return -1;
-
-        //}
-
-        ///// <summary>
-        ///// 解析一个片段类型的子类型。
-        ///// </summary>
-        ///// <param name="parentSegmentType">上级片段类型。</param>
-        ///// <param name="startIndex">解析的开始位置。</param>
-        ///// <param name="endIndex">解析的结束位置。</param>
-        ///// <returns>返回解析结束后的新结束位置。如果解析未成功则返回开始位置。</returns>
-        //private int parseSegments(SegmentType parentSegmentType, int startIndex, int endIndex) {
-        //    Segment childSegment;
-        //    childSegment.type = null;
-        //    childSegment.startIndex = int.MaxValue;
-        //    childSegment.endIndex = int.MaxValue;
-
-        //    // 遍历所有子片段类型，找到匹配的子片段类型。
-        //    // 如果发现多个匹配项，则匹配位置最前的生效。
-        //    // 子片段可能是完全匹配一个单词或仅仅匹配其开始标记。
-        //    for (var i = 0; i < parentSegmentType.children.Length; i++) {
-        //        var currentSegmentType = parentSegmentType.children[i];
-        //        int startIndex, end;
-        //        currentSegmentType.startIndex.match(textData, startIndex, endIndex, out startIndex, out end);
-        //        if (startIndex > 0 && childSegment.startIndex > startIndex) {
-        //            childSegment.type = currentSegmentType;
-        //            childSegment.startIndex = startIndex;
-        //            childSegment.endIndex = end;
-        //        }
-        //    }
-
-        //    // 不匹配任何子片段。
-        //    if (childSegment.type == null) {
-        //        return startIndex;
-        //    }
-
-        //    // 添加片段信息。
-        //    int segmentIndex = _segmentLength;
-        //    Utilty.incArrayList(ref _segments, ref _segmentLength);
-        //    _segments[segmentIndex] = childSegment;
-
-        //    // 区分是块级片段还是内联片段。
-        //    if (childSegment.type.isBlock) {
-        //        // 块级区块：end 表示结束为止。
-
-        //        // 创建一个区块。
-        //        var BlockSegment = new BlockSegment();
-        //        BlockSegment.startLine = this;
-        //        BlockSegment.type = (SegmentSegmentType)childSegment.type;
-
-        //        // 继续解析内部区块。
-        //        int newEndIndex = parseSegment(BlockSegment, childSegment.endIndex, endIndex);
-
-        //        // 同行片段不跨越行。
-        //        if (newEndIndex <= childSegment.endIndex && !childSegment.type.isMultiLine) {
-        //            newEndIndex = endIndex;
-        //        }
-
-        //        // 更新区块的结束位置。
-        //        _segments[segmentIndex].endIndex = newEndIndex;
-
-        //        return newEndIndex;
-
-        //    }
-
-        //    // 内联区块：childSegment.endIndex 表示当前区块的结束点。
-
-        //    // 在内部继续查找子片段。
-        //    parseSegments(childSegment.type, childSegment.startIndex, childSegment.endIndex);
-
-        //    return childSegment.endIndex;
-
-        //}
+        }
 
         #endregion
 
@@ -512,83 +456,36 @@ namespace Teal.CodeEditor {
 
     }
 
-    /// <summary>
-    /// 表示一个行内的片段。
-    /// </summary>
-    [DebuggerStepThrough]
-    public struct Segment {
+    ///// <summary>
+    ///// 表示一个行内的片段。
+    ///// </summary>
+    //[DebuggerStepThrough]
+    //public struct Segment {
 
-        /// <summary>
-        /// 获取当前片段的类型。
-        /// </summary>
-        public SegmentType type;
+    //    /// <summary>
+    //    /// 获取当前片段的类型。
+    //    /// </summary>
+    //    public SegmentType type;
 
-        /// <summary>
-        /// 获取当前片段在行内的开始位置。
-        /// </summary>
-        public int startIndex;
+    //    /// <summary>
+    //    /// 获取当前片段在行内的开始位置。
+    //    /// </summary>
+    //    public int startIndex;
 
-        /// <summary>
-        /// 获取当前片段在行内的结束位置。
-        /// </summary>
-        public int endIndex;
+    //    /// <summary>
+    //    /// 获取当前片段在行内的结束位置。
+    //    /// </summary>
+    //    public int endIndex;
 
-        public Segment(SegmentType type, int startIndex, int endIndex) {
-            this.startIndex = startIndex;
-            this.endIndex = endIndex;
-            this.type = type;
-        }
+    //    public Segment(SegmentType type, int startIndex, int endIndex) {
+    //        this.startIndex = startIndex;
+    //        this.endIndex = endIndex;
+    //        this.type = type;
+    //    }
 
-        public override string ToString() {
-            return $"{startIndex}-{endIndex}: {type}";
-        }
-    }
-
-    /// <summary>
-    /// 表示一个代码块。
-    /// </summary>
-    public sealed class Block {
-
-        /// <summary>
-        /// 获取上一级代码块。
-        /// </summary>
-        public Block parent { get; internal set; }
-
-        /// <summary>
-        /// 获取当前代码块的类型。
-        /// </summary>
-        public SegmentSegmentType type { get; }
-
-        /// <summary>
-        /// 获取当前代码块的起始行。
-        /// </summary>
-        public DocumentLine startLine { get; internal set; }
-
-        /// <summary>
-        /// 获取当前代码块的起始列。
-        /// </summary>
-        public int startColumn;
-
-        /// <summary>
-        /// 获取当前代码块的结束行。
-        /// </summary>
-        public DocumentLine endLine { get; internal set; }
-
-        /// <summary>
-        /// 获取或设置当前块的折叠状态。
-        /// </summary>
-        public bool collapsed { get; internal set; }
-        public int endColumn { get; internal set; }
-
-        public Block(Block parent, SegmentSegmentType type, DocumentLine startLine) {
-            this.parent = parent;
-            this.type = type;
-            this.startLine = startLine;
-        }
-
-        public override string ToString() {
-            return $"{type}";
-        }
-    }
+    //    public override string ToString() {
+    //        return $"{startIndex}-{endIndex}: {type}";
+    //    }
+    //}
 
 }

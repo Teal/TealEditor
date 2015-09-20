@@ -42,20 +42,25 @@ namespace Teal.CodeEditor {
         /// </summary>
         NEW_LINE_TYPE = newLineTypeAuto,
 
-        ///// <summary>
-        ///// 已修改。
-        ///// </summary>
-        //modified = 1 << 0,
+        /// <summary>
+        /// 当前行已解析。
+        /// </summary>
+        parsed = 1 << 2,
 
-        ///// <summary>
-        ///// 已修改并保存。
-        ///// </summary>
-        //modifiedAndSaved = 1 << 1,
+        /// <summary>
+        /// 已修改。
+        /// </summary>
+        modified = 1 << 3,
 
-        ///// <summary>
-        ///// 获取书签状态。
-        ///// </summary>
-        //MODIFIE_STATE = modified | modifiedAndSaved,
+        /// <summary>
+        /// 已保存。
+        /// </summary>
+        saved = 1 << 4,
+
+        /// <summary>
+        /// 已修改并保存。
+        /// </summary>
+        modifiedAndSaved = modified | saved,
 
         ///// <summary>
         ///// 指示当前行需要重新布局。
@@ -71,11 +76,6 @@ namespace Teal.CodeEditor {
         /// 包含断点。
         /// </summary>
         breakpoint = 1 << 4,
-
-        /// <summary>
-        /// 当前行已解析。
-        /// </summary>
-        parsed = 1 << 2,
 
         /// <summary>
         /// 正在激活。

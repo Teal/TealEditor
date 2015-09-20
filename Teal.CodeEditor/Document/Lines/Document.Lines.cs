@@ -160,26 +160,20 @@ namespace Teal.CodeEditor {
         #region 换行
 
         /// <summary>
-        /// 当前文档的换行符。
-        /// </summary>
-        private DocumentLineFlags _newLineType = DocumentConfigs.defaultNewLineType;
-
-        /// <summary>
         /// 判断当前文档是否包含混合的换行符。
         /// </summary>
         public bool hasMixedNewLine {
             get {
-                //if (lines.Count == 0) {
-                //    return false;
-                //}
+                if (lines.length == 0) {
+                    return false;
+                }
 
-                //var lastLine = lines[lines.Count - 1].newLineType;
-                //for (var i = 1; i < lines.Count; i++) {
-                //    if (lines[i].newLineType != lastLine) {
-                //        return false;
-                //    }
-                //}
-
+                var lastLine = lines[lines.length - 1].newLineType;
+                for (var i = 1; i < lines.length; i++) {
+                    if (lines[i].newLineType != lastLine) {
+                        return false;
+                    }
+                }
 
                 return true;
             }
@@ -203,19 +197,17 @@ namespace Teal.CodeEditor {
         public DocumentLineFlags newLineType {
             get {
                 if (lines.length == 0) {
-                    return _newLineType;
+                    return flags & DocumentLineFlags.NEW_LINE_TYPE;
                 }
-
                 return lines[lines.length - 1].newLineType;
-
             }
             set {
                 if (newLineType != value || hasMixedNewLine) {
-                    _newLineType = value;
+                    flags = (flags & ~DocumentLineFlags.NEW_LINE_TYPE) | value;
                     for (var i = 1; i < lines.length; i++) {
                         lines[i].newLineType = value;
                     }
-                    modifyState = ModifyState.modified;
+                    modifyState = DocumentLineFlags.modified;
                 }
             }
         }

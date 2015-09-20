@@ -77,6 +77,11 @@ namespace Teal.CodeEditor {
             while (layoutInfo.line < endLine && layoutInfo.top < bottom) {
                 var documentLine = lines.data[layoutInfo.line];
 
+                // 确保行已经解析。
+                if (!documentLine.parsed) {
+                    parseSegments(layoutInfo.line);
+                }
+
                 // 绘制一行。
 
                 // 获取当前行内已折叠的代码域。

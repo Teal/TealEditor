@@ -50,7 +50,6 @@
   <ItemGroup>
     <Compile Include="Document\Editing\CaretMode.cs" />
     <Compile Include="Document\Editing\Document.Caret.cs" />
-    <Compile Include="Document\Editing\ModifyState.cs" />
     <Compile Include="Document\Editing\MoveOperation.cs" />
     <Compile Include="Document\Lines\DocumentLineFlags.cs" />
     <Compile Include="Document\Selection\Document.Selections.cs" />
@@ -58,6 +57,10 @@
     <Compile Include="Document\Selection\Selection.cs" />
     <Compile Include="Document\Editing\Undo\UndoableOperations.cs" />
     <Compile Include="Document\Editing\Undo\UndoStack.cs" />
+    <Compile Include="Document\SyntaxBinding\Block.cs" />
+    <Compile Include="Document\SyntaxBinding\Document.Syntax.cs" />
+    <Compile Include="Document\SyntaxBinding\InternalSegmentTypes.cs" />
+    <Compile Include="Document\SyntaxBinding\Pettern.cs" />
     <Compile Include="Editing\CodeEditor.Core.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -66,13 +69,13 @@
     <Compile Include="Utility\Location.cs" />
     <Compile Include="Utility\Utility.cs" />
     <Compile Include="Document\Lines\Document.Lines.cs" />
-    <Compile Include="Document\Document.Layout.cs" />
-    <Compile Include="Document\BlockType.cs" />
+    <Compile Include="Document\Layout\Document.Layout.cs" />
+    <Compile Include="Document\SyntaxBinding\BlockType.cs" />
     <Compile Include="Document\Lines\DocumentLine.cs" />
-    <Compile Include="Document\SegmentType.cs" />
+    <Compile Include="Document\SyntaxBinding\SegmentType.cs" />
     <Compile Include="Utility\StringBuffer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SyntaxBinding\SyntaxBinding.cs" />
+    <Compile Include="Document\SyntaxBinding\SyntaxBinding.cs" />
     <Compile Include="Win32\Painter.cs" />
     <Compile Include="Win32\Win32Api.GDI.cs" />
     <Compile Include="Win32\Win32Api.GUI.cs" />
@@ -82,7 +85,7 @@
     <Content Include="_bak.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Document\Document.Scrolling.cs" />
+    <Compile Include="Document\Layout\Document.Scrolling.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Document\Editing\Document.Editing.cs" />
