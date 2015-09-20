@@ -355,16 +355,16 @@ namespace Teal.CodeEditor {
         /// 向当前字符串缓存追加数据。
         /// </summary>
         /// <param name="value">要追加的字符串。</param>
-        /// <param name="startIndex">插入的起始位置。</param>
-        /// <param name="charCount">插入的个数。</param>
-        public void append(string value, int startIndex, int charCount) {
+        /// <param name="startIndex"><paramref name="value"/> 中的起始位置。</param>
+        /// <param name="length"><paramref name="value"/> 中的长度。</param>
+        public void append(string value, int startIndex, int length) {
             Debug.Assert(startIndex >= 0);
-            Debug.Assert(startIndex + charCount <= value.Length);
+            Debug.Assert(startIndex + length <= value.Length);
             unsafe
             {
                 fixed (char* src = value)
                 {
-                    append(src + startIndex, charCount);
+                    append(src + startIndex, length);
                 }
             }
         }
@@ -374,15 +374,15 @@ namespace Teal.CodeEditor {
         /// </summary>
         /// <param name="value">要追加的字符数组。</param>
         /// <param name="startIndex">数组的起始位置。</param>
-        /// <param name="charCount">要追加的字符数。</param>
-        public void append(char[] value, int startIndex, int charCount) {
+        /// <param name="length">要追加的字符数。</param>
+        public void append(char[] value, int startIndex, int length) {
             Debug.Assert(startIndex >= 0);
-            Debug.Assert(startIndex + charCount <= value.Length);
+            Debug.Assert(startIndex + length <= value.Length);
             unsafe
             {
                 fixed (char* src = value)
                 {
-                    append(src + startIndex, charCount);
+                    append(src + startIndex, length);
                 }
             }
         }
@@ -538,7 +538,14 @@ namespace Teal.CodeEditor {
         /// 从当前缓存删除指定索引的字符串。
         /// </summary>
         /// <param name="startIndex">开始的索引。</param>
-        public void remove(int startIndex) => remove(startIndex, _length - startIndex);
+        public void remove(int startIndex) {
+            if (startIndex < 0) {
+                startIndex = 0;
+            } else if (startIndex >= _length) {
+                return;
+            }
+            _length = startIndex;
+        }
 
         /// <summary>
         /// 从当前缓存删除指定索引的字符串。
@@ -546,20 +553,23 @@ namespace Teal.CodeEditor {
         /// <param name="startIndex">开始的索引。</param>
         /// <param name="charCount">删除的长度。</param>
         public void remove(int startIndex, int charCount) {
-            Debug.Assert(startIndex >= 0);
-            Debug.Assert(startIndex + charCount <= _length);
+            if (startIndex + charCount >= _length) {
+                remove(startIndex);
+                return;
+            }
+            if (startIndex < 0) {
+                startIndex = 0;
+            }
+            var copyLength = length - startIndex - charCount;
             unsafe
             {
-                fixed (char* p = data)
+                fixed (char* dest = data)
                 {
-                    var ps = p + startIndex;
-
-                    var copyLength = length - startIndex - charCount;
+                    var ps = dest + startIndex;
                     wstrcpy(ps, ps + charCount, copyLength);
-
-                    _length -= charCount;
                 }
             }
+            _length -= charCount;
         }
 
         #endregion

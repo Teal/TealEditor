@@ -19,40 +19,40 @@ namespace Teal.CodeEditor {
         /// </summary>
         private int _caretColumn;
 
-        /// <summary>
-        /// 将当前光标左移一位。
-        /// </summary>
-        private MoveOperation moveLeftCore() {
+        ///// <summary>
+        ///// 将当前光标左移一位。
+        ///// </summary>
+        //private MoveOperation moveLeftCore() {
 
-            clearSelections();
+        //    clearSelections();
 
-            MoveOperation op;
+        //    MoveOperation op;
 
-            // 如果当前光标等于起始列，则切换到上一行。
-            if (_caretColumn == 0) {
-                if (_caretLine == 0) {
-                    return MoveOperation.none;
-                }
+        //    // 如果当前光标等于起始列，则切换到上一行。
+        //    if (_caretColumn == 0) {
+        //        if (_caretLine == 0) {
+        //            return MoveOperation.none;
+        //        }
 
-                _caretColumn = document.lines[--_caretLine].length;
-                op = MoveOperation.line;
-            } else {
-                var foldingRange = getFoldingRangeByEnd(_caretLine, _caretColumn);
-                if (foldingRange != null && foldingRange.isFolded) {
-                    _caretLine = foldingRange.startLine;
-                    _caretColumn = foldingRange.startColumn;
-                    op = MoveOperation.block;
-                } else {
-                    _caretColumn--;
-                    op = MoveOperation.column;
-                }
-            }
+        //        _caretColumn = document.lines[--_caretLine].length;
+        //        op = MoveOperation.line;
+        //    } else {
+        //        var foldingRange = getFoldingRangeByEnd(_caretLine, _caretColumn);
+        //        if (foldingRange != null && foldingRange.isFolded) {
+        //            _caretLine = foldingRange.startLine;
+        //            _caretColumn = foldingRange.startColumn;
+        //            op = MoveOperation.block;
+        //        } else {
+        //            _caretColumn--;
+        //            op = MoveOperation.column;
+        //        }
+        //    }
 
-            updateCaret();
+        //    updateCaret();
 
-            return op;
+        //    return op;
 
-        }
+        //}
 
 
 
@@ -300,19 +300,19 @@ namespace Teal.CodeEditor {
 
         //    #region 移动一格
 
-        /// <summary>
-        /// 将当前光标左移一位。
-        /// </summary>
-        public void moveLeft() {
-            moveLeftCore();
-        }
+        ///// <summary>
+        ///// 将当前光标左移一位。
+        ///// </summary>
+        //public void moveLeft() {
+        //    moveLeftCore();
+        //}
 
-        /// <summary>
-        /// 将当前光标右移一位。
-        /// </summary>
-        public void moveRight() {
-            moveRightCore();
-        }
+        ///// <summary>
+        ///// 将当前光标右移一位。
+        ///// </summary>
+        //public void moveRight() {
+        //    moveRightCore();
+        //}
 
         //    /// <summary>
         //    /// 将当前光标左移一位并选中。

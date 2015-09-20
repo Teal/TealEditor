@@ -9,7 +9,7 @@ namespace Teal.CodeEditor {
     /// <summary>
     /// 表示一个文档区域。文档区域会在文档更新后自动更新。
     /// </summary>
-    public partial class Range {
+    public class Range {
 
         /// <summary>
         /// 获取当前区域的起始行。
@@ -40,7 +40,6 @@ namespace Teal.CodeEditor {
         /// 判断指定的行是否包含在此区间。
         /// </summary>
         /// <param name="line"></param>
-        /// <param name="column"></param>
         /// <returns></returns>
         public bool contains(int line) {
             return line >= startLine && line < endLine;

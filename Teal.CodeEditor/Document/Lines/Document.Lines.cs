@@ -108,41 +108,44 @@ namespace Teal.CodeEditor {
         //    }
         //}
 
-        ///// <summary>
-        ///// 获取指定区间的文本。
-        ///// </summary>
-        ///// <param name="startLine"></param>
-        ///// <param name="startColumn"></param>
-        ///// <param name="endLine"></param>
-        ///// <param name="endColumn"></param>
-        ///// <returns></returns>
-        //public string getText(int startLine, int startColumn, int endLine, int endColumn) {
-        //    StringBuilder sb = new StringBuilder();
-        //    write(sb, startLine, startColumn, endLine, endColumn);
-        //    return sb.ToString();
-        //}
+        /// <summary>
+        /// 获取指定区间的文本。
+        /// </summary>
+        /// <param name="startLine"></param>
+        /// <param name="startColumn"></param>
+        /// <param name="endLine"></param>
+        /// <param name="endColumn"></param>
+        /// <returns></returns>
+        public string getText(int startLine, int startColumn, int endLine, int endColumn) {
+            if (startLine == endLine) {
+                return lines[startLine].buffer[startColumn, endColumn];
+            }
+            var sb = new StringBuilder();
+            write(sb, startLine, startColumn, endLine, endColumn);
+            return sb.ToString();
+        }
 
-        ///// <summary>
-        ///// 将指定区间的文本写入缓存器。
-        ///// </summary>
-        ///// <param name="sb"></param>
-        ///// <param name="startLine"></param>
-        ///// <param name="startColumn"></param>
-        ///// <param name="endLine"></param>
-        ///// <param name="endColumn"></param>
-        //public void write(StringBuilder sb, int startLine, int startColumn, int endLine, int endColumn) {
-        //    if (endLine == startLine) {
-        //        sb.Append(lines[startLine].chars, startColumn, endColumn - startColumn);
-        //    } else {
-        //        sb.Append(lines[startLine].chars, startColumn, lines[startLine].textLength - startColumn);
-        //        for (var i = startLine + 1; i < endLine; i++) {
-        //            sb.Append(lines[i].newLine);
-        //            sb.Append(lines[i].chars, 0, lines[i].textLength);
-        //        }
-        //        sb.Append(lines[endLine].newLine);
-        //        sb.Append(lines[endLine].chars, 0, endColumn);
-        //    }
-        //}
+        /// <summary>
+        /// 将指定区间的文本写入缓存器。
+        /// </summary>
+        /// <param name="sb"></param>
+        /// <param name="startLine"></param>
+        /// <param name="startColumn"></param>
+        /// <param name="endLine"></param>
+        /// <param name="endColumn"></param>
+        public void write(StringBuilder sb, int startLine, int startColumn, int endLine, int endColumn) {
+            if (endLine == startLine) {
+                sb.Append(lines[startLine].buffer.data, startColumn, endColumn - startColumn);
+            } else {
+                sb.Append(lines[startLine].buffer.data, startColumn, lines[startLine].textLength - startColumn);
+                for (var i = startLine + 1; i < endLine; i++) {
+                    sb.Append(lines[i].newLine);
+                    sb.Append(lines[i].buffer.data, 0, lines[i].textLength);
+                }
+                sb.Append(lines[endLine].newLine);
+                sb.Append(lines[endLine].buffer.data, 0, endColumn);
+            }
+        }
 
         ///// <summary>
         ///// 返回表示当前对象的字符串。

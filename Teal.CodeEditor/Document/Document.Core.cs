@@ -136,6 +136,11 @@ namespace Teal.CodeEditor {
 
         public const DocumentLineFlags defaultNewLineType = DocumentLineFlags.newLineTypeWin;
 
+        /// <summary>
+        /// 获取新行的默认容器大小。
+        /// </summary>
+        public const int defaultLineCapacity = 16;
+
         #endregion
 
     }

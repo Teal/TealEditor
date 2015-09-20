@@ -33,9 +33,14 @@ namespace Teal.CodeEditor {
         newLineTypeUnix = 1 << 1,
 
         /// <summary>
+        /// 表示自动设置换行符。
+        /// </summary>
+        newLineTypeAuto = newLineTypeWin | newLineTypeMac | newLineTypeUnix,
+
+        /// <summary>
         /// 表示换行符类型。
         /// </summary>
-        NEW_LINE_TYPE = newLineTypeWin | newLineTypeMac | newLineTypeUnix,
+        NEW_LINE_TYPE = newLineTypeAuto,
 
         ///// <summary>
         ///// 已修改。

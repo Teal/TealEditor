@@ -19,7 +19,7 @@ namespace Teal.CodeEditor.Test {
 
             ce.Dock = DockStyle.Fill;
 
-            ce.document.lines.add(new DocumentLine("aaaa"));
+            ce.document.lines.add(new DocumentLine(DocumentLineFlags.newLineTypeWin, "aaaa"));
             ce.document.lines[0].segments.add(new SegmentSplitter() {
                 type = null,
                 index = ce.document.lines[0].textLength

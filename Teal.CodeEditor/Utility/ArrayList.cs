@@ -136,13 +136,33 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 删除指定索引的项。
         /// </summary>
-        /// <param name="item"></param>
-        public void removeAt(int item) {
-            if (item < 0 || item >= _length)
+        /// <param name="index"></param>
+        public void removeAt(int index) {
+            if (index < 0 || index >= _length)
                 return;
 
-            Array.Copy(data, item + 1, data, item, _length - item - 1);
+            Array.Copy(data, index + 1, data, index, _length - index - 1);
             _length--;
+        }
+
+        /// <summary>
+        /// 删除指定索引之间的项。
+        /// </summary>
+        /// <param name="startIndex">从零开始的搜索的起始索引。空数组中 0（零）为有效值。</param>
+        /// <param name="length">要删除的部分中的元素数。</param>
+        public void removeRange(int startIndex, int length) {
+            var endIndex = startIndex + length;
+            if (endIndex > _length) {
+                endIndex = _length;
+                length = endIndex - startIndex;
+            }
+            if (startIndex < 0) {
+                startIndex = 0;
+                length = endIndex;
+            }
+
+            Array.Copy(data, endIndex, data, startIndex, length);
+            _length -= length;
         }
 
         /// <summary>
@@ -203,7 +223,7 @@ namespace Teal.CodeEditor {
         /// <returns></returns>
         public T[] toArray() {
             var result = new T[_length];
-            data.CopyTo(result, 0);
+            Array.Copy(data, result, _length);
             return result;
         }
 

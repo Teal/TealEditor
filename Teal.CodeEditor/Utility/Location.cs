@@ -1,6 +1,6 @@
 using System;
 
-namespace Teal.Compiler {
+namespace Teal.CodeEditor {
 
     /// <summary>
     /// 表示一个源码位置。
@@ -18,6 +18,27 @@ namespace Teal.Compiler {
         /// 获取或设置当前位置的列号。列号从 0 开始。 
         /// </summary>
         public int column;
+        
+        public Location(int line, int column) {
+            this.line = line;
+            this.column = column;
+        }
+
+        /// <summary>
+        /// 当问到发生改变后更新位置。
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="column"></param>
+        /// <param name="deltaLine"></param>
+        /// <param name="deltaColumn"></param>
+        public void update(int line, int column, int deltaLine, int deltaColumn) {
+            //var minLine = deltaLine < 0 ? line + deltaLine : line;
+            //var maxLine = deltaLine > 0 ? line + deltaLine : line;
+
+            //if(this.line > minLine) {
+                
+            //}
+        }
 
         #endregion
 

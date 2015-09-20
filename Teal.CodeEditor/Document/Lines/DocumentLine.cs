@@ -65,20 +65,44 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 初始化 <see cref="DocumentLine"/> 类的新实例。
         /// </summary>
+        /// <param name="newLine">当前行的换行符.</param>
         /// <param name="value">初始化的值。</param>
-        public DocumentLine(string value) {
+        public DocumentLine(DocumentLineFlags newLine, string value) {
+            flags = newLine;
             buffer = new StringBuffer(value);
             segments = new ArrayList<SegmentSplitter>(value.Length >> 4);
         }
 
         /// <summary>
+        /// 初始化 <see cref="DocumentLine"/> 类的新实例。
+        /// </summary>
+        /// <param name="newLine">当前行的换行符.</param>
+        /// <param name="value">初始化的值。</param>
+        /// <param name="startIndex"><paramref name="value"/> 中的起始位置。</param>
+        /// <param name="length"><paramref name="value"/> 中的长度。</param>
+        public DocumentLine(DocumentLineFlags newLine, string value, int startIndex, int length) {
+            flags = newLine;
+            buffer = new StringBuffer(length + 2);
+            buffer.append(value, startIndex, length);
+            segments = new ArrayList<SegmentSplitter>(length >> 4);
+        }
+
+        /// <summary>
         /// 初始化 <see cref="DocumentLine" /> 类的新实例。
         /// </summary>
+        /// <param name="newLine">当前行的换行符.</param>
         /// <param name="capacity">初始化容量。</param>
-        public DocumentLine(int capacity = 16) {
+        public DocumentLine(DocumentLineFlags newLine, int capacity = DocumentConfigs.defaultLineCapacity) {
+            flags = newLine;
             buffer = new StringBuffer(capacity);
             segments = new ArrayList<SegmentSplitter>(capacity >> 4);
         }
+
+        /// <summary>
+        /// 初始化 <see cref="DocumentLine" /> 类的新实例。
+        /// </summary>
+        public DocumentLine()
+                : this(DocumentLineFlags.newLineTypeWin, DocumentConfigs.defaultLineCapacity) { }
 
         /// <summary>
         /// 返回当前行的字符串形式。

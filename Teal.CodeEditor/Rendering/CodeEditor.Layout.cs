@@ -230,21 +230,6 @@ namespace Teal.CodeEditor {
         }
 
         /// <summary>
-        /// 避免在调用 endUpdate() 方法之前描述控件。
-        /// </summary>
-        public void beginUpdate() {
-            _updateCount++;
-        }
-
-        /// <summary>
-        /// 在 beginUpdate() 方法挂起描述后，继续描述控件。
-        /// </summary>
-        public void endUpdate() {
-            _updateCount--;
-            updateLayout();
-        }
-
-        /// <summary>
         /// 当文档内容改变后进行重新布局。
         /// </summary>
         /// <param name="line">发生改变的行。</param>
