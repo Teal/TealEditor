@@ -120,7 +120,7 @@ namespace Teal.CodeEditor {
         /// </summary>
         public int caretWidth = 2;
 
-        public const DocumentLineFlags defaultNewLineType = DocumentLineFlags.newLineTypeWin;
+        public const DocumentLineFlags defaultNewLineType = DocumentLineFlags.newLineTypeWindows;
 
         /// <summary>
         /// 获取新行的默认容器大小。

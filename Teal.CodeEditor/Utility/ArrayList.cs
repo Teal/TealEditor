@@ -35,6 +35,9 @@ namespace Teal.CodeEditor {
                     if (newLength < value) {
                         newLength = value;
                     }
+                    if (newLength < 128) {
+                        newLength = 128;
+                    }
                     capacity = newLength;
                 }
                 _length = value;

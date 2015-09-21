@@ -67,8 +67,11 @@
     <Compile Include="DocumentView\Selection\Document.Selections.cs" />
     <Compile Include="DocumentView\Selection\Range.cs" />
     <Compile Include="DocumentView\Selection\Selection.cs" />
-    <Compile Include="Document\Editing\Undo\UndoableOperations.cs" />
-    <Compile Include="Document\Editing\Undo\UndoStack.cs" />
+    <Compile Include="Document\Lines\Undo\BlockOperation.cs" />
+    <Compile Include="Document\Lines\Undo\BreakLineOperation.cs" />
+    <Compile Include="Document\Lines\Undo\CharOperation.cs" />
+    <Compile Include="Document\Lines\Undo\UndoableOperations.cs" />
+    <Compile Include="Document\Lines\Undo\UndoStack.cs" />
     <Compile Include="Document\SyntaxBinding\Block.cs" />
     <Compile Include="Document\SyntaxBinding\Document.Syntax.cs" />
     <Compile Include="Document\SyntaxBinding\InternalSegmentTypes.cs" />
@@ -100,7 +103,7 @@
     <Compile Include="DocumentView\DocumentView.Scrolling.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Document\Editing\Document.Editing.cs" />
+    <Compile Include="Document\Document.Editing.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DocumentView\Rendering\" />

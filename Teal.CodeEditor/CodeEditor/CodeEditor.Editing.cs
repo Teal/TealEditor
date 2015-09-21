@@ -25,7 +25,7 @@ namespace Teal.CodeEditor {
         /// 创建一个新的光标。
         /// </summary>
         private void createCaret(int width) {
-            Win32Api.CreateCaret(Handle, width, _document.painter.lineHeight);
+            Win32Api.CreateCaret(Handle, width, _view.painter.lineHeight);
             updateCaret();
             showCaret();
             if (!isCaretVisible) {
@@ -118,7 +118,7 @@ namespace Teal.CodeEditor {
                 if (_caretMode != value) {
                     _caretMode = value;
                     destroyCaret();
-                    createCaret(_caretMode == CaretMode.overwriteMode ? _document.painter.fontWidth : _document.configs.caretWidth);
+                    createCaret(_caretMode == CaretMode.overwriteMode ? _view.painter.fontWidth : _view.configs.caretWidth);
                     caretModeChanged?.Invoke();
                 }
             }

@@ -9,6 +9,77 @@ namespace Teal.CodeEditor {
     /// </summary>
     public sealed class DocumentLine {
 
+        #region 标记
+
+        /// <summary>
+        /// 获取或设置当前行的所有标记。
+        /// </summary>
+        public DocumentLineFlags flags;
+
+        /// <summary>
+        /// 获取当前行和上一行之间的换行符类型。
+        /// </summary>
+        public DocumentLineFlags newLineType {
+            get {
+                return flags & DocumentLineFlags.NEW_LINE_TYPES;
+            }
+            set {
+                flags = (flags & ~DocumentLineFlags.NEW_LINE_TYPES) | value;
+            }
+        }
+
+        /// <summary>
+        /// 获取当前行和上一行之间的换行符。
+        /// </summary>
+        public string newLine {
+            get {
+                return Utility.newlineTypeToNewLine(newLineType);
+            }
+            set {
+                newLineType = Utility.newlineToNewLineType(value);
+            }
+        }
+
+        /// <summary>
+        /// 获取或设置当前行的修改状态。
+        /// </summary>
+        public DocumentLineFlags modifyState {
+            get {
+                return flags & DocumentLineFlags.modifiedAndSaved;
+            }
+            set {
+                flags = (flags & ~(DocumentLineFlags.modifiedAndSaved | DocumentLineFlags.parsed)) | value;
+            }
+        }
+
+        /// <summary>
+        /// 获取当前行的缩进长度。
+        /// </summary>
+        public int indentCount {
+            get {
+                for (var i = 0; i < buffer.length; i++) {
+                    if (!Utility.isIndentChar(buffer.data[i])) {
+                        return i;
+                    }
+                }
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// 判断当前行是否已解析。
+        /// </summary>
+        public bool parsed {
+            get {
+                return (flags & DocumentLineFlags.parsed) != 0;
+            }
+            set {
+                flags = value ? flags | DocumentLineFlags.parsed : flags & ~DocumentLineFlags.parsed;
+            }
+        }
+
+        #endregion
+
         #region 字符
 
         /// <summary>
@@ -29,6 +100,11 @@ namespace Teal.CodeEditor {
         }
 
         /// <summary>
+        /// 获取当前行的实际字符长度。
+        /// </summary>
+        public int textLength => buffer.length;
+
+        /// <summary>
         /// 获取或设置当前行指定位置的字符。
         /// </summary>
         /// <param name="index">要获取的索引。</param>
@@ -41,7 +117,6 @@ namespace Teal.CodeEditor {
                 buffer[index] = value;
             }
         }
-
 
         /// <summary>
         /// 获取或设置当前行指定区域的子字符串。
@@ -59,19 +134,14 @@ namespace Teal.CodeEditor {
         }
 
         /// <summary>
-        /// 获取当前行的实际字符长度。
-        /// </summary>
-        public int textLength => buffer.length;
-
-        /// <summary>
         /// 初始化 <see cref="DocumentLine"/> 类的新实例。
         /// </summary>
         /// <param name="newLine">当前行的换行符.</param>
         /// <param name="value">初始化的值。</param>
         public DocumentLine(DocumentLineFlags newLine, string value) {
-            flags = newLine;
+            flags = newLine | DocumentLineFlags.modified;
             buffer = new StringBuffer(value);
-            segments = new ArrayList<SegmentSplitter>(value.Length >> 4);
+            segmentSplitters = new ArrayList<SegmentSplitter>(value.Length >> 4);
         }
 
         /// <summary>
@@ -85,7 +155,7 @@ namespace Teal.CodeEditor {
             flags = newLine | DocumentLineFlags.modified;
             buffer = new StringBuffer(length + 2);
             buffer.append(value, startIndex, length);
-            segments = new ArrayList<SegmentSplitter>(length >> 4);
+            segmentSplitters = new ArrayList<SegmentSplitter>(length >> 4);
         }
 
         /// <summary>
@@ -96,14 +166,14 @@ namespace Teal.CodeEditor {
         public DocumentLine(DocumentLineFlags newLine, int capacity = DocumentConfigs.defaultLineCapacity) {
             flags = newLine | DocumentLineFlags.modified;
             buffer = new StringBuffer(capacity);
-            segments = new ArrayList<SegmentSplitter>(capacity >> 4);
+            segmentSplitters = new ArrayList<SegmentSplitter>(capacity >> 4);
         }
 
         /// <summary>
         /// 初始化 <see cref="DocumentLine" /> 类的新实例。
         /// </summary>
         public DocumentLine()
-                : this(DocumentLineFlags.newLineTypeWin, DocumentConfigs.defaultLineCapacity) { }
+                : this(DocumentLineFlags.newLineTypeWindows, DocumentConfigs.defaultLineCapacity) { }
 
         /// <summary>
         /// 返回当前行的字符串形式。
@@ -113,174 +183,22 @@ namespace Teal.CodeEditor {
 
         #endregion
 
-        #region 行属性
-
-        /// <summary>
-        /// 获取当前行和上一行之间的换行符。
-        /// </summary>
-        public string newLine {
-            get {
-                return Utility.newlineTypeToNewLine(newLineType);
-            }
-            set {
-                newLineType = Utility.newlineToNewLineType(value);
-            }
-        }
-
-        /// <summary>
-        /// 获取当前行和上一行之间的换行符类型。
-        /// </summary>
-        public DocumentLineFlags newLineType {
-            get {
-                return flags & DocumentLineFlags.NEW_LINE_TYPE;
-            }
-            set {
-                flags = (flags & ~DocumentLineFlags.NEW_LINE_TYPE) | value;
-            }
-        }
-
-        /// <summary>
-        /// 获取当前行的缩进长度。
-        /// </summary>
-        public int indentCount {
-            get {
-                for (var i = 0; i < buffer.length; i++) {
-                    if (!Utility.isIndentChar(buffer.data[i])) {
-                        return i;
-                    }
-                }
-                return 0;
-            }
-        }
-
-        /// <summary>
-        /// 获取或设置当前行的标记。
-        /// </summary>
-        public DocumentLineFlags flags;
-
-        /// <summary>
-        /// 判断当前行是否已解析。
-        /// </summary>
-        public bool parsed {
-            get {
-                return (flags & DocumentLineFlags.parsed) != 0;
-            }
-            set {
-                flags = value ? flags | DocumentLineFlags.parsed : flags & ~DocumentLineFlags.parsed;
-            }
-        }
-
-        /// <summary>
-        /// 获取或设置当前行的状态。
-        /// </summary>
-        public DocumentLineFlags modifyState {
-            get {
-                return flags & DocumentLineFlags.modifiedAndSaved;
-            }
-            set {
-                flags = (flags & ~(DocumentLineFlags.modifiedAndSaved | DocumentLineFlags.parsed)) | value;
-            }
-        }
-
-        #endregion
-
-        #region 区块
-
-        /// <summary>
-        /// 存储当前行最后一个字符之后所属的块。其块所属可能属于当前行或之前行。
-        /// </summary>
-        private Block _endingBlock;
-
-        /// <summary>
-        /// 获取当前行最开始的块。
-        /// </summary>
-        /// <returns></returns>
-        public Block startingBlock {
-            get {
-                var block = _endingBlock;
-                if (block != null) {
-                    for (; block.parent != null && block.parent.startLine == this; block = block.parent)
-                        ;
-                }
-                return block;
-            }
-        }
-
-        /// <summary>
-        /// 获取当前行最结尾的块。
-        /// </summary>
-        /// <returns></returns>
-        public Block endingBlock => _endingBlock;
-
-        /// <summary>
-        /// 获取属于从当前行开始的所有折叠块。
-        /// </summary>
-        public IEnumerable<Block> startBlocks {
-            get {
-                for (var block = _endingBlock; block != null && block.startLine == this; block = block.parent) {
-                    yield return block;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 获取属于从当前行结束的所有折叠块。
-        /// </summary>
-        public IEnumerable<Block> endBlocks {
-            get {
-                for (var block = _endingBlock; block != null; block = block.parent) {
-                    if (block.endLine == this) {
-                        yield return block;
-                    }
-                }
-            }
-        }
-
-        public IEnumerable<Block> blocks {
-            get {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 获取从当前行开始的最后一个已折叠的块。
-        /// </summary>
-        /// <returns>返回已折叠的块。</returns>
-        public Block getCollapsedBlock() {
-            for (var block = _endingBlock; block != null && block.startLine == this; block = block.parent) {
-                if (block.collapsed) {
-                    return block;
-                }
-            }
-            return null;
-        }
-
-        #endregion
-
         #region 片段
 
         /// <summary>
         /// 获取当前行的所有片段分隔符。
         /// </summary>
-        public ArrayList<SegmentSplitter> segments;
+        public ArrayList<SegmentSplitter> segmentSplitters;
 
         /// <summary>
-        /// 添加一个已找到的片段节点。
+        /// 解析当前行的片段列表。
         /// </summary>
-        /// <param name="index"></param>
-        /// <param name="type"></param>
-        private void addSegmentSplitter(int index, SegmentType type) {
-            segments.add(new SegmentSplitter(index, type));
-        }
-
-        /// <summary>
-        /// 更新当前行的片段列表。
-        /// </summary>
-        /// <param name="parentBlockSegment">当前行所在的块。</param>
-        public Block parseSegments(Block parentBlockSegment) {
+        /// <param name="parentBlock">当前行所在的块。</param>
+        /// <returns>返回解析完成后的新行尾。</returns>
+        public Block parseSegments(Block parentBlock) {
             flags |= DocumentLineFlags.parsed;
-            segments.clear();
-            return _endingBlock = parseSegmentsCore(parentBlockSegment);
+            segmentSplitters.clear();
+            return _endingBlock = parseSegmentsCore(parentBlock);
         }
 
         /// <summary>
@@ -380,99 +298,90 @@ namespace Teal.CodeEditor {
 
         }
 
+        /// <summary>
+        /// 添加一个已找到的片段节点。
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="type"></param>
+        private void addSegmentSplitter(int index, SegmentType type) {
+            segmentSplitters.add(new SegmentSplitter(index, type));
+        }
+
+        #endregion
+
+        #region 区块
+
+        /// <summary>
+        /// 存储当前行最后一个字符之后所属的块。块可能是当前行或之前行创建的。
+        /// </summary>
+        private Block _endingBlock;
+
+        /// <summary>
+        /// 获取当前行最结尾的块。
+        /// </summary>
+        /// <returns></returns>
+        public Block endingBlock => _endingBlock;
+
+        /// <summary>
+        /// 获取当前行最开始的块。
+        /// </summary>
+        /// <returns></returns>
+        public Block startingBlock {
+            get {
+                var block = _endingBlock;
+                if (block != null) {
+                    for (; block.parent != null && block.parent.startLine == this; block = block.parent)
+                        ;
+                }
+                return block;
+            }
+        }
+
+        ///// <summary>
+        ///// 获取属于从当前行开始的所有折叠块。
+        ///// </summary>
+        //public IEnumerable<Block> startBlocks {
+        //    get {
+        //        for (var block = _endingBlock; block != null && block.startLine == this; block = block.parent) {
+        //            yield return block;
+        //        }
+        //    }
+        //}
+
+        ///// <summary>
+        ///// 获取属于从当前行结束的所有折叠块。
+        ///// </summary>
+        //public IEnumerable<Block> endBlocks {
+        //    get {
+        //        for (var block = _endingBlock; block != null; block = block.parent) {
+        //            if (block.endLine == this) {
+        //                yield return block;
+        //            }
+        //        }
+        //    }
+        //}
+
+        //public IEnumerable<Block> blocks {
+        //    get {
+        //        return null;
+        //    }
+        //}
+
+        ///// <summary>
+        ///// 获取从当前行开始的最后一个已折叠的块。
+        ///// </summary>
+        ///// <returns>返回已折叠的块。</returns>
+        //public Block getCollapsedBlock() {
+        //    for (var block = _endingBlock; block != null && block.startLine == this; block = block.parent) {
+        //        if (block.collapsed) {
+        //            return block;
+        //        }
+        //    }
+        //    return null;
+        //}
+
         #endregion
 
     }
-
-
-    public struct DocumentLayoutInfo {
-
-        /// <summary>
-        /// 获取当前布局行第一个字符的垂直坐标。如果当前布局行被隐藏，则返回 -1。
-        /// </summary>
-        public int top;
-
-
-    }
-
-    ///// <summary>
-    ///// 表示一个布局信息元素。
-    ///// </summary>
-    //public abstract class DocumentLayoutElement {
-
-    //    /// <summary>
-    //    /// 获取同个布局行的下一个中断点。
-    //    /// </summary>
-    //    public LayoutBreakPoint next;
-
-    //    /// <summary>
-    //    /// 获取当前中断点的起始列。
-    //    /// </summary>
-    //    public abstract int startColumn {
-    //        get;
-    //    }
-
-    //    /// <summary>
-    //    /// 判断当前中断点是否是自动换行中断点。
-    //    /// </summary>
-    //    public abstract bool isWrapPoint {
-    //        get;
-    //    }
-
-    //}
-
-    ///// <summary>
-    ///// 表示一个片段类型。
-    ///// </summary>
-    //public enum SegmentType {
-
-    //    /// <summary>
-    //    /// 表示普通字符。
-    //    /// </summary>
-    //    word,
-
-    //    /// <summary>
-    //    /// 表示空格。
-    //    /// </summary>
-    //    space,
-
-    //    /// <summary>
-    //    /// 表示制表符。
-    //    /// </summary>
-    //    tab,
-
-    //}
-
-    ///// <summary>
-    ///// 表示一个行内的片段。
-    ///// </summary>
-    //[DebuggerStepThrough]
-    //public struct Segment {
-
-    //    /// <summary>
-    //    /// 获取当前片段的类型。
-    //    /// </summary>
-    //    public SegmentType type;
-
-    //    /// <summary>
-    //    /// 获取当前片段在行内的开始位置。
-    //    /// </summary>
-    //    public int startIndex;
-
-    //    /// <summary>
-    //    /// 获取当前片段在行内的结束位置。
-    //    /// </summary>
-    //    public int endIndex;
-
-    //    public Segment(SegmentType type, int startIndex, int endIndex) {
-    //        this.startIndex = startIndex;
-    //        this.endIndex = endIndex;
-    //        this.type = type;
-    //    }
-
-    //    public override string ToString() {
-    //        return $"{startIndex}-{endIndex}: {type}";
-    //    }
-    //}
 
 }

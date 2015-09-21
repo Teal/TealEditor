@@ -68,7 +68,7 @@ namespace Teal.CodeEditor {
         /// <param name="bottom">结束绘制的垂直位置。</param>
         public void draw(Graphics graphics, int top, int bottom) {
             _painter.beginPaint(graphics);
-            draw(0, top, bottom, 0, lines.length);
+            draw(0, top, bottom, 0, _document.lines.length);
             _painter.endPaint(graphics);
         }
 
@@ -90,17 +90,17 @@ namespace Teal.CodeEditor {
 
             // 如果存在对应的行，且当前行正在重绘区域内，则继续往下绘制。
             while (layoutInfo.line < endLine && layoutInfo.top < bottom) {
-                var documentLine = lines.data[layoutInfo.line];
+                var documentLine = _document.lines.data[layoutInfo.line];
 
                 // 确保行已经解析。
                 if (!documentLine.parsed) {
-                    parseSegments(layoutInfo.line);
+                   // parseSegments(layoutInfo.line);
                 }
 
                 // 绘制一行。
 
                 // 获取当前行内已折叠的代码域。
-                var block = documentLine.getCollapsedBlock();
+                var block = (Block)null; // documentLine.getCollapsedBlock();
                 if (block != null && block.startColumn > layoutInfo.column) {
 
                     // 绘制 折叠域 之前的文本。
@@ -110,7 +110,7 @@ namespace Teal.CodeEditor {
                     drawCollapsedBlock(ref layoutInfo, block);
 
                     // 更新行号。
-                    layoutInfo.line = lines.indexOf(block.endLine, layoutInfo.line);
+                    layoutInfo.line = _document.lines.indexOf(block.endLine, layoutInfo.line);
                     layoutInfo.column = block.endColumn;
 
                     Debug.Assert(layoutInfo.line >= 0, "block.endLine 指向了一个被删除的行。");
@@ -142,27 +142,27 @@ namespace Teal.CodeEditor {
             // NOTE: endColumn 必须是 segmentSplitter 所在位置。
 
             // 当前要绘制的行数据。
-            var documentLine = lines.data[layoutInfo.line];
+            var documentLine = _document.lines.data[layoutInfo.line];
 
             // 记录当前绘制的片段进度。
             var segmentSplitterIndex = 0;
 
             // 1. 跳过 layoutInfo.startIndex 之前的分割器，一般地，这些分割器是已被折叠的代码。
-            for (; segmentSplitterIndex < documentLine.segments.length && documentLine.segments.data[segmentSplitterIndex].index < layoutInfo.column; segmentSplitterIndex++)
+            for (; segmentSplitterIndex < documentLine.segmentSplitters.length && documentLine.segmentSplitters.data[segmentSplitterIndex].index < layoutInfo.column; segmentSplitterIndex++)
                 ;
 
             // 2. 绘制所有片段。
-            for (; segmentSplitterIndex < documentLine.segments.length; segmentSplitterIndex++) {
+            for (; segmentSplitterIndex < documentLine.segmentSplitters.length; segmentSplitterIndex++) {
 
                 // 判断是否超过限制。
-                var currentEnd = documentLine.segments.data[segmentSplitterIndex].index;
+                var currentEnd = documentLine.segmentSplitters.data[segmentSplitterIndex].index;
                 if (currentEnd > endColumn) {
-                    drawSegment(ref layoutInfo, endColumn, documentLine.segments.data[segmentSplitterIndex].type);
+                    drawSegment(ref layoutInfo, endColumn, documentLine.segmentSplitters.data[segmentSplitterIndex].type);
                     return;
                 }
 
                 // 绘制片段。
-                drawSegment(ref layoutInfo, currentEnd, documentLine.segments.data[segmentSplitterIndex].type);
+                drawSegment(ref layoutInfo, currentEnd, documentLine.segmentSplitters.data[segmentSplitterIndex].type);
             }
 
             // 绘制最后一块内容。
@@ -178,7 +178,7 @@ namespace Teal.CodeEditor {
         /// <param name="type">当前绘制使用的样式。</param>
         private void drawSegment(ref LayoutInfo layoutInfo, int endColumn, SegmentType type) {
 
-            var documentLine = lines.data[layoutInfo.line];
+            var documentLine = _document.lines.data[layoutInfo.line];
             var textData = documentLine.buffer.data;
 
             // 记录当前的最新值。
@@ -338,7 +338,7 @@ namespace Teal.CodeEditor {
             var wrapPoint = endIndex - 1;
 
             // 如果此字符是单词组成部分，则不强制分割单词，找到单词之前的首字符。
-            for (; wrapPoint > startIndex && syntaxBinding.isWordPart(textData[wrapPoint]); wrapPoint--) {
+            for (; wrapPoint > startIndex && _document.syntaxBinding.isWordPart(textData[wrapPoint]); wrapPoint--) {
                 Debug.Assert(textData[wrapPoint] != '\t', "TAB 不能是标识符");
                 Debug.Assert(textData[wrapPoint] != ' ', "空格不能是标识符");
             }
@@ -391,7 +391,7 @@ namespace Teal.CodeEditor {
                 drawWrap(layoutInfo.top, oldLeft);
 
                 var collapsedTextWidth = layoutInfo.left - oldLeft;
-                oldLeft = (lines.data[layoutInfo.line].indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
+                oldLeft = (_document.lines.data[layoutInfo.line].indentCount + configs.wrapIndentCount) * _painter.measureString(' ');
                 layoutInfo.top += _painter.lineHeight;
                 layoutInfo.left = oldLeft + collapsedTextWidth;
             }

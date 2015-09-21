@@ -64,7 +64,7 @@ namespace Teal.CodeEditor.Test {
 sasas
   // aaaa
  */    asasss // asdasd");
-            //ce.document.lines[0].segments.add(new SegmentSplitter() {
+            //ce.document.lines[0].segmentSplitters.add(new SegmentSplitter() {
             //    type = null,
             //    index = ce.document.lines[0].textLength
             //});

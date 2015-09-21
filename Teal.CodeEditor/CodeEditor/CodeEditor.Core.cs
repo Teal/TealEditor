@@ -14,7 +14,12 @@ namespace Teal.CodeEditor {
         /// 存储当前编辑器的文档。
         /// </summary>
         private Document _document = new Document();
-        
+
+        /// <summary>
+        /// 存储当前编辑器的文档视图。
+        /// </summary>
+        private DocumentView _view = new DocumentView();
+
         /// <summary>
         /// 获取或设置当前编辑器所编辑的文档。
         /// </summary>
@@ -37,10 +42,10 @@ namespace Teal.CodeEditor {
         /// </summary>
         public DocumentConfigs configs {
             get {
-                return _document.configs;
+                return _view.configs;
             }
             set {
-                _document.configs = value;
+                _view.configs = value;
             }
         }
 
@@ -137,7 +142,7 @@ namespace Teal.CodeEditor {
         /// </summary>
         /// <param name="e">包含事件数据的 <see cref="T:System.Windows.Forms.PaintEventArgs"/>。</param>
         protected override void OnPaint(PaintEventArgs e) {
-            document.draw(e.Graphics, e.ClipRectangle.Top, e.ClipRectangle.Bottom);
+            _view.draw(e.Graphics, e.ClipRectangle.Top, e.ClipRectangle.Bottom);
 
             return;
             //if (!e.ClipRectangle.IsEmpty) {
@@ -197,7 +202,7 @@ namespace Teal.CodeEditor {
         /// </summary>
         /// <param name="e">一个 <see cref="T:System.EventArgs"/>，其中包含事件数据。</param>
         protected override void OnResize(EventArgs e) {
-                document._offsetRight = Width;
+              //  document._offsetRight = Width;
              Invalidate();
             //return;
             //bool flag = this.gutter.InvalidateLineNumberArea(false);

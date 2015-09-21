@@ -35,7 +35,7 @@ namespace Teal.CodeEditor {
         /// <param name="top">返回显示的垂直位置。</param>
         /// <param name="foldingRange">如果当前行列号已被折叠，则返回所在折叠域。否则返回 <c>null</c>。</param>
         public void locationToPosition(int line, int column, out int left, out int top, out FoldingRange foldingRange) {
-
+            throw new NotImplementedException();
             //foldingRange = null;
 
             //// 获取保存对应行布局信息的行。
@@ -111,7 +111,7 @@ namespace Teal.CodeEditor {
         /// <param name="column">返回对应的列。</param>
         /// <param name="foldingRange">如果指定位置是一个折叠域，则返回所在折叠域。否则返回 <c>null</c>。</param>
         public void positionToLocation(int left, int top, out int line, out int column, out FoldingRange foldingRange) {
-
+            throw new NotImplementedException();
             //foldingRange = null;
 
             //// 根据 y 大致确定所在行。
@@ -296,5 +296,96 @@ namespace Teal.CodeEditor {
         #endregion
 
     }
+
+
+    public struct DocumentLayoutInfo {
+
+        /// <summary>
+        /// 获取当前布局行第一个字符的垂直坐标。如果当前布局行被隐藏，则返回 -1。
+        /// </summary>
+        public int top;
+
+
+    }
+
+    ///// <summary>
+    ///// 表示一个布局信息元素。
+    ///// </summary>
+    //public abstract class DocumentLayoutElement {
+
+    //    /// <summary>
+    //    /// 获取同个布局行的下一个中断点。
+    //    /// </summary>
+    //    public LayoutBreakPoint next;
+
+    //    /// <summary>
+    //    /// 获取当前中断点的起始列。
+    //    /// </summary>
+    //    public abstract int startColumn {
+    //        get;
+    //    }
+
+    //    /// <summary>
+    //    /// 判断当前中断点是否是自动换行中断点。
+    //    /// </summary>
+    //    public abstract bool isWrapPoint {
+    //        get;
+    //    }
+
+    //}
+
+    ///// <summary>
+    ///// 表示一个片段类型。
+    ///// </summary>
+    //public enum SegmentType {
+
+    //    /// <summary>
+    //    /// 表示普通字符。
+    //    /// </summary>
+    //    word,
+
+    //    /// <summary>
+    //    /// 表示空格。
+    //    /// </summary>
+    //    space,
+
+    //    /// <summary>
+    //    /// 表示制表符。
+    //    /// </summary>
+    //    tab,
+
+    //}
+
+    ///// <summary>
+    ///// 表示一个行内的片段。
+    ///// </summary>
+    //[DebuggerStepThrough]
+    //public struct Segment {
+
+    //    /// <summary>
+    //    /// 获取当前片段的类型。
+    //    /// </summary>
+    //    public SegmentType type;
+
+    //    /// <summary>
+    //    /// 获取当前片段在行内的开始位置。
+    //    /// </summary>
+    //    public int startIndex;
+
+    //    /// <summary>
+    //    /// 获取当前片段在行内的结束位置。
+    //    /// </summary>
+    //    public int endIndex;
+
+    //    public Segment(SegmentType type, int startIndex, int endIndex) {
+    //        this.startIndex = startIndex;
+    //        this.endIndex = endIndex;
+    //        this.type = type;
+    //    }
+
+    //    public override string ToString() {
+    //        return $"{startIndex}-{endIndex}: {type}";
+    //    }
+    //}
 
 }

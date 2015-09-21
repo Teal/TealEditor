@@ -70,7 +70,7 @@ namespace Teal.CodeEditor {
 
         //}
 
-        //public static int readLine(string value, int length, ref int index, out DocumentLineFlags newLine) {
+        //public static int readLine(string value, int length, ref int index, out DocumentFlags newLine) {
         //    for (var i = index; i < length; i++) {
         //        if (value[i] == '\r') {
         //            var c = i - index;
@@ -117,7 +117,7 @@ namespace Teal.CodeEditor {
 
         public static string newlineTypeToNewLine(DocumentLineFlags flags) {
             switch (flags) {
-                case DocumentLineFlags.newLineTypeWin:
+                case DocumentLineFlags.newLineTypeWindows:
                     return "\r\n";
                 case DocumentLineFlags.newLineTypeUnix:
                     return "\n";
@@ -127,7 +127,7 @@ namespace Teal.CodeEditor {
         }
 
         public static DocumentLineFlags newlineToNewLineType(string flags) {
-            return flags.Length != 1 ? DocumentLineFlags.newLineTypeWin : flags[0] == '\r' ? DocumentLineFlags.newLineTypeMac : DocumentLineFlags.newLineTypeUnix;
+            return flags.Length != 1 ? DocumentLineFlags.newLineTypeWindows : flags[0] == '\r' ? DocumentLineFlags.newLineTypeMac : DocumentLineFlags.newLineTypeUnix;
         }
 
 

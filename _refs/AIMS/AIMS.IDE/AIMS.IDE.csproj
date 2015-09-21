@@ -51,6 +51,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resources" />
     <EmbeddedResource Include="Test\Main.resources" />
+    <EmbeddedResource Include="Test\Main.resx">
+      <DependentUpon>Main.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
