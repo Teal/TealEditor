@@ -55,15 +55,18 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CodeEditor\CaretMode.cs" />
-    <Compile Include="Document\DocumentConfigs.cs" />
-    <Compile Include="Document\Editing\Document.Caret.cs" />
-    <Compile Include="Document\Editing\MoveOperation.cs" />
-    <Compile Include="Document\Folding\FoldBlockOperation.cs" />
+    <Compile Include="DocumentConfigs.cs" />
+    <Compile Include="DocumentView\DocumentView.Caret.cs" />
+    <Compile Include="DocumentView\MoveOperation.cs" />
+    <Compile Include="DocumentView\Folding\FoldBlockOperation.cs" />
+    <Compile Include="DocumentView\Folding\FoldingRange.cs" />
+    <Compile Include="DocumentView\DocumentView.Layout.cs" />
+    <Compile Include="DocumentView\VisualLine.cs" />
     <Compile Include="Document\Lines\DocumentLineFlags.cs" />
     <Compile Include="Document\Lines\SegmentSplitter.cs" />
-    <Compile Include="Document\Selection\Document.Selections.cs" />
-    <Compile Include="Document\Selection\Range.cs" />
-    <Compile Include="Document\Selection\Selection.cs" />
+    <Compile Include="DocumentView\Selection\Document.Selections.cs" />
+    <Compile Include="DocumentView\Selection\Range.cs" />
+    <Compile Include="DocumentView\Selection\Selection.cs" />
     <Compile Include="Document\Editing\Undo\UndoableOperations.cs" />
     <Compile Include="Document\Editing\Undo\UndoStack.cs" />
     <Compile Include="Document\SyntaxBinding\Block.cs" />
@@ -78,7 +81,7 @@
     <Compile Include="Utility\Location.cs" />
     <Compile Include="Utility\Utility.cs" />
     <Compile Include="Document\Lines\Document.Lines.cs" />
-    <Compile Include="Document\Rendering\Document.Rendering.cs" />
+    <Compile Include="DocumentView\DocumentView.Rendering.cs" />
     <Compile Include="Document\SyntaxBinding\BlockType.cs" />
     <Compile Include="Document\Lines\DocumentLine.cs" />
     <Compile Include="Document\SyntaxBinding\SegmentType.cs" />
@@ -94,12 +97,14 @@
     <Content Include="_bak.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Document\Rendering\Document.Scrolling.cs" />
+    <Compile Include="DocumentView\DocumentView.Scrolling.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Document\Editing\Document.Editing.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="DocumentView\Rendering\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -41,11 +41,6 @@ namespace Teal.CodeEditor {
         /// </summary>
         public int endColumn;
 
-        /// <summary>
-        /// 判断或设置当前块的折叠状态。
-        /// </summary>
-        public bool collapsed;
-
         public Block(Block parent, BlockType type, DocumentLine startLine, int startColumn) {
             this.parent = parent;
             this.type = type;
