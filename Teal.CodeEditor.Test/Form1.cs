@@ -69,6 +69,8 @@ sasas
             //    index = ce.document.lines[0].textLength
             //});
 
+         //   ce.document.load("../Teal.CodeEditor.Test/a.txt", Encoding.UTF8);
+
             Controls.Add(ce);
 
         }

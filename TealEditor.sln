@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeEditor.SyntaxDocument",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{764DACCF-D87A-401C-B96C-BCF44BD064BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICSharpCode.TextEditor", "_refs\other\ICSharpCode.TextEditor\Project\ICSharpCode.TextEditor.csproj", "{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{764DACCF-D87A-401C-B96C-BCF44BD064BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{764DACCF-D87A-401C-B96C-BCF44BD064BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{764DACCF-D87A-401C-B96C-BCF44BD064BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,5 +74,6 @@ Global
 		{94BFA44A-F4D0-4605-88E6-3ADD498F5E16} = {F7833274-8A4A-4270-B02A-8EE5771EF095}
 		{3814F627-858A-42A3-9AAF-CD649413F2A8} = {F7833274-8A4A-4270-B02A-8EE5771EF095}
 		{3F43BAB0-22B4-4FD6-9655-8BA214A093A5} = {F7833274-8A4A-4270-B02A-8EE5771EF095}
+		{2D18BE89-D210-49EB-A9DD-2246FBB3DF6D} = {F7833274-8A4A-4270-B02A-8EE5771EF095}
 	EndGlobalSection
 EndGlobal
