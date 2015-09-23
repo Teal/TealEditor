@@ -67,7 +67,7 @@ namespace Teal.CodeEditor {
         /// <summary>
         /// 执行一个删除单词操作。(默认地，按下“Ctrl+Delete”将执行此操作）
         /// </summary>
-        private void deleteWord() {
+        public void deleteWord() {
 
         }
 
@@ -268,6 +268,27 @@ namespace Teal.CodeEditor {
         /// </summary>
         public void redo() {
             // undoStack.redo(this);
+        }
+
+        /// <summary>
+        /// 执行一个向上滚动的操作。(默认地，按下“PageUp”将执行此操作）
+        /// </summary>
+        public void pageUp() {
+
+        }
+
+        /// <summary>
+        /// 执行一个向上滚动一页的操作。(默认地，按下“PageUp”将执行此操作）
+        /// </summary>
+        public void pageUpToView() {
+
+        }
+
+        /// <summary>
+        /// 执行一个转到行首的操作。(默认地，按下“Home”将执行此操作）
+        /// </summary>
+        public void gotoLineStart() {
+
         }
 
     }
