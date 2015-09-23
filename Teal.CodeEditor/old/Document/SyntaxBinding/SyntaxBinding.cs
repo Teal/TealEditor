@@ -118,6 +118,10 @@ namespace Teal.CodeEditor {
             
         }
 
+        public char getPairChar(char ch) {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// 获取当前语法关联的语句块
         /// </summary>

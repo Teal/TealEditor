@@ -48,6 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeEditor\CodeEditor.Editing.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="old\CodeEditor\CodeEditor.Actions.cs">
       <SubType>Component</SubType>
     </Compile>

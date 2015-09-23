@@ -141,20 +141,6 @@ namespace Teal.CodeEditor {
         #region 键盘命令
 
         /// <summary>
-        /// 对当前编辑器执行撤销操作。
-        /// </summary>
-        public void undo() {
-           // undoStack.undo(this);
-        }
-
-        /// <summary>
-        /// 对当前编辑器执行恢复操作。
-        /// </summary>
-        public void redo() {
-           // undoStack.redo(this);
-        }
-
-        /// <summary>
         /// 判断当前是否可进行撤销操作。
         /// </summary>
         public bool canUndo => document.undoStack.canUndo;
@@ -190,27 +176,6 @@ namespace Teal.CodeEditor {
         }
 
         /// <summary>
-        /// 执行复制操作。
-        /// </summary>
-        public void copy() {
-            Utility.mark();
-        }
-
-        /// <summary>
-        /// 执行剪切操作。
-        /// </summary>
-        public void cut() {
-            Utility.mark();
-        }
-
-        /// <summary>
-        /// 执行粘贴操作。
-        /// </summary>
-        public void paste() {
-            Utility.mark();
-        }
-
-        /// <summary>
         /// 执行一次缩进操作。
         /// </summary>
         public void indent() {
@@ -224,116 +189,6 @@ namespace Teal.CodeEditor {
 
         }
 
-        public void breakLine() {
-            
-        }
-
-        /// <summary>
-        /// 模拟用户输入一个字符。
-        /// </summary>
-        /// <param name="ch">要插入的字符。</param>
-        public void input(char ch) {
-            Utility.mark(ch);
-
-            //// 没有选区直接输入。
-            //if (_selections != null) {
-            //    replaceSelections(ch.ToString(), false);
-            //    return;
-            //}
-
-            //// 插入模式：插入字符。
-            //if (caretMode == CaretMode.insertMode || caretColumn >= document.lines[caretLine].length) {
-            //    addUndo(new InsertCharOperation(caretLine, caretColumn, ch));
-            //    document.insert(caretLine, caretColumn, ch);
-            //    moveRight();
-            //} else {
-            //    replace(caretLine, caretColumn, caretLine, caretColumn, caretLine, caretColumn + 1, ch.ToString());
-            //}
-
-        }
-
-        /// <summary>
-        /// 执行一个 DELETE 操作。
-        /// </summary>
-        public void delete() {
-
-            ////if (_selections == null) {
-            ////    deleteChar(_caretVisualLine, _caretColumn - 1);
-            ////    return;
-            ////}
-
-            //backspace();
-        }
-
-        private void deleteWord() {
-
-        }
-
-        /// <summary>
-        /// 执行一个退格键。
-        /// </summary>
-        public void backspace() {
-
-            //// 1. 删除选区。
-            //if (_selections != null) {
-            //    replaceSelections(String.Empty, false);
-            //    return;
-            //}
-
-            //var oldCaretLine = _caretLine;
-            //var oldCaretColumn = _caretColumn;
-
-            //switch (moveLeftCore()) {
-
-            //    // 2. 现在在某字符前，删除字符。
-            //    case MoveOperation.column:
-            //        addUndo(new BackCharOperation(oldCaretLine, oldCaretColumn, document.lines[_caretLine].chars[_caretColumn]));
-            //        document.delete(_caretLine, _caretColumn);
-            //        return;
-
-            //    // 3. 现在行首，删除整行。
-            //    case MoveOperation.line:
-            //        var nl = document.unbreakLine(oldCaretLine).newLine;
-            //        //addUndo(new UnbreakLineUndoableOperation(oldCaretLine, oldCaretColumn, document.lines[_caretLine].chars[_caretColumn]));
-            //        return;
-
-            //    // 4. 现在在某折叠域前，删除折叠域。
-            //    case MoveOperation.block:
-            //        return;
-
-            //    // 5. 现在在最开头，不操作。
-            //    default:
-            //        return;
-            //}
-
-            //// 其他情况。
-            ////addUndo(new DeleteBlockUndoableOperation() {
-            ////    line = startLine,
-            ////    column = startColumn,
-            ////    value = _document.getText(startLine, startColumn, endLine, endColumn),
-            ////    endLocation = new Point(endLine, endColumn)
-            ////});
-            //_document.deleteBlock(startLine, startColumn, endLine, endColumn);
-
-            //delete(_caretVisualLine, _caretColumn, oldCaretLine, oldCaretColumn, oldCaretLine, oldCaretColumn);
-
-            // 有选区先撤销选区。
-        }
-
-        private void backspaceWord() {
-
-            //if (_selections != null) {
-            //    replaceSelections(String.Empty, false);
-            //    return;
-            //}
-
-            //var oldCaretLine = caretLine;
-            //var oldCaretColumn = caretColumn;
-            //moveWordLeft();
-            //delete(oldCaretLine, oldCaretColumn, caretLine, caretColumn, oldCaretLine, oldCaretColumn);
-
-        }
-
         private void toggleComment() {
 
         }
@@ -342,23 +197,11 @@ namespace Teal.CodeEditor {
 
         }
 
-        private void selectAll() {
-
-        }
-
-        private void dumpLine() {
-
-        }
-
         private void scrollDown() {
 
         }
 
         public void scrollUp() {
-
-        }
-
-        public void moveLeft() {
 
         }
 
