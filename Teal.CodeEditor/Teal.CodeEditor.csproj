@@ -48,65 +48,65 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CodeEditor\CodeEditor.Actions.cs">
+    <Compile Include="old\CodeEditor\CodeEditor.Actions.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CodeEditor\CodeEditor.Editing.cs">
+    <Compile Include="old\CodeEditor\CodeEditor.Editing.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CodeEditor\CaretMode.cs" />
-    <Compile Include="DocumentConfigs.cs" />
-    <Compile Include="DocumentView\DocumentView.Caret.cs" />
-    <Compile Include="DocumentView\MoveOperation.cs" />
-    <Compile Include="DocumentView\Folding\FoldBlockOperation.cs" />
-    <Compile Include="DocumentView\Folding\FoldingRange.cs" />
-    <Compile Include="DocumentView\DocumentView.Layout.cs" />
-    <Compile Include="DocumentView\VisualLine.cs" />
-    <Compile Include="Document\Lines\DocumentLineFlags.cs" />
-    <Compile Include="Document\Lines\SegmentSplitter.cs" />
-    <Compile Include="DocumentView\Selection\Document.Selections.cs" />
-    <Compile Include="DocumentView\Selection\Range.cs" />
-    <Compile Include="DocumentView\Selection\Selection.cs" />
-    <Compile Include="Document\Lines\Undo\BlockOperation.cs" />
-    <Compile Include="Document\Lines\Undo\BreakLineOperation.cs" />
-    <Compile Include="Document\Lines\Undo\CharOperation.cs" />
-    <Compile Include="Document\Lines\Undo\UndoableOperations.cs" />
-    <Compile Include="Document\Lines\Undo\UndoStack.cs" />
-    <Compile Include="Document\SyntaxBinding\Block.cs" />
-    <Compile Include="Document\SyntaxBinding\Document.Syntax.cs" />
-    <Compile Include="Document\SyntaxBinding\InternalSegmentTypes.cs" />
-    <Compile Include="Document\SyntaxBinding\Pattern.cs" />
-    <Compile Include="CodeEditor\CodeEditor.Core.cs">
+    <Compile Include="old\CodeEditor\CaretMode.cs" />
+    <Compile Include="old\DocumentConfigs.cs" />
+    <Compile Include="old\DocumentView\DocumentView.Caret.cs" />
+    <Compile Include="old\DocumentView\MoveOperation.cs" />
+    <Compile Include="old\DocumentView\Folding\FoldBlockOperation.cs" />
+    <Compile Include="old\DocumentView\Folding\FoldingRange.cs" />
+    <Compile Include="old\DocumentView\DocumentView.Layout.cs" />
+    <Compile Include="old\DocumentView\VisualLine.cs" />
+    <Compile Include="old\Document\Lines\DocumentLineFlags.cs" />
+    <Compile Include="old\Document\Lines\SegmentSplitter.cs" />
+    <Compile Include="old\DocumentView\Selection\Document.Selections.cs" />
+    <Compile Include="old\DocumentView\Selection\Range.cs" />
+    <Compile Include="old\DocumentView\Selection\Selection.cs" />
+    <Compile Include="old\Document\Lines\Undo\BlockOperation.cs" />
+    <Compile Include="old\Document\Lines\Undo\BreakLineOperation.cs" />
+    <Compile Include="old\Document\Lines\Undo\CharOperation.cs" />
+    <Compile Include="old\Document\Lines\Undo\UndoableOperations.cs" />
+    <Compile Include="old\Document\Lines\Undo\UndoStack.cs" />
+    <Compile Include="old\Document\SyntaxBinding\Block.cs" />
+    <Compile Include="old\Document\SyntaxBinding\Document.Syntax.cs" />
+    <Compile Include="old\Document\SyntaxBinding\InternalSegmentTypes.cs" />
+    <Compile Include="old\Document\SyntaxBinding\Pattern.cs" />
+    <Compile Include="old\CodeEditor\CodeEditor.Core.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Utility\ArrayList.cs" />
-    <Compile Include="Document\Document.Core.cs" />
-    <Compile Include="Utility\Location.cs" />
-    <Compile Include="Utility\Utility.cs" />
-    <Compile Include="Document\Lines\Document.Lines.cs" />
-    <Compile Include="DocumentView\DocumentView.Rendering.cs" />
-    <Compile Include="Document\SyntaxBinding\BlockType.cs" />
-    <Compile Include="Document\Lines\DocumentLine.cs" />
-    <Compile Include="Document\SyntaxBinding\SegmentType.cs" />
-    <Compile Include="Utility\StringBuffer.cs" />
+    <Compile Include="old\Utility\ArrayList.cs" />
+    <Compile Include="old\Document\Document.Core.cs" />
+    <Compile Include="old\Utility\Location.cs" />
+    <Compile Include="old\Utility\Utility.cs" />
+    <Compile Include="old\Document\Lines\Document.Lines.cs" />
+    <Compile Include="old\DocumentView\DocumentView.Rendering.cs" />
+    <Compile Include="old\Document\SyntaxBinding\BlockType.cs" />
+    <Compile Include="old\Document\Lines\DocumentLine.cs" />
+    <Compile Include="old\Document\SyntaxBinding\SegmentType.cs" />
+    <Compile Include="old\Utility\StringBuffer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Document\SyntaxBinding\SyntaxBinding.cs" />
-    <Compile Include="Win32\Painter.cs" />
-    <Compile Include="Win32\Win32Api.GDI.cs" />
-    <Compile Include="Win32\Win32Api.GUI.cs" />
+    <Compile Include="old\Document\SyntaxBinding\SyntaxBinding.cs" />
+    <Compile Include="old\Win32\Painter.cs" />
+    <Compile Include="old\Win32\Win32Api.GDI.cs" />
+    <Compile Include="old\Win32\Win32Api.GUI.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="note.txt" />
-    <Content Include="_bak.txt" />
+    <Content Include="old\note.txt" />
+    <Content Include="old\_bak.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DocumentView\DocumentView.Scrolling.cs" />
+    <Compile Include="old\DocumentView\DocumentView.Scrolling.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Document\Document.Editing.cs" />
+    <Compile Include="old\Document\Document.Editing.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DocumentView\Rendering\" />
+    <Folder Include="old\DocumentView\Rendering\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

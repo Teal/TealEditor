@@ -55,6 +55,36 @@ namespace Teal.CodeEditor {
             return MoveOperation.none;
         }
 
+        /// <summary>
+        /// 执行删除操作。
+        /// </summary>
+        public void delete() {
+            beginUpdate();
+
+            if(hasSelections) {
+                
+            } else {
+                
+            }
+
+            endUpdate();
+        }
+
+        /// <summary>
+        /// 执行删除操作。
+        /// </summary>
+        public void input() {
+            beginUpdate();
+
+            if (hasSelections) {
+
+            } else {
+
+            }
+
+            endUpdate();
+        }
+
         ///// <summary>
         ///// 表示一个代码编辑器。
         ///// </summary>
