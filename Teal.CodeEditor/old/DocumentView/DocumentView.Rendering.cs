@@ -348,15 +348,6 @@ namespace Teal.CodeEditor {
         }
 
         /// <summary>
-        /// 计算加上 TAB 后新坐标。
-        /// </summary>
-        /// <param name="left">当前的左边距。</param>
-        /// <returns>返回添加 TAB 后的左边距。</returns>
-        private int alignTab(int left) {
-            return configs.tabWidth <= 0 ? left - configs.tabWidth : (left / configs.tabWidth + 1) * configs.tabWidth;
-        }
-
-        /// <summary>
         /// 当前编辑器代码区域（不含滚动条和边界）的实际宽度。
         /// </summary>
         private int _clientWidth;

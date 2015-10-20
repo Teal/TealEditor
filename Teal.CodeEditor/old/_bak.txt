@@ -1,4 +1,4 @@
-﻿
+
         #region 区域
 
         /// <summary>
@@ -49,34 +49,6 @@
 
         #endregion
 
-        /// <summary>
-        /// 计算加上指定字符串后新坐标。
-        /// </summary>
-        /// <param name="x">当前的左边距。</param>
-        /// <param name="s">追加的字符。</param>
-        /// <returns>返回添加指定字符后的新坐标。</returns>
-        public int alignString(int x, string s) {
-            for (var i = 0; i < s.Length; i++) {
-                x = alignChar(x, s[i]);
-            }
-            return x;
-        }
-
-        /// <summary>
-        /// 计算加上指定字符串后新坐标。
-        /// </summary>
-        /// <param name="x">当前的左边距。</param>
-        /// <param name="s">追加的字符数组。</param>
-        /// <param name="startIndex">开始的索引。</param>
-        /// <param name="endIndex">结束的索引。</param>
-        /// <returns>返回添加指定字符后的新坐标。</returns>
-        public int alignChars(int x, char[] chars, int startIndex, int endIndex) {
-            for (var i = startIndex; i < endIndex; i++) {
-                x = alignChar(x, chars[i]);
-            }
-            return x;
-        }
-		
         ///// <summary>
         ///// 在指定区域插入一个字符串。
         ///// </summary>
@@ -173,16 +145,6 @@
             _document.unbreakLine(line);
         }
 
-        /// <summary>
-        /// 计算加上指定字符后新坐标。
-        /// </summary>
-        /// <param name="left">当前的左边距。</param>
-        /// <param name="ch">追加的字符。</param>
-        /// <returns>返回添加指定字符后的新坐标。</returns>
-        private int alignChar(int left, char ch) {
-            return ch == '\t' ? alignTab(left) : (left + _painter.measureString(ch));
-        }
-		
     ///// <summary>
     ///// 表示移动光标的撤销操作。
     ///// </summary>
